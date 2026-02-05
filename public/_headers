@@ -1,0 +1,25 @@
+# CSP 配置
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# 允許載入外部圖片
+/img/*
+  Access-Control-Allow-Origin: *
+
+# 允許載入 Bilibili 頭像
+/i0.hdslb.com/*
+  Access-Control-Allow-Origin: *
+
+# 允許載入 R2 CDN 圖片
+/cdn.yuanbimu.top/*
+  Access-Control-Allow-Origin: *
+
+# 允許 Google Fonts
+/fonts.googleapis.com/*
+  Access-Control-Allow-Origin: *
+
+//fonts.gstatic.com/*
+  Access-Control-Allow-Origin: *
