@@ -20,7 +20,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install requests boto3 bilibili-api-python aiohttp
+        pip install requests boto3
 
     - name: Fetch Bilibili stats
       run: |
@@ -34,37 +34,18 @@ jobs:
       env:
         BILIBILI_UID: ${{ secrets.BILIBILI_UID }}
 
-    - name: Fetch dynamics
+    - name: Commit updated data
       run: |
-        python scripts/fetch-dynamics.py
-      env:
-        BILIBILI_UID: ${{ secrets.BILIBILI_UID }}
-        BILIBILI_SESSDATA: ${{ secrets.BILIBILI_SESSDATA }}
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add src/data/site-data.json
+        git commit -m "Update stats - $(date '+%Y-%m-%d %H:%M')" || echo "No changes to commit"
 
-    - name: Convert dynamics
+    - name: Push changes
       run: |
-        python scripts/convert-dynamics.py
+        git push origin master
       env:
-        CDN_DOMAIN: ${{ secrets.CDN_DOMAIN }}
-
-    - name: Upload images to R2
-      run: |
-        python scripts/upload-images.py
-      env:
-        R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
-        R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-        R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
-        CDN_DOMAIN: ${{ secrets.CDN_DOMAIN }}
-
-    - name: Upload data to R2
-      run: |
-        python scripts/upload-to-r2.py
-      env:
-        R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
-        R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-        R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Trigger Astro build
       run: |
