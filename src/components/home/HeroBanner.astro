@@ -2,6 +2,7 @@
 import siteData from '../../data/site-data.json';
 
 const { profile, stats, config } = siteData;
+const BILIBILI_MID = '3821157';
 ---
 
 <section id="hero" class="hero-section">
@@ -13,7 +14,15 @@ const { profile, stats, config } = siteData;
     <div class="hero-left">
       <div class="avatar-wrapper">
         <div class="avatar-glow"></div>
-        <img src={profile.avatar} alt={profile.name} class="avatar" loading="eager" decoding="async" onerror="this.src='https://placehold.co/400x400/C4A77D/FFFFFF?text=Lovely'" />
+        <img 
+          src={`https://api.bilibili.com/x/web-interface/card?mid=${BILIBILI_MID}`} 
+          alt={profile.name} 
+          class="avatar" 
+          loading="eager" 
+          decoding="async" 
+          id="hero-avatar"
+          onerror="this.src='https://placehold.co/400x400/C4A77D/FFFFFF?text=Lovely'" 
+        />
       </div>
 
       <div class="fans-card">
@@ -274,3 +283,41 @@ const { profile, stats, config } = siteData;
     }
   }
 </style>
+
+<script>
+  // 从 Bilibili API 获取头像
+  const BILIBILI_MID = '3821157';
+  
+  async function fetchBilibiliAvatar() {
+    try {
+      const response = await fetch(`https://api.bilibili.com/x/web-interface/card?mid=${BILIBILI_MID}`);
+      const data = await response.json();
+      
+      if (data.code === 0 && data.data && data.data.card && data.data.card.face) {
+        const avatarUrl = data.data.card.face;
+        const avatarImg = document.getElementById('hero-avatar') as HTMLImageElement | null;
+        if (avatarImg) {
+          avatarImg.src = avatarUrl;
+        }
+        
+        // 同时更新粉丝数
+        const fansCount = data.data.follower;
+        if (fansCount) {
+          const fansElement = document.querySelector('.fans-count');
+          if (fansElement) {
+            fansElement.textContent = `${(fansCount / 10000).toFixed(1)}w`;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch Bilibili avatar:', error);
+    }
+  }
+  
+  // 页面加载完成后获取头像
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fetchBilibiliAvatar);
+  } else {
+    fetchBilibiliAvatar();
+  }
+</script>
