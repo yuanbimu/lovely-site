@@ -5,13 +5,10 @@ import configData from '../../data/config.json';
 const { profile } = siteData;
 const { showcase } = configData;
 
-// 隨機選擇一張 showcase 圖片
+// 使用第一張 showcase 圖片
 const CDN_DOMAIN = 'cdn.yuanbimu.top';
-const randomShowcase = showcase.length > 0 
-  ? showcase[Math.floor(Math.random() * showcase.length)] 
-  : null;
-const randomImageUrl = randomShowcase 
-  ? `https://${CDN_DOMAIN}/showcase/${randomShowcase.image}` 
+const aboutImage = showcase.length > 0 
+  ? `https://${CDN_DOMAIN}/showcase/${showcase[0].image}` 
   : profile.avatar;
 ---
 
@@ -19,7 +16,7 @@ const randomImageUrl = randomShowcase
   <div class="about-layout">
     <div class="about-left">
       <div class="about-img-box">
-        <img src={randomImageUrl} alt={profile.name} loading="lazy" decoding="async" onerror="this.src='https://placehold.co/400x400/C4A77D/FFFFFF?text=Lovely'" />
+        <img src={aboutImage} alt={profile.name} loading="lazy" decoding="async" onerror="this.src='https://placehold.co/400x400/C4A77D/FFFFFF?text=Lovely'" />
         <div class="img-backdrop"></div>
       </div>
     </div>
