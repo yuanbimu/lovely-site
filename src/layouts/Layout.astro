@@ -46,28 +46,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://example.
   </style>
 </head>
 <body class="min-h-screen bg-bg-cream">
-  <!-- Skip to main content -->
-  <a href="#main-content" class="skip-link">跳转到主要内容</a>
-  
   <main id="main-content">
     <slot />
   </main>
 </body>
-</html>
-
-<style>
-  .skip-link {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    background: #6B5637;
-    color: white;
-    padding: 8px 16px;
-    z-index: 10000;
-    transition: top 0.3s;
-  }
-  
-  .skip-link:focus {
-    top: 0;
-  }
-</style>
