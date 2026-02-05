@@ -43,9 +43,5 @@ jobs:
         git add src/data/site-data.json public/images/avatar.webp
         git diff --staged --quiet || (git commit -m "Update avatar and stats [skip ci]" && git push)
 
-    - name: Upload to R2
-      run: |
-        curl -X PUT \
-          -H "Authorization: Bearer ${{ secrets.R2_ACCESS_KEY_ID }}:${{ secrets.R2_SECRET_ACCESS_KEY }}" \
-          --data-binary @src/data/site-data.json \
-          "${{ secrets.R2_ENDPOINT }}/${{ secrets.R2_BUCKET_NAME }}/data/site-data.json"
+    # 注意：頭像保存在 public/images/avatar.webp，隨 GitHub Pages 部署
+    # 不需要上傳到 R2
