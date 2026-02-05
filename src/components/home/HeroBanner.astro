@@ -1,0 +1,276 @@
+---
+import siteData from '../../data/site-data.json';
+
+const { profile, stats, config } = siteData;
+---
+
+<section id="hero" class="hero-section">
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="avatar-wrapper">
+        <div class="avatar-glow"></div>
+        <img src={profile.avatar} alt={profile.name} class="avatar" loading="eager" decoding="async" onerror="this.src='https://placehold.co/400x400/C4A77D/FFFFFF?text=Lovely'" />
+      </div>
+
+      <div class="fans-card">
+        <div class="fans-icon">
+          <svg viewBox="0 0 512 512" width="28" height="28" fill="#00aeec" aria-hidden="true">
+            <path fill="currentColor" d="M488.6 104.1c16.7 18.1 24.4 39.7 23.3 65.7v202.4c-.4 26.4-9.2 48.1-26.5 65.1c-17.2 17-39.1 25.9-65.5 26.7H92.02c-26.45-.8-48.21-9.8-65.28-27.2C9.682 419.4.767 396.5 0 368.2V169.8c.767-26 9.682-47.6 26.74-65.7C43.81 87.75 65.57 78.77 92.02 78h29.38L96.05 52.19c-5.75-5.73-8.63-13-8.63-21.79c0-8.8 2.88-16.06 8.63-21.797C101.8 2.868 109.1 0 117.9 0s16.1 2.868 21.9 8.603L213.1 78h88l74.5-69.397C381.7 2.868 389.2 0 398 0c8.8 0 16.1 2.868 21.9 8.603c5.7 5.737 8.6 12.997 8.6 21.797c0 8.79-2.9 16.06-8.6 21.79L394.6 78h29.3c26.4.77 48 9.75 64.7 26.1z"/>
+          </svg>
+        </div>
+        <div class="fans-info">
+          <span class="fans-label">B站粉丝</span>
+          <span class="fans-count">{stats.fans > 0 ? `${(stats.fans / 10000).toFixed(1)}w` : '--'}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <h1 class="site-title">{profile.name}</h1>
+      <p class="subtitle">{profile.bio}</p>
+
+      <div class="social-buttons">
+        <a href={profile.socials.bilibili} target="_blank" rel="noopener noreferrer" class="social-btn bilibili-btn">
+          <svg viewBox="0 0 512 512" width="20" height="20" fill="currentColor" aria-hidden="true">
+            <path d="M488.6 104.1c16.7 18.1 24.4 39.7 23.3 65.7v202.4c-.4 26.4-9.2 48.1-26.5 65.1c-17.2 17-39.1 25.9-65.5 26.7H92.02c-26.45-.8-48.21-9.8-65.28-27.2C9.682 419.4.767 396.5 0 368.2V169.8c.767-26 9.682-47.6 26.74-65.7C43.81 87.75 65.57 78.77 92.02 78h29.38L96.05 52.19c-5.75-5.73-8.63-13-8.63-21.79c0-8.8 2.88-16.06 8.63-21.797C101.8 2.868 109.1 0 117.9 0s16.1 2.868 21.9 8.603L213.1 78h88l74.5-69.397C381.7 2.868 389.2 0 398 0c8.8 0 16.1 2.868 21.9 8.603c5.7 5.737 8.6 12.997 8.6 21.797c0 8.79-2.9 16.06-8.6 21.79L394.6 78h29.3c26.4.77 48 9.75 64.7 26.1z"/>
+          </svg>
+          <span>B站主页</span>
+        </a>
+        {profile.socials.weibo && (
+          <a href={profile.socials.weibo} target="_blank" rel="noopener noreferrer" class="social-btn weibo-btn">
+            <svg viewBox="0 0 512 512" width="20" height="20" fill="currentColor" aria-hidden="true">
+              <path d="M407 177.6c7.6-24-13.4-46.8-37.4-41.7c-22 4.8-28.8-28.1-7.1-32.8c50.1-10.9 92.3 37.1 76.5 84.8c-6.8 21.2-38.8 10.8-32-10.3z"/>
+            </svg>
+            <span>微博</span>
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: linear-gradient(180deg, #FFF8F0 0%, #F5EDE3 30%, #E8F4FC 100%);
+  }
+
+  .bg-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+  }
+
+  .orb-1 {
+    width: 500px;
+    height: 500px;
+    background: linear-gradient(135deg, #E8D4C0 0%, #D4B896 100%);
+    top: -150px;
+    left: -150px;
+    opacity: 0.6;
+  }
+
+  .orb-2 {
+    width: 600px;
+    height: 600px;
+    background: linear-gradient(135deg, #D6EBF8 0%, #B3D9F2 100%);
+    bottom: -200px;
+    right: -200px;
+    opacity: 0.5;
+  }
+
+  .orb-3 {
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+    top: 50%;
+    right: 10%;
+    opacity: 0.2;
+  }
+
+  .hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 100px;
+    width: 100%;
+    max-width: 1100px;
+    padding: 60px 30px;
+    margin: 0 auto;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .avatar-wrapper {
+    position: relative;
+  }
+
+  .avatar-glow {
+    position: absolute;
+    inset: -25px;
+    background: linear-gradient(135deg, rgba(196, 167, 125, 0.5) 0%, rgba(122, 184, 232, 0.5) 100%);
+    border-radius: 50%;
+    filter: blur(35px);
+    z-index: -1;
+  }
+
+  .avatar {
+    width: 280px;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 8px solid white;
+    box-shadow: 0 20px 60px rgba(139, 111, 71, 0.25);
+  }
+
+  .fans-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 16px 28px;
+    border-radius: 50px;
+    box-shadow: 0 8px 30px rgba(139, 111, 71, 0.12);
+  }
+
+  .fans-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fans-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fans-label {
+    font-size: 13px;
+    color: #8B6F47;
+  }
+
+  .fans-count {
+    font-size: 26px;
+    font-weight: 700;
+    color: #00aeec;
+  }
+
+  .hero-right {
+    text-align: left;
+  }
+
+  .site-title {
+    font-size: 56px;
+    font-weight: 700;
+    color: #6B5637;
+    margin: 0 0 15px 0;
+    letter-spacing: 3px;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-size: 20px;
+    color: #8B6F47;
+    margin: 0 0 35px 0;
+    letter-spacing: 1px;
+  }
+
+  .social-buttons {
+    display: flex;
+    gap: 15px;
+  }
+
+  .social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .social-btn:focus {
+    outline: 3px solid #4A90D9;
+    outline-offset: 3px;
+  }
+
+  .bilibili-btn {
+    background: linear-gradient(135deg, #00aeec 0%, #0090d4 100%);
+    color: white;
+  }
+
+  .weibo-btn {
+    background: linear-gradient(135deg, #E6162D 0%, #c01224 100%);
+    color: white;
+  }
+
+  .social-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 1000px) {
+    .hero-content {
+      flex-direction: column;
+      text-align: center;
+      gap: 50px;
+      padding: 100px 25px 60px;
+    }
+
+    .hero-right {
+      text-align: center;
+    }
+
+    .social-buttons {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .avatar {
+      width: 220px;
+      height: 220px;
+    }
+
+    .site-title {
+      font-size: 40px;
+    }
+
+    .subtitle {
+      font-size: 17px;
+    }
+
+    .social-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .social-btn {
+      width: 100%;
+      max-width: 260px;
+      justify-content: center;
+    }
+  }
+</style>

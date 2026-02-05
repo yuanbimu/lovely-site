@@ -1,0 +1,74 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="关于 - 本站">
+  <Navigation />
+
+  <main class="about-page">
+    <section class="section-padding">
+      <div class="container text-center">
+        <h1 class="page-title">关于本站</h1>
+        <p class="page-desc">待建设</p>
+        <a href="/" class="back-btn">返回首页</a>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .about-page {
+    padding-top: 70px;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #FFF8F0 0%, #F5EDE3 100%);
+  }
+
+  .section-padding {
+    padding: 100px 20px;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .page-title {
+    font-size: 36px;
+    color: #6B5637;
+    margin: 0 0 15px 0;
+  }
+
+  .page-desc {
+    font-size: 16px;
+    color: #8B6F47;
+    margin: 0 0 30px 0;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .back-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(106, 76, 147, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    .page-title {
+      font-size: 28px;
+    }
+  }
+</style>

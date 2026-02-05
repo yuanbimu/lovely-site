@@ -1,0 +1,114 @@
+---
+import siteData from '../data/site-data.json';
+
+const { config, dynamics } = siteData;
+
+// 只显示前3条动态
+const recentDynamics = dynamics.slice(0, 3);
+---
+
+{config.showDynamics && recentDynamics.length > 0 && (
+  <section class="py-16 md:py-24 bg-gradient-to-b from-transparent to-[#F5EDE3]/30">
+    <div class="container-cute">
+      <!-- 标题 -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-2xl md:text-3xl font-bold text-[#6B5637] mb-2">最新动态</h2>
+          <p class="text-[#6B5637]/60">来自B站的最新分享</p>
+        </div>
+        
+        <a 
+          href="/dynamics" 
+          class="hidden sm:flex items-center text-[#4A90D9] font-medium hover:underline"
+        >
+          查看全部
+          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+      
+      <!-- 动态卡片列表 -->
+      <div class="space-y-4">
+        {recentDynamics.map(dynamic => (
+          <div class="card-cute p-6">
+            <div class="flex gap-4">
+              <!-- 头像 -->
+              <div class="flex-shrink-0">
+                <img 
+                  src="/images/Lovely.webp"
+                  alt="Avatar"
+                  class="w-12 h-12 rounded-xl object-cover"
+                />
+              </div>
+              
+              <div class="flex-1 min-w-0">
+                <!-- 头部信息 -->
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="font-bold text-[#6B5637]">{dynamic.author}</span>
+                  <span class="text-[#6B5637]/40 text-sm">·</span>
+                  <span class="text-[#6B5637]/40 text-sm">{dynamic.time}</span>
+                </div>
+                
+                <!-- 内容 -->
+                <p class="text-[#6B5637]/80 mb-3 line-clamp-2">{dynamic.content}</p>
+                
+                <!-- 图片预览 -->
+                {dynamic.images.length > 0 && (
+                  <div class="flex gap-2 mb-3">
+                    {dynamic.images.slice(0, 3).map(img => (
+                      <img 
+                        src={img}
+                        alt=""
+                        class="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg"
+                      />
+                    ))}
+                    {dynamic.images.length > 3 && (
+                      <div class="w-20 h-20 md:w-24 md:h-24 bg-[#F5EDE3] rounded-lg flex items-center justify-center text-[#6B5637]/60 text-sm">
+                        +{dynamic.images.length - 3}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                <!-- 统计 -->
+                <div class="flex items-center gap-4 text-sm text-[#6B5637]/50">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                    {dynamic.stats.likes}
+                  </span>
+                  
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                    {dynamic.stats.comments}
+                  </span>
+                  
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                    </svg>
+                    {dynamic.stats.reposts}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <!-- 移动端查看全部按钮 -->
+      <div class="mt-6 text-center sm:hidden">
+        <a 
+          href="/dynamics" 
+          class="btn-cute-secondary inline-flex"
+        >
+          查看全部动态
+        </a>
+      </div>
+    </div>
+  </section>
+)}

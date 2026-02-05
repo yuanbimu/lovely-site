@@ -1,0 +1,73 @@
+name: Update Site Data
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install requests boto3 bilibili-api-python aiohttp
+
+    - name: Fetch Bilibili stats
+      run: |
+        python scripts/fetch-stats.py
+      env:
+        BILIBILI_UID: ${{ secrets.BILIBILI_UID }}
+
+    - name: Check live status
+      run: |
+        python scripts/check-live.py
+      env:
+        BILIBILI_UID: ${{ secrets.BILIBILI_UID }}
+
+    - name: Fetch dynamics
+      run: |
+        python scripts/fetch-dynamics.py
+      env:
+        BILIBILI_UID: ${{ secrets.BILIBILI_UID }}
+        BILIBILI_SESSDATA: ${{ secrets.BILIBILI_SESSDATA }}
+
+    - name: Convert dynamics
+      run: |
+        python scripts/convert-dynamics.py
+      env:
+        CDN_DOMAIN: ${{ secrets.CDN_DOMAIN }}
+
+    - name: Upload images to R2
+      run: |
+        python scripts/upload-images.py
+      env:
+        R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+        R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+        R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+        CDN_DOMAIN: ${{ secrets.CDN_DOMAIN }}
+
+    - name: Upload data to R2
+      run: |
+        python scripts/upload-to-r2.py
+      env:
+        R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+        R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+        R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+
+    - name: Trigger Astro build
+      run: |
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+          "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/lovely-site/deployments"

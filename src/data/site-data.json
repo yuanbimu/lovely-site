@@ -1,0 +1,64 @@
+{
+  "config": {
+    "showDynamics": false,
+    "showLiveStatus": true,
+    "showFansCount": true
+  },
+  "site": {
+    "title": "東愛璃Lovely - 秧歌星的狍子窝",
+    "description": "東愛璃Lovely的非官方应援站",
+    "author": "東愛璃Lovely"
+  },
+  "profile": {
+    "name": "東愛璃Lovely",
+    "nickname": "狍子",
+    "avatar": "/images/Lovely.webp",
+    "bio": "温柔可爱的虚拟偶像，秧歌星的狍子",
+    "description": "大家好，这里是東愛璃Lovely，可以叫我狍子！",
+    "socials": {
+      "bilibili": "https://space.bilibili.com/3821157",
+      "weibo": "https://weibo.com/u/7802960328"
+    }
+  },
+  "stats": {
+    "fans": 0,
+    "lastUpdated": "2024-02-05"
+  },
+  "liveStatus": {
+    "isLive": false,
+    "title": "",
+    "url": "",
+    "lastChecked": "2024-02-05T00:00:00"
+  },
+  "dynamics": [
+    {
+      "id": "mock-001",
+      "type": "text",
+      "content": "今天也是元气满满的一天！💪 感谢大家的支持~",
+      "images": [],
+      "author": "東愛璃Lovely",
+      "time": "2024-02-05T10:30:00",
+      "stats": {
+        "likes": 1234,
+        "comments": 56,
+        "reposts": 23
+      }
+    },
+    {
+      "id": "mock-002",
+      "type": "image",
+      "content": "分享一张美图~",
+      "images": [
+        "https://placehold.co/600x400/8B6F47/FFFFFF?text=Sample+Image+1"
+      ],
+      "author": "東愛璃Lovely",
+      "time": "2024-02-04T15:20:00",
+      "stats": {
+        "likes": 2345,
+        "comments": 89,
+        "reposts": 45
+      }
+    }
+  ],
+  "articles": []
+}

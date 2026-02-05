@@ -1,0 +1,176 @@
+/**
+ * 设计系统 - 温馨可爱风格
+ * 主题：東愛璃Lovely
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* === 核心配色 === */
+    --brown-50: #FDF8F3;
+    --brown-100: #F5EDE3;
+    --brown-200: #E8D4C0;
+    --brown-300: #D4B896;
+    --brown-400: #C4A77D;
+    --brown-500: #8B6F47;
+    --brown-600: #6B5637;
+    --brown-700: #5C4A30;
+    --brown-800: #4A3B26;
+    --brown-900: #3D3020;
+
+    --blue-50: #F0F7FC;
+    --blue-100: #D6EBF8;
+    --blue-200: #B3D9F2;
+    --blue-300: #8AC4EA;
+    --blue-400: #7AB8E8;
+    --blue-500: #4A90D9;
+    --blue-600: #3A7BC8;
+    --blue-700: #2E5C8A;
+    --blue-800: #264A6E;
+    --blue-900: #1F3D5C;
+
+    --purple-100: #f3e8ff;
+    --purple-200: #d8b4fe;
+    --purple-300: #c084fc;
+    --purple-400: #a855f7;
+    --purple-500: #8b5cf6;
+    --purple-600: #7c3aed;
+    --purple-700: #6b21a8;
+
+    --gradient-warm: linear-gradient(135deg, #FFF8F0 0%, #F5EDE3 50%, #FAF0E8 100%);
+    --gradient-accent: linear-gradient(135deg, var(--brown-400) 0%, var(--blue-400) 100%);
+    --gradient-hero: linear-gradient(180deg, #FFF8F0 0%, #F5EDE3 30%, #E8F4FC 100%);
+    --gradient-purple: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+    --space-4xl: 6rem;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-2xl: 32px;
+    --radius-full: 9999px;
+
+    --shadow-xs: 0 1px 2px rgba(139, 111, 71, 0.05);
+    --shadow-sm: 0 2px 8px rgba(139, 111, 71, 0.08);
+    --shadow-md: 0 4px 16px rgba(139, 111, 71, 0.1);
+    --shadow-lg: 0 8px 32px rgba(139, 111, 71, 0.12);
+    --shadow-xl: 0 16px 48px rgba(139, 111, 71, 0.15);
+    --shadow-glow: 0 0 40px rgba(122, 184, 232, 0.3);
+
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+
+    --z-base: 0;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-modal: 300;
+    --z-popover: 400;
+    --z-tooltip: 500;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--gradient-warm);
+    background-attachment: fixed;
+    color: var(--brown-800);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--blue-200);
+    color: var(--brown-800);
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@layer components {
+  .container-cute {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .card-cute {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: var(--shadow-lg);
+    transition: all var(--duration-normal) ease;
+  }
+
+  .card-cute:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .divider-cute {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--brown-200), transparent);
+    border-radius: var(--radius-full);
+  }
+
+  .text-gradient-cute {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+@layer utilities {
+  .text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}

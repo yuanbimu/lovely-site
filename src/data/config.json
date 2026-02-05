@@ -1,0 +1,40 @@
+{
+  "showcase": [
+    {
+      "id": "model-1",
+      "name": "東愛璃Lovely",
+      "description": "最初的皮肤，梦开始的地方",
+      "image": "model-1.jpg"
+    },
+    {
+      "id": "model-2",
+      "name": "東愛璃1.0",
+      "description": "纯洁的女仆狗狗，启用于生日回",
+      "image": "model-2.jpg"
+    },
+    {
+      "id": "model-3",
+      "name": "東愛璃2.0",
+      "description": "触手萝莉，正式雌堕的里程碑",
+      "image": "model-3.jpg"
+    },
+    {
+      "id": "model-4",
+      "name": "東愛璃3.0",
+      "description": "军装符瑶，成熟温柔的大狗狗",
+      "image": "model-4.jpg"
+    },
+    {
+      "id": "model-5",
+      "name": "東愛璃4.0",
+      "description": "修女形象，首次采用四分之三视图",
+      "image": "model-5.jpg"
+    },
+    {
+      "id": "model-6",
+      "name": "東愛璃4.0 DLC",
+      "description": "修女形象的居家服版本",
+      "image": "model-6.jpg"
+    }
+  ]
+}

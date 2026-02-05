@@ -1,0 +1,356 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+import siteData from '../data/site-data.json';
+import dynamicsData from '../data/dynamics.json';
+
+const { config } = siteData;
+const allDynamics = dynamicsData;
+
+const ITEMS_PER_PAGE = 10;
+const currentPage = Astro.url.searchParams.get('page') ? parseInt(Astro.url.searchParams.get('page')) : 1;
+const totalPages = Math.ceil(allDynamics.length / ITEMS_PER_PAGE);
+const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+const paginatedDynamics = allDynamics.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+function getPageUrl(page: number) {
+  if (page === 1) return '/dynamics';
+  return `/dynamics?page=${page}`;
+}
+---
+
+<Layout title="动态 - 東愛璃Lovely">
+  <Navigation />
+
+  <main class="dynamics-page">
+    <section class="dynamics-section">
+      <div class="container-cute">
+        <div class="section-header text-center">
+          <span class="section-tag">Dynamics</span>
+          <h2>全部动态</h2>
+          <p class="section-desc">共 {allDynamics.length} 条动态</p>
+        </div>
+
+        {paginatedDynamics.length > 0 ? (
+          <>
+            <div class="dynamics-list">
+              {paginatedDynamics.map((dynamic) => (
+                <div class="dynamic-card">
+                  <div class="dynamic-header">
+                    <img src="/images/Lovely.webp" alt="Avatar" class="dynamic-avatar" onerror="this.src='https://placehold.co/80x80/C4A77D/FFFFFF?text=Lovely'" />
+                    <div class="dynamic-info">
+                      <span class="dynamic-author">{dynamic.author}</span>
+                      <span class="dynamic-time">{dynamic.time}</span>
+                    </div>
+                  </div>
+
+                  {dynamic.origin_user && (
+                    <div class="forward-header">
+                      <span class="forward-icon">🔄</span>
+                      <span>转发 @{dynamic.origin_user}</span>
+                    </div>
+                  )}
+
+                  <div class="dynamic-content">
+                    <p class="content-text">{dynamic.content}</p>
+                  </div>
+
+                  {dynamic.origin_content && (
+                    <div class="origin-content">
+                      <p>{dynamic.origin_content}</p>
+                    </div>
+                  )}
+
+                  {(dynamic.images.length > 0 || dynamic.origin_images?.length > 0) && (
+                    <div class="dynamic-images">
+                      {(dynamic.images.length > 0 ? dynamic.images : dynamic.origin_images).map((img) => (
+                        <img src={img} alt="" class="dynamic-image" onerror="this.style.display='none'" />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div class="pagination">
+                {currentPage > 1 && (
+                  <a href={getPageUrl(currentPage - 1)} class="page-btn">
+                    ← 上一页
+                  </a>
+                )}
+
+                <div class="page-numbers">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <a
+                      href={getPageUrl(page)}
+                      class={`page-number ${page === currentPage ? 'active' : ''}`}
+                    >
+                      {page}
+                    </a>
+                  ))}
+                </div>
+
+                {currentPage < totalPages && (
+                  <a href={getPageUrl(currentPage + 1)} class="page-btn">
+                    下一页 →
+                  </a>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <div class="empty-state">
+            <p>暂无动态</p>
+            <a href="/" class="btn-back">返回首页</a>
+          </div>
+        )}
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .dynamics-page {
+    padding-top: 70px;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #FFF8F0 0%, #F5EDE3 100%);
+  }
+
+  .dynamics-section {
+    padding: 80px 20px;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .section-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 15px;
+  }
+
+  .section-header h2 {
+    font-size: 36px;
+    color: #6B5637;
+    margin: 0 0 10px 0;
+  }
+
+  .section-desc {
+    color: #8B6F47;
+    font-size: 14px;
+  }
+
+  .dynamics-list {
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .dynamic-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(139, 111, 71, 0.1);
+  }
+
+  .dynamic-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .dynamic-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+
+  .dynamic-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .dynamic-author {
+    font-weight: 600;
+    color: #6B5637;
+    font-size: 16px;
+  }
+
+  .dynamic-time {
+    font-size: 13px;
+    color: #8B6F47;
+  }
+
+  .forward-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background: rgba(196, 167, 125, 0.1);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #6B5637;
+  }
+
+  .forward-icon {
+    font-size: 16px;
+  }
+
+  .origin-content {
+    padding: 15px;
+    background: rgba(196, 167, 125, 0.05);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #6B5637;
+    line-height: 1.6;
+  }
+
+  .dynamic-content {
+    margin-bottom: 15px;
+  }
+
+  .content-text {
+    color: #6B5637;
+    line-height: 1.7;
+    font-size: 15px;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+
+  .dynamic-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .dynamic-image {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+  .dynamic-image:hover {
+    transform: scale(1.02);
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 50px;
+    padding: 20px 0;
+  }
+
+  .page-numbers {
+    display: flex;
+    gap: 8px;
+  }
+
+  .page-number,
+  .page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .page-number {
+    background: rgba(255, 255, 255, 0.9);
+    color: #6B5637;
+    border: 2px solid transparent;
+  }
+
+  .page-number.active {
+    background: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+    color: white;
+  }
+
+  .page-number:hover:not(.active),
+  .page-btn:hover {
+    background: rgba(157, 132, 183, 0.2);
+    color: #6a4c93;
+  }
+
+  .page-btn {
+    background: rgba(255, 255, 255, 0.9);
+    color: #6B5637;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #8B6F47;
+  }
+
+  .btn-back {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 500;
+    transition: transform 0.3s ease;
+  }
+
+  .btn-back:hover {
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .section-header h2 {
+      font-size: 28px;
+    }
+
+    .dynamics-list {
+      gap: 20px;
+    }
+
+    .dynamic-card {
+      padding: 20px;
+    }
+
+    .pagination {
+      flex-wrap: wrap;
+    }
+
+    .page-numbers {
+      order: -1;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+</style>

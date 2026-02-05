@@ -1,0 +1,265 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="footer-decoration">
+    <div class="deco-orb deco-1"></div>
+    <div class="deco-orb deco-2"></div>
+  </div>
+
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">東愛璃Lovely</div>
+        <p class="footer-desc">
+          東愛璃Lovely的非官方应援站
+        </p>
+        <p class="license-text">
+          内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">CC BY-NC-SA 4.0</a> 协议<br>
+          Made with 💙 by 秧歌星
+        </p>
+      </div>
+
+      <div class="footer-links">
+        <h4>站点状态</h4>
+        <p class="copyright">© {currentYear} 東愛璃Lovely应援站</p>
+        <a href="https://icp.gov.moe/?keyword=20250130" target="_blank" class="icp-link">ICP备案</a>
+      </div>
+
+      <div class="footer-colors">
+        <h4>主题配色</h4>
+        <div class="palette-grid">
+          <div class="color-dot-wrapper">
+            <div class="color-dot" style="background: linear-gradient(135deg, #6a4c93, #9d84b7);"></div>
+            <span>#6a4c93</span>
+          </div>
+          <div class="color-dot-wrapper">
+            <div class="color-dot" style="background: linear-gradient(135deg, #C4A77D, #D4B896);"></div>
+            <span>#C4A77D</span>
+          </div>
+          <div class="color-dot-wrapper">
+            <div class="color-dot" style="background: linear-gradient(135deg, #7AB8E8, #B3D9F2);"></div>
+            <span>#7AB8E8</span>
+          </div>
+          <div class="color-dot-wrapper">
+            <div class="color-dot" style="background: linear-gradient(135deg, #f9f7fc, #FFF8F0); border: 1px solid #E8D4C0;"></div>
+            <span>#FFF8F0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-divider"></div>
+
+    <div class="footer-bottom">
+      <p>Powered by Astro</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    background: linear-gradient(180deg, #F5EDE3 0%, #FAF6F0 50%, #FFF8F0 100%);
+    border-top: 1px solid rgba(196, 167, 125, 0.2);
+    padding: 70px 20px 40px;
+    overflow: hidden;
+  }
+
+  .footer-decoration {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .deco-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.3;
+  }
+
+  .deco-1 {
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, #E8D4C0 0%, #C4A77D 100%);
+    top: -100px;
+    left: -100px;
+  }
+
+  .deco-2 {
+    width: 350px;
+    height: 350px;
+    background: linear-gradient(135deg, #D6EBF8 0%, #B3D9F2 100%);
+    bottom: -100px;
+    right: -100px;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 50px;
+    margin-bottom: 50px;
+  }
+
+  .footer-brand {
+    padding-right: 30px;
+  }
+
+  .footer-logo {
+    font-size: 26px;
+    font-weight: 700;
+    color: #6B5637;
+    margin-bottom: 18px;
+    letter-spacing: 2px;
+  }
+
+  .footer-desc {
+    color: #8B6F47;
+    font-size: 15px;
+    line-height: 1.8;
+    margin: 0 0 15px 0;
+  }
+
+  .license-text {
+    color: #8B6F47;
+    font-size: 13px;
+    opacity: 0.7;
+    line-height: 1.7;
+  }
+
+  .license-text a {
+    color: #6B5637;
+    text-decoration: none;
+  }
+
+  .license-text a:hover {
+    text-decoration: underline;
+  }
+
+  .footer-links h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #6B5637;
+    margin: 0 0 18px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(196, 167, 125, 0.3);
+    display: inline-block;
+  }
+
+  .copyright {
+    color: #8B6F47;
+    font-size: 14px;
+    margin: 0 0 12px 0;
+  }
+
+  .icp-link {
+    display: inline-block;
+    color: #6B5637;
+    font-size: 13px;
+    text-decoration: none;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .icp-link:hover {
+    background: rgba(255, 255, 255, 0.8);
+    transform: translateY(-2px);
+  }
+
+  .footer-colors h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #6B5637;
+    margin: 0 0 18px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(196, 167, 125, 0.3);
+    display: inline-block;
+  }
+
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .color-dot-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .color-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .color-dot-wrapper span {
+    font-size: 12px;
+    color: #6B5637;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-weight: 500;
+  }
+
+  .footer-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(196, 167, 125, 0.3), transparent);
+    margin: 30px 0;
+  }
+
+  .footer-bottom {
+    text-align: center;
+  }
+
+  .footer-bottom p {
+    color: #8B6F47;
+    font-size: 13px;
+    margin: 0;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 900px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .footer-brand {
+      grid-column: span 2;
+      padding-right: 0;
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 35px;
+    }
+
+    .footer-brand {
+      grid-column: span 1;
+    }
+
+    .palette-grid {
+      justify-content: center;
+    }
+
+    .color-dot-wrapper {
+      justify-content: center;
+    }
+  }
+</style>

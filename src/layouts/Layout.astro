@@ -1,0 +1,73 @@
+---
+const { title, description, image = '/images/Lovely.webp' } = Astro.props;
+const siteData = await import('../data/site-data.json');
+const { site, profile } = siteData.default;
+const pageTitle = title || site.title;
+const pageDesc = description || site.description;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://example.com').toString();
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content={pageDesc}>
+  <meta name="keywords" content="東愛璃Lovely, 狍子, 虚拟偶像, Vtuber, B站, 应援站">
+  <meta name="author" content={site.author}>
+  <meta name="theme-color" content="#6B5637">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href={canonicalURL}>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content={canonicalURL}>
+  <meta property="og:title" content={pageTitle}>
+  <meta property="og:description" content={pageDesc}>
+  <meta property="og:image" content={new URL(image, Astro.site || 'https://example.com').toString()}>
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:site_name" content={site.title}>
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content={canonicalURL}>
+  <meta property="twitter:title" content={pageTitle}>
+  <meta property="twitter:description" content={pageDesc}>
+  <meta property="twitter:image" content={new URL(image, Astro.site || 'https://example.com').toString()}>
+  
+  <title>{pageTitle}</title>
+  
+  <style>
+    @import '../styles/global.css';
+  </style>
+</head>
+<body class="min-h-screen bg-bg-cream">
+  <!-- Skip to main content -->
+  <a href="#main-content" class="skip-link">跳转到主要内容</a>
+  
+  <main id="main-content">
+    <slot />
+  </main>
+</body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #6B5637;
+    color: white;
+    padding: 8px 16px;
+    z-index: 10000;
+    transition: top 0.3s;
+  }
+  
+  .skip-link:focus {
+    top: 0;
+  }
+</style>

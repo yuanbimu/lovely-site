@@ -1,0 +1,232 @@
+---
+import siteData from '../../data/site-data.json';
+
+const { profile } = siteData;
+---
+
+<section id="about" class="about-section">
+  <div class="about-layout">
+    <div class="about-left">
+      <div class="about-img-box">
+        <img src={profile.avatar} alt={profile.name} loading="lazy" decoding="async" onerror="this.src='https://placehold.co/400x400/C4A77D/FFFFFF?text=Lovely'" />
+        <div class="img-backdrop"></div>
+      </div>
+    </div>
+
+    <div class="about-right">
+      <div class="about-header">
+        <span class="section-tag">About</span>
+        <h2>关于 {profile.name}</h2>
+      </div>
+
+      <div class="about-text">
+        <p>{profile.description}</p>
+        <p>温柔可爱的虚拟偶像，秧歌星的狍子。</p>
+        <p>喜欢唱歌、玩游戏、出cos！</p>
+        <p>感谢每一位粉丝的支持！</p>
+      </div>
+
+      <div class="friend-links">
+        <a href="#" target="_blank" rel="noopener noreferrer" class="link-card">
+          <div class="link-icon">📖</div>
+          <div class="link-info">
+            <h4>萌娘百科</h4>
+            <p>查看更详细的设定</p>
+          </div>
+        </a>
+        <a href="#" target="_blank" rel="noopener noreferrer" class="link-card">
+          <div class="link-icon">💬</div>
+          <div class="link-info">
+            <h4>QQ粉丝群</h4>
+            <p>加入我们</p>
+          </div>
+        </a>
+        <a href="#" target="_blank" rel="noopener noreferrer" class="link-card">
+          <div class="link-icon">👑</div>
+          <div class="link-info">
+            <h4>库鲁Kuru</h4>
+            <p>符瑶的主人(?)</p>
+          </div>
+        </a>
+        <a href="#" target="_blank" rel="noopener noreferrer" class="link-card">
+          <div class="link-icon">🎬</div>
+          <div class="link-info">
+            <h4>直播切片</h4>
+            <p>心碎丝瓜滞留地</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-section {
+    padding: 100px 30px;
+    background: linear-gradient(180deg, #FAF6F0 0%, #F5EDE3 50%, #FDF8F3 100%);
+  }
+
+  .about-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 80px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .about-left {
+    flex-shrink: 0;
+  }
+
+  .about-img-box {
+    position: relative;
+  }
+
+  .about-img-box img {
+    width: 380px;
+    height: 480px;
+    object-fit: cover;
+    border-radius: 24px;
+    box-shadow: 0 25px 80px rgba(139, 111, 71, 0.2);
+    position: relative;
+    z-index: 2;
+  }
+
+  .img-backdrop {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    right: -30px;
+    bottom: -30px;
+    background: linear-gradient(135deg, #C4A77D 0%, #7AB8E8 50%, #9d84b7 100%);
+    border-radius: 24px;
+    z-index: 1;
+    opacity: 0.2;
+    filter: blur(20px);
+  }
+
+  .about-right {
+    max-width: 500px;
+  }
+
+  .about-header {
+    margin-bottom: 30px;
+  }
+
+  .section-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+  }
+
+  .about-right h2 {
+    font-size: 42px;
+    color: #6B5637;
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .about-text {
+    margin-bottom: 35px;
+  }
+
+  .about-text p {
+    font-size: 17px;
+    color: #6B5637;
+    line-height: 1.9;
+    margin: 0 0 12px 0;
+  }
+
+  .friend-links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .link-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 16px 20px;
+    border-radius: 16px;
+    text-decoration: none;
+    box-shadow: 0 4px 20px rgba(139, 111, 71, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .link-card:focus {
+    outline: 3px solid #4A90D9;
+    outline-offset: 3px;
+  }
+
+  .link-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 35px rgba(139, 111, 71, 0.15);
+  }
+
+  .link-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #F5EDE3 0%, #E8D4C0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .link-info h4 {
+    font-size: 15px;
+    color: #6B5637;
+    margin: 0 0 3px 0;
+    font-weight: 600;
+  }
+
+  .link-info p {
+    font-size: 12px;
+    color: #8B6F47;
+    margin: 0;
+  }
+
+  @media (max-width: 1000px) {
+    .about-layout {
+      flex-direction: column;
+      gap: 60px;
+      text-align: center;
+    }
+
+    .friend-links {
+      justify-items: center;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .about-img-box img {
+      width: 280px;
+      height: 350px;
+    }
+
+    .about-right h2 {
+      font-size: 32px;
+    }
+
+    .about-text p {
+      font-size: 15px;
+    }
+
+    .friend-links {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

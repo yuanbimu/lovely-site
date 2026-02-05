@@ -1,0 +1,173 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+import siteData from '../data/site-data.json';
+
+const { profile } = siteData;
+
+const officialLinks = [
+  {
+    title: 'Bilibili',
+    url: profile.socials.bilibili,
+    description: '東愛璃Lovely的官方B站空间',
+    color: '#00AEEC'
+  },
+  {
+    title: '微博',
+    url: profile.socials.weibo,
+    description: '官方微博账号',
+    color: '#E6162D'
+  }
+];
+---
+
+<Layout title="链接 - 東愛璃Lovely">
+  <Navigation />
+
+  <main class="links-page">
+    <section class="links-section">
+      <div class="container-cute">
+        <div class="section-header text-center">
+          <span class="section-tag">Links</span>
+          <h2>相关链接</h2>
+        </div>
+
+        <div class="links-grid">
+          {officialLinks.map(link => (
+            <a href={link.url} target="_blank" class="link-card">
+              <div class="link-icon" style={`background: ${link.color}`}>
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="white">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+              </div>
+              <div class="link-content">
+                <h4>{link.title}</h4>
+                <p>{link.description}</p>
+              </div>
+              <div class="link-arrow">→</div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .links-page {
+    padding-top: 70px;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #FFF8F0 0%, #F5EDE3 100%);
+  }
+
+  .links-section {
+    padding: 80px 20px;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .section-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 15px;
+  }
+
+  .section-header h2 {
+    font-size: 36px;
+    color: #6B5637;
+    margin: 0;
+  }
+
+  .links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .link-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 20px 25px;
+    border-radius: 16px;
+    text-decoration: none;
+    box-shadow: 0 4px 20px rgba(139, 111, 71, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .link-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(139, 111, 71, 0.15);
+  }
+
+  .link-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .link-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .link-content h4 {
+    font-size: 18px;
+    color: #6B5637;
+    margin: 0 0 5px 0;
+  }
+
+  .link-content p {
+    font-size: 14px;
+    color: #8B6F47;
+    margin: 0;
+  }
+
+  .link-arrow {
+    font-size: 20px;
+    color: #C4A77D;
+    transition: transform 0.3s ease;
+  }
+
+  .link-card:hover .link-arrow {
+    transform: translateX(5px);
+  }
+
+  @media (max-width: 768px) {
+    .section-header h2 {
+      font-size: 28px;
+    }
+
+    .links-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .link-card {
+      padding: 15px 20px;
+    }
+
+    .link-icon {
+      width: 48px;
+      height: 48px;
+    }
+  }
+</style>
