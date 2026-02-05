@@ -20,7 +20,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install requests boto3
+        pip install requests
 
     - name: Fetch Bilibili stats
       run: |
@@ -34,21 +34,9 @@ jobs:
       env:
         BILIBILI_UID: ${{ secrets.BILIBILI_UID }}
 
-    - name: Commit updated data
+    - name: Upload to R2
       run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git add src/data/site-data.json
-        git commit -m "Update stats - $(date '+%Y-%m-%d %H:%M')" || echo "No changes to commit"
-
-    - name: Push changes
-      run: |
-        git push origin master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Trigger Astro build
-      run: |
-        curl -X POST \
-          -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-          "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/lovely-site/deployments"
+        curl -X PUT \
+          -H "Authorization: Bearer ${{ secrets.R2_ACCESS_KEY_ID }}:${{ secrets.R2_SECRET_ACCESS_KEY }}" \
+          --data-binary @src/data/site-data.json \
+          "${{ secrets.R2_ENDPOINT }}/${{ secrets.R2_BUCKET_NAME }}/data/site-data.json"
