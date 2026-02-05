@@ -8,6 +8,8 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout code
@@ -33,6 +35,13 @@ jobs:
         python scripts/check-live.py
       env:
         BILIBILI_UID: ${{ secrets.BILIBILI_UID }}
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add src/data/site-data.json public/images/avatar.webp
+        git diff --staged --quiet || (git commit -m "Update avatar and stats [skip ci]" && git push)
 
     - name: Upload to R2
       run: |
