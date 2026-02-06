@@ -1,0 +1,113 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+---
+
+<PageLayout title="服务器错误 - 東愛璃Lovely" pageClass="error-page">
+  <section class="error-section">
+    <div class="container-cute">
+      <div class="error-content">
+        <div class="error-icon">🔧</div>
+        <h1 class="error-code">500</h1>
+        <h2 class="error-title">服务器开小差了~</h2>
+        <p class="error-desc">
+          就像狍子正在休息，服务器也需要一点时间
+          <br />
+          请稍后再试，或者联系管理员
+        </p>
+        <a href="/" class="btn-home">
+          🏠 返回首页
+        </a>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .error-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, #FFF8F0 0%, #F5EDE3 100%);
+    padding-top: 70px;
+  }
+
+  .error-section {
+    padding: 80px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 70px);
+  }
+
+  .error-content {
+    text-align: center;
+    max-width: 500px;
+  }
+
+  .error-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: spin 4s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .error-code {
+    font-size: 120px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    line-height: 1;
+    background: linear-gradient(135deg, #E6162D 0%, #c01224 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .error-title {
+    font-size: 28px;
+    color: #6B5637;
+    margin: 0 0 15px 0;
+  }
+
+  .error-desc {
+    font-size: 16px;
+    color: #8B6F47;
+    margin: 0 0 30px 0;
+    line-height: 1.6;
+  }
+
+  .btn-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 32px;
+    background: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 6px 20px rgba(157, 132, 183, 0.3);
+  }
+
+  .btn-home:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(157, 132, 183, 0.4);
+  }
+
+  @media (max-width: 600px) {
+    .error-code {
+      font-size: 80px;
+    }
+
+    .error-title {
+      font-size: 22px;
+    }
+
+    .error-icon {
+      font-size: 60px;
+    }
+  }
+</style>

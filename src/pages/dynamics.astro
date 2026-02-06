@@ -10,9 +10,24 @@ const { config } = siteData;
 const allDynamics = dynamicsData;
 
 const ITEMS_PER_PAGE = SITE_CONFIG.pagination.dynamicsPerPage;
-const currentPage = Astro.url.searchParams.get('page') ? parseInt(Astro.url.searchParams.get('page')) : 1;
-const totalPages = Math.ceil(allDynamics.length / ITEMS_PER_PAGE);
-const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+
+// 分页参数验证
+function getValidPageNumber(): number {
+  const pageParam = Astro.url.searchParams.get('page');
+  if (!pageParam) return 1;
+  
+  const parsed = parseInt(pageParam, 10);
+  if (isNaN(parsed) || parsed < 1) return 1;
+  
+  return parsed;
+}
+
+const currentPage = getValidPageNumber();
+const totalPages = Math.max(1, Math.ceil(allDynamics.length / ITEMS_PER_PAGE));
+
+// 如果页码超出范围，重置为有效页码
+const validPage = Math.min(currentPage, totalPages);
+const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
 const paginatedDynamics = allDynamics.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
 function getPageUrl(page: number) {
@@ -39,7 +54,7 @@ function getPageUrl(page: number) {
               {paginatedDynamics.map((dynamic) => (
                 <div class="dynamic-card">
                   <div class="dynamic-header">
-                    <img src="/images/Lovely.webp" alt="Avatar" class="dynamic-avatar" onerror="this.src='https://placehold.co/80x80/C4A77D/FFFFFF?text=Lovely'" />
+                    <img src="/images/Lovely.webp" alt="東愛璃Lovely 头像" class="dynamic-avatar" width="50" height="50" loading="lazy" decoding="async" onerror="this.src='https://placehold.co/80x80/C4A77D/FFFFFF?text=Lovely'" />
                     <div class="dynamic-info">
                       <span class="dynamic-author">{dynamic.author}</span>
                       <span class="dynamic-time">{dynamic.time}</span>
@@ -65,8 +80,8 @@ function getPageUrl(page: number) {
 
                   {(dynamic.images.length > 0 || dynamic.origin_images?.length > 0) && (
                     <div class="dynamic-images">
-                      {(dynamic.images.length > 0 ? dynamic.images : dynamic.origin_images).map((img) => (
-                        <img src={img} alt="" class="dynamic-image" onerror="this.style.display='none'" />
+                      {(dynamic.images.length > 0 ? dynamic.images : dynamic.origin_images).map((img: string, index: number) => (
+                        <img src={img} alt={`动态图片 ${index + 1}`} class="dynamic-image" width="150" height="150" loading="lazy" decoding="async" onerror="this.style.display='none'" />
                       ))}
                     </div>
                   )}

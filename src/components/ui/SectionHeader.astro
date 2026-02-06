@@ -1,0 +1,51 @@
+---
+interface Props {
+  tag: string;
+  title: string;
+  description?: string;
+}
+
+const { tag, title, description } = Astro.props;
+---
+
+<div class="section-header text-center">
+  <span class="section-tag">{tag}</span>
+  <h2>{title}</h2>
+  {description && <p class="section-desc">{description}</p>}
+</div>
+
+<style>
+  .section-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .section-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 15px;
+  }
+
+  .section-header h2 {
+    font-size: 36px;
+    color: #6B5637;
+    margin: 0 0 10px 0;
+  }
+
+  .section-desc {
+    color: #8B6F47;
+    font-size: 14px;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .section-header h2 {
+      font-size: 28px;
+    }
+  }
+</style>
