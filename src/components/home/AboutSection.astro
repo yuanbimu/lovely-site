@@ -1,14 +1,14 @@
 ---
 import siteData from '../../data/site-data.json';
 import configData from '../../data/config.json';
+import { getShowcaseImageUrl } from '../../config/site.config';
 
 const { profile } = siteData;
 const { showcase } = configData;
 
 // 使用第一張 showcase 圖片
-const CDN_DOMAIN = 'cdn.yuanbimu.top';
 const aboutImage = showcase.length > 0 
-  ? `https://${CDN_DOMAIN}/showcase/${showcase[0].image}` 
+  ? getShowcaseImageUrl(showcase[0].image)
   : profile.avatar;
 ---
 

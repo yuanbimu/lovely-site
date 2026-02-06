@@ -4,11 +4,12 @@ import Navigation from '../components/Navigation.astro';
 import Footer from '../components/Footer.astro';
 import siteData from '../data/site-data.json';
 import dynamicsData from '../data/dynamics.json';
+import { SITE_CONFIG } from '../config/site.config';
 
 const { config } = siteData;
 const allDynamics = dynamicsData;
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = SITE_CONFIG.pagination.dynamicsPerPage;
 const currentPage = Astro.url.searchParams.get('page') ? parseInt(Astro.url.searchParams.get('page')) : 1;
 const totalPages = Math.ceil(allDynamics.length / ITEMS_PER_PAGE);
 const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;

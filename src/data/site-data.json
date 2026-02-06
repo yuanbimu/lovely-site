@@ -13,7 +13,8 @@
     "name": "東愛璃Lovely",
     "nickname": "狍子",
     "avatar": "/images/avatar.webp",
-    "avatarApi": "https://api.bilibili.com/x/web-interface/card?mid=3821157",
+    "avatarApi": "https://api.bilibili.com/x/web-interface/card?mid={{UID}}",
+    "uid": "3821157",
     "bio": "温柔可爱的虚拟偶像，秧歌星的狍子",
     "description": "我是来自PSPLive的虚拟主播 可爱的 杂谈整活唱跳主持都会一点的～东北小狍子（不是偶像）的东爱璃Lovely！！！",
     "socials": {

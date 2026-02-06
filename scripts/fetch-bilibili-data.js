@@ -1,8 +1,13 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const BILIBILI_MID = '3821157';
-const DATA_FILE = './src/data/site-data.json';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 從環境變量讀取配置，使用默認值
+const BILIBILI_MID = process.env.BILIBILI_UID || '3821157';
+const DATA_FILE = path.join(__dirname, '..', 'src', 'data', 'site-data.json');
 
 // 從環境變量讀取 cookie
 const BILI_JCT = process.env.BILI_JCT;

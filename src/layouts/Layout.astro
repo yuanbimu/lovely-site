@@ -1,10 +1,13 @@
 ---
-const { title, description, image = '/images/Lovely.webp' } = Astro.props;
+import { SITE_CONFIG, getSiteUrl } from '../config/site.config';
+
+const { title, description, image = SITE_CONFIG.images.defaultOgImage } = Astro.props;
 const siteData = await import('../data/site-data.json');
 const { site, profile } = siteData.default;
 const pageTitle = title || site.title;
 const pageDesc = description || site.description;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://example.com').toString();
+const canonicalURL = new URL(Astro.url.pathname, SITE_CONFIG.url).toString();
+const ogImageUrl = image.startsWith('http') ? image : getSiteUrl(image);
 ---
 
 <!DOCTYPE html>
@@ -28,7 +31,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://example.
   <meta property="og:url" content={canonicalURL}>
   <meta property="og:title" content={pageTitle}>
   <meta property="og:description" content={pageDesc}>
-  <meta property="og:image" content={new URL(image, Astro.site || 'https://example.com').toString()}>
+  <meta property="og:image" content={ogImageUrl}>
   <meta property="og:locale" content="zh_CN">
   <meta property="og:site_name" content={site.title}>
   
@@ -37,7 +40,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://example.
   <meta property="twitter:url" content={canonicalURL}>
   <meta property="twitter:title" content={pageTitle}>
   <meta property="twitter:description" content={pageDesc}>
-  <meta property="twitter:image" content={new URL(image, Astro.site || 'https://example.com').toString()}>
+  <meta property="twitter:image" content={ogImageUrl}>
   
   <title>{pageTitle}</title>
   
