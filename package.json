@@ -10,12 +10,6 @@
     "preview": "astro preview",
     "astro": "astro"
   },
-    "dev": "astro dev",
-    "fetch-data": "node scripts/fetch-bilibili-data.js",
-    "build": "npm run fetch-data && astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
   "dependencies": {
     "@astrojs/react": "^4.4.2",
     "astro": "^5.17.1",
