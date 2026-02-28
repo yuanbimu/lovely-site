@@ -16,12 +16,12 @@ const BILIBILI_UID = '3821157';
 export default function LiveStatus() {
   const [status, setStatus] = useState<StatusState>('loading');
   const [data, setData] = useState<LiveStatusData | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
-  const fetchLiveStatus = async () => {
+  const fetchLiveStatus = async (isRetry = false) => {
     const lastChecked = new Date().toISOString();
     
     try {
-      // Try Cloudflare Functions API first (production)
       console.log('[LiveStatus] Fetching from /api/live...');
       const response = await fetch('/api/live');
       console.log('[LiveStatus] Response status:', response.status);
@@ -35,57 +35,21 @@ export default function LiveStatus() {
       
       setData(result);
       setStatus(result.isLive ? 'live' : 'offline');
+      setRetryCount(0); // Reset retry count on success
     } catch (error) {
       console.error('[LiveStatus] API Error:', error);
       
-      // Fallback: Fetch directly from Bilibili (for local development)
-      // Note: This may still fail due to CORS in browser
-      try {
-        console.log('[LiveStatus] Falling back to Bilibili API...');
-        const fallbackResponse = await fetch(
-          `https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=${BILIBILI_UID}`,
-          {
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            },
-          }
-        );
-        
-        if (!fallbackResponse.ok) {
-          throw new Error('Bilibili API failed');
-        }
-        
-        const fallbackData = await fallbackResponse.json() as {
-          code: number;
-          data?: {
-            live_status: number;
-            title: string;
-            room_id: number;
-          };
-        };
-        
-        if (fallbackData.code === 0 && fallbackData.data) {
-          const { live_status, title, room_id } = fallbackData.data;
-          const isLive = live_status === 1;
-          
-          const result: LiveStatusData = {
-            isLive,
-            title: isLive ? title : '',
-            url: isLive ? `https://live.bilibili.com/${room_id}` : '',
-            roomId: room_id?.toString() || '',
-            lastChecked,
-          };
-          
-          setData(result);
-          setStatus(isLive ? 'live' : 'offline');
-          return;
-        }
-      } catch (fallbackError) {
-        console.error('[LiveStatus] Fallback also failed:', fallbackError);
+      // Only retry up to 3 times
+      if (!isRetry && retryCount < 3) {
+        console.log(`[LiveStatus] Retrying... (${retryCount + 1}/3)`);
+        setRetryCount(prev => prev + 1);
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s before retry
+        await fetchLiveStatus(true);
+        return;
       }
       
-      // Ultimate fallback: assume offline
-      setStatus('offline');
+      // After all retries, show error state
+      setStatus('error');
       setData({
         isLive: false,
         title: '',
@@ -98,9 +62,19 @@ export default function LiveStatus() {
 
   useEffect(() => {
     fetchLiveStatus();
-    const interval = setInterval(fetchLiveStatus, 15 * 60 * 1000);
+    // Retry every 15 minutes
+    const interval = setInterval(() => {
+      setRetryCount(0); // Reset retry count for periodic checks
+      fetchLiveStatus();
+    }, 15 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleRetry = () => {
+    setRetryCount(0);
+    setStatus('loading');
+    fetchLiveStatus();
+  };
 
   if (status === 'loading') {
     return (
@@ -120,11 +94,22 @@ export default function LiveStatus() {
     );
   }
 
-  // Show offline for both offline and error states
+  if (status === 'offline' && data) {
+    return (
+      <div className="live-status offline">
+        <span className="offline-dot"></span>
+        <span>未开播</span>
+      </div>
+    );
+  }
+
+  // Error state - show error message with retry button
   return (
-    <div className="live-status offline">
-      <span className="offline-dot"></span>
-      <span>未开播</span>
+    <div className="live-status error">
+      <span>⚠️ 检测失败</span>
+      <button className="retry-btn" onClick={handleRetry}>
+        重试
+      </button>
     </div>
   );
 }
