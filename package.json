@@ -4,6 +4,13 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "dev:cf": "wrangler pages dev -- astro dev",
+    "fetch-data": "node scripts/fetch-bilibili-data.js",
+    "build": "npm run fetch-data && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+    "dev": "astro dev",
     "fetch-data": "node scripts/fetch-bilibili-data.js",
     "build": "npm run fetch-data && astro build",
     "preview": "astro preview",

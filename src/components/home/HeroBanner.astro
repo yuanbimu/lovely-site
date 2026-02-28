@@ -1,6 +1,7 @@
 ---
 import siteData from '../../data/site-data.json';
-import LiveStatus from '../LiveStatus.tsx';
+import Avatar from '../Avatar';
+import LiveStatus from '../LiveStatus';
 import { formatNumber } from '../../lib/utils';
 
 const { profile, stats, config } = siteData;
@@ -14,18 +15,8 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
 
   <div class="hero-content">
     <div class="hero-left">
-      <div class="avatar-wrapper">
-        <div class="avatar-glow"></div>
-        <img 
-          src={profile.avatar} 
-          alt={profile.name} 
-          class="avatar" 
-          width="280" 
-          height="280"
-          loading="eager" 
-          decoding="async"
-        />
-      </div>
+      <Avatar client:load size={280} />
+
 
       <div class="fans-card">
         <div class="fans-icon">
