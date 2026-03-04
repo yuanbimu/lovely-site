@@ -1,0 +1,15 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "lovely-site"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "./dist"
+
+# D1 数据库绑定
+[[d1_databases]]
+binding = "DB"
+database_name = "lovely-site-db"
+database_id = "YOUR_DATABASE_ID"
+
+# R2 存储桶绑定
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "lovely-site-images"

@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "dev:cf": "wrangler pages dev -- astro dev",
     "fetch-data": "node scripts/fetch-bilibili-data.js",
+    "sync-dynamics": "node scripts/sync-dynamics.js",
     "build": "npm run fetch-data && astro build",
     "preview": "astro preview",
     "astro": "astro"
@@ -16,5 +17,8 @@
     "hono": "^4.11.8",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260301.1"
   }
 }

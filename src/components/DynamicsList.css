@@ -1,0 +1,224 @@
+.dynamics-list {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.dynamics-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.dynamics-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dynamic-item {
+  background: var(--bg-card, #ffffff);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dynamic-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.dynamic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.dynamic-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.author-name {
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+}
+
+.dynamic-time {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+.dynamic-type-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--purple-100, #f3e8ff);
+  color: var(--purple-600, #9333ea);
+  text-transform: capitalize;
+}
+
+.dynamic-content {
+  color: var(--text-primary, #1f2937);
+  line-height: 1.6;
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.dynamic-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.dynamic-image {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.dynamic-image:hover {
+  transform: scale(1.05);
+}
+
+.dynamic-footer {
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  padding-top: 12px;
+}
+
+.dynamic-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+}
+
+.stat-icon {
+  font-size: 1rem;
+}
+
+/* 加载状态 */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color, #e5e7eb);
+  border-top-color: var(--purple-500, #a855f7);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-indicator p {
+  color: var(--text-secondary, #6b7280);
+}
+
+/* 加载更多按钮 */
+.load-more-btn {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  margin: 20px auto;
+  padding: 12px 24px;
+  background: var(--purple-500, #a855f7);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.load-more-btn:hover {
+  background: var(--purple-600, #9333ea);
+}
+
+.load-more-btn:disabled {
+  background: var(--text-disabled, #9ca3af);
+  cursor: not-allowed;
+}
+
+.no-more {
+  text-align: center;
+  color: var(--text-secondary, #6b7280);
+  padding: 20px;
+}
+
+/* 空状态 */
+.dynamics-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary, #6b7280);
+}
+
+/* 错误状态 */
+.dynamics-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 3rem;
+}
+
+.dynamics-error button {
+  padding: 8px 16px;
+  background: var(--purple-500, #a855f7);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dynamics-error button:hover {
+  background: var(--purple-600, #9333ea);
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .dynamics-list {
+    padding: 16px;
+  }
+  
+  .dynamic-images {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .dynamic-image {
+    aspect-ratio: 1;
+  }
+}
