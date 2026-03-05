@@ -43,40 +43,75 @@ function buildCookieHeader() {
  * API 文档：https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/dynamic/overview.md
  */
 async function fetchDynamics() {
-  console.log('📥 正在获取 B 站动态...');
+  console.log('\ud83d\udce5 \u6b63\u5728\u83b7\u53d6 B \u7ad9\u52a8\u6001...');
   
   const headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Referer': `https://space.bilibili.com/${BILIBILI_MID}/dynamic`
+    'Referer': `https://space.bilibili.com/${BILIBILI_MID}/dynamic`,
+    'Accept': 'application/json, text/plain, */*',
+    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+    'Origin': 'https://space.bilibili.com',
+    'Connection': 'keep-alive'
   };
   
   const cookieHeader = buildCookieHeader();
   if (cookieHeader) {
     headers['Cookie'] = cookieHeader;
-    console.log('✅ 使用 Cookie 认证');
+    console.log('\u2705 \u4f7f\u7528 Cookie \u8ba4\u8bc1');
   } else {
-    console.log('⚠️  未提供 Cookie，可能触发风控');
+    console.log('\u26a0\ufe0f  \u672a\u63d0\u4f9b Cookie\uff0c\u53ef\u80fd\u89e6\u53d1\u98ce\u63a7');
   }
   
   try {
-    // B 站动态 API v2
+    // B \u7ad9\u52a8\u6001 API v2
+    // \u6dfb\u52a0 30 \u79d2\u8d85\u65f6
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    
     const response = await fetch(
       `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${BILIBILI_MID}&timezone_offset=-480&offset=&features=itemOpusStyle`,
-      { headers }
+      { headers, signal: controller.signal }
     );
+    clearTimeout(timeoutId);
+    
+    // \u68c0\u67e5\u54cd\u5e94\u7c7b\u578b
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await response.text();
+      console.error('\u274c API \u8fd4\u56de\u975e JSON \u54cd\u5e94:');
+      console.error('   Status:', response.status);
+      console.error('   Content-Type:', contentType);
+      console.error('   Response (first 500 chars):', text.substring(0, 500));
+      
+      if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+        throw new Error('B\u7ad9\u8fd4\u56de\u4e86 HTML \u9875\u9762\uff0c\u53ef\u80fd\u662f Cookie \u5df2\u8fc7\u671f\u6216\u88ab\u98ce\u63a7\u62e6\u622a\u3002\u8bf7\u68c0\u67e5 GitHub Secrets \u4e2d\u7684 BILIBILI_SESSDATA \u662f\u5426\u6709\u6548\u3002');
+      }
+      throw new Error(`API \u8fd4\u56de\u975e JSON: ${response.status} ${response.statusText}`);
+    }
     
     const data = await response.json();
     
     if (data.code !== 0) {
-      throw new Error(`API 返回错误：${data.message} (code: ${data.code})`);
+      // \u7279\u6b8a\u9519\u8bef\u7801\u5904\u7406
+      if (data.code === -352) {
+        throw new Error('B\u7ad9\u98ce\u63a7\u62e6\u622a (-352)\u3002Cookie \u53ef\u80fd\u5df2\u8fc7\u671f\uff0c\u8bf7\u66f4\u65b0 GitHub Secrets\u3002');
+      }
+      if (data.code === -101) {
+        throw new Error('B\u7ad9\u672a\u767b\u5f55 (-101)\u3002SESSDATA \u65e0\u6548\uff0c\u8bf7\u66f4\u65b0 GitHub Secrets\u3002');
+      }
+      throw new Error(`API \u8fd4\u56de\u9519\u8bef\uff1a${data.message} (code: ${data.code})`);
     }
     
     const items = data.data?.items || [];
-    console.log(`✅ 获取到 ${items.length} 条动态`);
+    console.log(`\u2705 \u83b7\u53d6\u5230 ${items.length} \u6761\u52a8\u6001`);
     
     return items.map(item => parseDynamicItem(item));
   } catch (error) {
-    console.error('❌ 获取动态失败:', error.message);
+    if (error.name === 'AbortError') {
+      console.error('\u274c \u8bf7\u6c42\u8d85\u65f6 (30\u79d2)');
+      throw new Error('\u8bf7\u6c42\u8d85\u65f6\uff0c\u53ef\u80fd\u662f\u7f51\u7edc\u95ee\u9898\u6216 B\u7ad9 API \u4e0d\u54cd\u5e94');
+    }
+    console.error('\u274c \u83b7\u53d6\u52a8\u6001\u5931\u8d25:', error.message);
     throw error;
   }
 }

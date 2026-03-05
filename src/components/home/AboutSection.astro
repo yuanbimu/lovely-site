@@ -28,9 +28,9 @@ const aboutImage = showcase.length > 0
       </div>
 
       <div class="about-text">
-        <p>{profile.description}</p>
-        <p>温柔可爱的虚拟偶像，秧歌星的狍子。</p>
-        <p>感谢每一位粉丝的支持！</p>
+        {(profile.aboutText as string[]).map((p: string) => (
+          <p>{p}</p>
+        ))}
       </div>
 
       <div class="friend-links">
