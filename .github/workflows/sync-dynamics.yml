@@ -1,11 +1,17 @@
 name: Sync Bilibili Dynamics
 
+
+
 on:
-  schedule:
-    # 每 30 分钟执行一次 (UTC 时间)
-    # 北京时间 = UTC + 8
-    - cron: '*/30 * * * *'
+
+  # 已禁用自动同步 (B站 -412 风控封禁 GitHub Actions IP)
+
+  # schedule:
+
+  #   - cron: '*/30 * * * *'
+
   workflow_dispatch:
+
     # 允许手动触发
 
 jobs:
