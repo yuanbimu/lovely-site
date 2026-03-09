@@ -1,183 +1,154 @@
-# AGENTS.md - 東愛璃 Lovely 应援站开发指南
+# AGENTS.md - 東愛璃 Lovely 应援站
 
-## 项目概述
-
-本项目是 VTuber 東愛璃 Lovely 的非官方粉丝应援站点，包含两个主要部分：
-- `lovely-site/` - Astro + React 站点主体
-- `tools/` - 本地工具脚本（数据同步、图片上传等）
-
-## 技术栈
-
-- **框架**: Astro 5.17 + React 19 (Islands 架构)
-- **语言**: TypeScript (strict 模式)
-- **样式**: Tailwind CSS + 自定义设计系统 (OKLCH 配色)
-- **部署**: Cloudflare Pages + Hono 边缘函数
-- **数据**: JSON 文件 + Bilibili API
+**Stack**: Astro 5.17 + React 19 + TypeScript + Cloudflare Pages  
+**Domain**: VTuber 粉丝应援站点  
+**Generated**: 2026-03-06
 
 ---
 
-## 构建/测试/运行命令
+## 项目结构
 
-### 开发环境
-```bash
-cd lovely-site
-npm install                    # 安装依赖
-npm run dev                    # 启动开发服务器 (localhost:4321)
-npm run dev:cf                 # Cloudflare Pages 本地调试
-```
-
-### 生产构建
-```bash
-npm run fetch-data             # 获取最新 B 站数据
-npm run build                  # 构建静态站点
-npm run preview                # 预览生产构建
-```
-
-### 数据同步
-```bash
-npm run sync-dynamics          # 同步 B 站动态
-node scripts/fetch-bilibili-data.js  # 获取 B 站用户数据
-```
-
-### 运行单个测试
-当前项目无自动化测试框架。添加测试时使用：
-```bash
-npm install -D vitest @testing-library/react
-# vitest.config.ts 配置后运行
-npm run test                   # 运行所有测试
-npm run test -- --run File.test.ts  # 运行单个测试文件
-```
-
----
-
-## 代码风格指南
-
-### 文件组织
 ```
 lovely-site/
 ├── src/
-│   ├── components/           # 可复用组件
-│   │   ├── ui/              # 基础 UI 组件
-│   │   ├── home/            # 首页专用组件
-│   │   └── *.tsx/*.astro    # React 或 Astro 组件
-│   ├── layouts/             # 页面布局
-│   ├── pages/               # 路由页面
-│   │   ├── api/             # API 端点
-│   │   └── *.astro          # Astro 页面
-│   ├── styles/              # 全局样式
-│   │   ├── design-system.css  # 设计系统变量
-│   │   └── global.css       # 全局样式
-│   ├── types/               # TypeScript 类型定义
-│   ├── lib/                 # 工具函数
-│   └── config/              # 配置中心
-├── functions/               # Cloudflare Pages 函数
-├── scripts/                 # 构建自动化脚本
-└── public/                  # 静态资源
+│   ├── components/     # React + Astro 组件 (见 /src/components/AGENTS.md)
+│   ├── pages/          # 路由页面 + API 端点 (见 /src/pages/AGENTS.md)
+│   ├── styles/         # 设计系统 + 全局样式
+│   ├── types/          # TypeScript 类型定义
+│   ├── lib/            # 工具函数
+│   └── config/         # 站点配置中心
+├── functions/          # Cloudflare Pages 边缘函数 (见 /functions/AGENTS.md)
+├── scripts/            # 数据同步/自动化脚本
+├── public/             # 静态资源
+└── .github/workflows/  # CI/CD (自动同步 B 站动态)
 ```
-
-### 命名约定
-- **文件**: 小写 + 连字符 (e.g., `hero-banner.astro`)
-- **组件**: 大驼峰 (e.g., `HeroBanner.astro`, `LiveStatus.tsx`)
-- **类型**: 大驼峰接口 (e.g., `Profile`, `SiteConfig`)
-- **CSS 类**: 连字符分隔 (e.g., `.hero-section`, `.avatar-wrapper`)
-- **变量**: 小驼峰 (e.g., `fanCount`, `avatarUrl`)
-- **常量**: 全大写 (e.g., `SITE_CONFIG`, `BILIBILI_UID`)
-
-### 导入顺序
-```typescript
-// 1. React 导入
-import { useState, useEffect } from 'react';
-
-// 2. 第三方库
-import { formatNumber } from '../../lib/utils';
-
-// 3. 内部模块
-import Avatar from '../Avatar';
-import type { Profile } from '../../types';
-
-// 4. 样式
-import './HeroBanner.css';
-```
-
-### TypeScript 规范
-- 使用 `astro/tsconfigs/strict` 基础配置
-- 所有函数参数和返回值必须标注类型
-- 使用接口定义数据结构 (`interface Dynamic { ... }`)
-- 避免 `any`，必要时使用 `unknown` 或类型断言
-- 事件处理：`React.ChangeEvent<HTMLInputElement>`
-
-### Astro 组件模式
-```astro
----
-// Frontmatter 中的逻辑
-import { formatNumber } from '../../lib/utils';
-const { count = 0 } = Astro.props;
----
-
-<!-- 模板部分 -->
-<div class="card">{formatNumber(count)}</div>
-
-<style>
-  .card { /* 作用域样式 */ }
-</style>
-```
-
-### React Islands 模式
-```tsx
-interface Props {
-  size?: number;
-  className?: string;
-}
-
-export default function Avatar({ size = 280, className = '' }: Props) {
-  const [url, setUrl] = useState('/images/avatar.webp');
-  
-  return <img src={url} style={{ width: size }} className={className} />;
-}
-```
-
-### 错误处理
-- API 端点：返回友好错误响应，记录日志
-- 数据获取：提供降级数据，避免页面崩溃
-- 图片加载：使用 `onError` 提供备用图片
-
-### 样式约定
-- 优先使用设计系统变量 (e.g., `var(--brown-500)`)
-- 响应式断点：600px, 1000px
-- 动画时长：fast (150ms), normal (300ms), slow (500ms)
-- 使用 `@layer` 管理 CSS 优先级
 
 ---
 
-## 环境配置
-
-### .env 示例
-```env
-BILIBILI_UID=3821157
-CDN_DOMAIN=cdn.yuanbimu.top
-```
-
-### Cloudflare 绑定 (wrangler.toml)
-- D1 数据库：`DB` 绑定
-- R2 存储桶：`IMAGES` 绑定
-
----
-
-## Git 工作流
+## 快速开始
 
 ```bash
-git checkout -b feature/amazing-feature
-# 开发完成后
-git commit -m 'Add amazing feature'
-git push origin feature/amazing-feature
-# 创建 Pull Request
+# 开发
+npm install
+npm run dev              # localhost:4321
+npm run dev:cf           # Cloudflare Pages 本地调试
+
+# 生产
+npm run fetch-data       # 获取 B 站数据
+npm run build            # 构建到 dist/
+npm run preview          # 预览
+
+# 数据同步
+npm run sync-dynamics    # 同步 B 站动态
 ```
 
 ---
 
-## 调试技巧
+## 技术栈决策
 
-- 开发服务器：`npm run dev` 查看详细错误堆栈
-- 类型检查：Astro 自动运行，VSCode 实时提示
-- 网络请求：检查 `src/pages/api/` 端点响应
-- 样式调试：使用浏览器 DevTools 检查 CSS 变量
+| 领域 | 技术 | 原因 |
+|------|------|------|
+| 静态页面 | Astro | SEO 友好，零 JS 输出 |
+| 交互组件 | React Islands | 按需 hydration |
+| API 端点 | Hono | 轻量，Cloudflare 原生支持 |
+| 部署 | Cloudflare Pages | 免费边缘网络，Functions 集成 |
+| 样式 | Tailwind + CSS 变量 | 设计系统复用 |
+
+---
+
+## 核心约定
+
+### 文件命名
+- **组件**: 大驼峰 (`HeroBanner.astro`, `LiveStatus.tsx`)
+- **页面**: 小写 (`index.astro`, `dynamics.astro`)
+- **工具**: 小写 + 连字符 (`site.config.ts`)
+
+### TypeScript
+- 严格模式 (`astro/tsconfigs/strict`)
+- 所有接口定义在 `src/types/index.ts`
+- 禁止 `any`，必要时用 `unknown`
+
+### 样式
+- 设计系统变量优先 (`var(--brown-500)`, `var(--blue-200)`)
+- 响应式断点：`600px`, `1000px`
+- 使用 `@layer` 管理优先级
+
+---
+
+## 边缘函数 (Cloudflare)
+
+**位置**: `functions/api/*.ts`
+
+**部署**: 自动部署到 Cloudflare Pages Functions
+
+**本地测试**: `npm run dev:cf`
+
+**环境绑定** (wrangler.toml):
+- `DB`: D1 数据库
+- `IMAGES`: R2 存储桶
+
+---
+
+## 数据流
+
+```
+Bilibili API → scripts/sync-dynamics.js → src/data/dynamics.json
+                                           ↓
+                                    Astro 页面渲染
+                                           ↓
+                                    静态 HTML 输出
+```
+
+**自动同步**: GitHub Actions 每 30 分钟触发 (已禁用，因 B 站风控)
+
+---
+
+## 测试
+
+**当前状态**: 无自动化测试
+
+**推荐添加**:
+```bash
+npm install -D vitest @testing-library/react
+```
+
+**运行单个测试**:
+```bash
+npx vitest path/to/test.test.ts
+```
+
+---
+
+## CI/CD
+
+**工作流**:
+- `sync-dynamics.yml`: 同步 B 站动态 (已禁用)
+- `update.yml`: 自动更新依赖
+
+**部署**: 推送到 main 分支自动部署到 Cloudflare Pages
+
+---
+
+## 常见问题
+
+### B 站 API 风控
+- GitHub Actions IP 被封，改用本地运行脚本
+- 需要 Cookie: `BILI_JCT`, `BUVID3`, `SESSDATA`
+
+### Cloudflare 绑定
+- 本地开发无需配置
+- 生产环境在 Cloudflare Dashboard 设置
+
+### 设计系统
+- 位置：`src/styles/design-system.css`
+- 包含：配色、间距、阴影、动画时长
+
+---
+
+## 子目录 AGENTS.md
+
+| 目录 | 内容 |
+|------|------|
+| `/src/components/AGENTS.md` | React + Astro 组件模式 |
+| `/src/pages/AGENTS.md` | 页面路由 + API 端点 |
+| `/functions/AGENTS.md` | Cloudflare 边缘函数 |
