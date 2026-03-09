@@ -12,7 +12,7 @@
   "profile": {
     "name": "東愛璃Lovely",
     "nickname": "狍子",
-    "avatar": "/images/avatar.webp",
+    "avatar": "https://i0.hdslb.com/bfs/face/fc07a1669559a0758ff8ee6f1b0eda5f3196d5dc.webp",
     "avatarApi": "https://api.bilibili.com/x/web-interface/card?mid={{UID}}",
     "uid": "3821157",
     "bio": "温柔可爱的虚拟偶像，秧歌星的偶像",
@@ -28,9 +28,9 @@
     ]
   },
   "stats": {
-    "fans": 311001,
+    "fans": 311696,
     "following": 824,
-    "lastUpdated": "2026-03-08T04:17:47.710259",
+    "lastUpdated": "2026-03-09",
     "avatar": "/images/avatar.webp"
   },
   "liveStatus": {

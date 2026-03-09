@@ -1,6 +1,7 @@
 /**
  * 设计系统 - 温馨可爱风格
- * 主题：東愛璃Lovely
+ * 主题：東愛璃 Lovely
+ * 包含响应式设计系统
  */
 
 @tailwind base;
@@ -45,6 +46,7 @@
     --gradient-hero: linear-gradient(180deg, #FFF8F0 0%, #F5EDE3 30%, #E8F4FC 100%);
     --gradient-purple: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
 
+    /* 间距系统 */
     --space-xs: 0.25rem;
     --space-sm: 0.5rem;
     --space-md: 1rem;
@@ -54,6 +56,7 @@
     --space-3xl: 4rem;
     --space-4xl: 6rem;
 
+    /* 圆角 */
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 16px;
@@ -61,6 +64,7 @@
     --radius-2xl: 32px;
     --radius-full: 9999px;
 
+    /* 阴影 */
     --shadow-xs: 0 1px 2px rgba(139, 111, 71, 0.05);
     --shadow-sm: 0 2px 8px rgba(139, 111, 71, 0.08);
     --shadow-md: 0 4px 16px rgba(139, 111, 71, 0.1);
@@ -68,19 +72,43 @@
     --shadow-xl: 0 16px 48px rgba(139, 111, 71, 0.15);
     --shadow-glow: 0 0 40px rgba(122, 184, 232, 0.3);
 
+    /* 字体 */
     --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
     --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
 
+    /* 动画时长 */
     --duration-fast: 150ms;
     --duration-normal: 300ms;
     --duration-slow: 500ms;
 
+    /* 层级 */
     --z-base: 0;
     --z-dropdown: 100;
     --z-sticky: 200;
     --z-modal: 300;
     --z-popover: 400;
     --z-tooltip: 500;
+    --z-hamburger: 1500;
+
+    /* 响应式断点 */
+    --breakpoint-xs: 320px;
+    --breakpoint-sm: 375px;
+    --breakpoint-md: 414px;
+    --breakpoint-lg: 600px;
+    --breakpoint-xl: 768px;
+    --breakpoint-2xl: 900px;
+    --breakpoint-3xl: 1000px;
+    --breakpoint-4xl: 1200px;
+
+    /* 响应式字体大小 */
+    --text-xs: clamp(0.75rem, 2vw, 0.875rem);
+    --text-sm: clamp(0.875rem, 2.5vw, 1rem);
+    --text-base: clamp(1rem, 3vw, 1.125rem);
+    --text-lg: clamp(1.125rem, 3.5vw, 1.25rem);
+    --text-xl: clamp(1.25rem, 4vw, 1.5rem);
+    --text-2xl: clamp(1.5rem, 5vw, 2rem);
+    --text-3xl: clamp(1.75rem, 6vw, 2.5rem);
+    --text-4xl: clamp(2rem, 7vw, 3rem);
   }
 
   * {
@@ -102,6 +130,7 @@
     line-height: 1.6;
     min-height: 100vh;
     overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
   }
 
   ::selection {
@@ -124,6 +153,13 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+  }
+
+  /* 移动端容器 */
+  @media (max-width: 414px) {
+    .container-cute {
+      padding: 0 16px;
+    }
   }
 
   .text-center {
@@ -163,6 +199,12 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  /* 移动端工具类 */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
   }
 
   .scrollbar-hide {

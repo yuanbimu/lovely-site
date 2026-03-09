@@ -152,3 +152,35 @@ npx vitest path/to/test.test.ts
 | `/src/components/AGENTS.md` | React + Astro 组件模式 |
 | `/src/pages/AGENTS.md` | 页面路由 + API 端点 |
 | `/functions/AGENTS.md` | Cloudflare 边缘函数 |
+| `/src/pages/AGENTS.md` | 页面路由 + API 端点 |
+| `/functions/AGENTS.md` | Cloudflare 边缘函数 |
+
+---
+
+## 响应式设计
+
+### 断点系统
+
+```css
+--breakpoint-xs: 320px;   /* 小型手机 */
+--breakpoint-sm: 375px;   /* iPhone 12 mini */
+--breakpoint-md: 414px;   /* iPhone 12 Pro Max */
+--breakpoint-lg: 600px;   /* 平板竖屏 */
+--breakpoint-xl: 768px;   /* 平板横屏 */
+--breakpoint-2xl: 900px;  /* 小屏笔记本 */
+--breakpoint-3xl: 1000px; /* 桌面过渡 */
+--breakpoint-4xl: 1200px; /* 标准桌面 */
+```
+
+### 移动端优化
+
+- **Navigation**: 汉堡菜单（<600px）
+- **HeroBanner**: 响应式字体和布局
+- **Footer**: 单列布局（<600px）
+- **AboutSection**: 垂直堆叠（<1000px）
+- **DynamicsList**: 触摸友好按钮
+
+### 响应式工具类
+
+- `.touch-target` - 最小 44px 触摸区域
+- `.container-cute` - 自适应容器

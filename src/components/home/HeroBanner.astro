@@ -105,6 +105,29 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
     opacity: 0.2;
   }
 
+  /* 移动端背景球体调整 */
+  @media (max-width: 600px) {
+    .orb-1 {
+      width: 250px;
+      height: 250px;
+      top: -80px;
+      left: -80px;
+    }
+
+    .orb-2 {
+      width: 300px;
+      height: 300px;
+      bottom: -100px;
+      right: -100px;
+    }
+
+    .orb-3 {
+      width: 150px;
+      height: 150px;
+      right: 5%;
+    }
+  }
+
   .hero-content {
     display: flex;
     align-items: center;
@@ -190,7 +213,7 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
   }
 
   .site-title {
-    font-size: 56px;
+    font-size: clamp(2rem, 5vw, 56px);
     font-weight: 700;
     color: #6B5637;
     margin: 0 0 15px 0;
@@ -199,7 +222,7 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
   }
 
   .subtitle {
-    font-size: 20px;
+    font-size: clamp(1rem, 3vw, 20px);
     color: #8B6F47;
     margin: 0 0 35px 0;
     letter-spacing: 1px;
@@ -262,27 +285,100 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
 
   @media (max-width: 600px) {
     .avatar {
-      width: 220px;
-      height: 220px;
+      width: 200px;
+      height: 200px;
+      border-width: 6px;
     }
 
     .site-title {
-      font-size: 40px;
+      font-size: 32px;
+      letter-spacing: 2px;
     }
 
     .subtitle {
-      font-size: 17px;
+      font-size: 15px;
+      margin: 0 0 25px 0;
+    }
+
+    .fans-card {
+      padding: 12px 20px;
+    }
+
+    .fans-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .fans-label {
+      font-size: 12px;
+    }
+
+    .fans-count {
+      font-size: 22px;
     }
 
     .social-buttons {
       flex-direction: column;
       align-items: center;
+      gap: 12px;
     }
 
     .social-btn {
       width: 100%;
-      max-width: 260px;
+      max-width: 280px;
       justify-content: center;
+      padding: 14px 24px;
+      font-size: 14px;
+    }
+
+    .hero-content {
+      padding: 80px 20px 40px;
+      gap: 40px;
+    }
+  }
+
+  /* 超小屏幕优化 (320px-375px) */
+  @media (max-width: 375px) {
+    .avatar {
+      width: 180px;
+      height: 180px;
+    }
+
+    .site-title {
+      font-size: 28px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+    }
+
+    .fans-card {
+      padding: 10px 16px;
+      gap: 12px;
+    }
+
+    .fans-icon {
+      width: 36px;
+      height: 36px;
+    }
+
+    .fans-count {
+      font-size: 20px;
+    }
+
+    .social-btn {
+      padding: 12px 20px;
+      font-size: 13px;
+    }
+
+    .orb-1 {
+      width: 200px;
+      height: 200px;
+    }
+
+    .orb-2 {
+      width: 250px;
+      height: 250px;
     }
   }
 </style>

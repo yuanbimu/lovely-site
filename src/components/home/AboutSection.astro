@@ -55,7 +55,7 @@ const aboutImage = showcase.length > 0
 
 <style>
   .about-section {
-    padding: 100px 30px;
+    padding: clamp(60px, 10vw, 100px) clamp(16px, 5vw, 30px);
     background: linear-gradient(180deg, #FAF6F0 0%, #F5EDE3 50%, #FDF8F3 100%);
   }
 
@@ -77,8 +77,8 @@ const aboutImage = showcase.length > 0
   }
 
   .about-img-box img {
-    width: 380px;
-    height: 480px;
+    width: clamp(280px, 60vw, 380px);
+    height: clamp(350px, 75vw, 480px);
     object-fit: cover;
     border-radius: 24px;
     box-shadow: 0 25px 80px rgba(139, 111, 71, 0.2);
@@ -88,10 +88,10 @@ const aboutImage = showcase.length > 0
 
   .img-backdrop {
     position: absolute;
-    top: 30px;
-    left: 30px;
-    right: -30px;
-    bottom: -30px;
+    top: clamp(15px, 3vw, 30px);
+    left: clamp(15px, 3vw, 30px);
+    right: clamp(-30px, -5vw, -30px);
+    bottom: clamp(-30px, -5vw, -30px);
     background: linear-gradient(135deg, #C4A77D 0%, #7AB8E8 50%, #9d84b7 100%);
     border-radius: 24px;
     z-index: 1;
@@ -120,7 +120,7 @@ const aboutImage = showcase.length > 0
   }
 
   .about-right h2 {
-    font-size: 42px;
+    font-size: clamp(1.75rem, 5vw, 42px);
     color: #6B5637;
     margin: 0;
     font-weight: 700;
@@ -131,12 +131,11 @@ const aboutImage = showcase.length > 0
   }
 
   .about-text p {
-    font-size: 17px;
+    font-size: clamp(1rem, 3vw, 17px);
     color: #6B5637;
     line-height: 1.9;
     margin: 0 0 12px 0;
   }
-
   .friend-links {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -205,21 +204,61 @@ const aboutImage = showcase.length > 0
   }
 
   @media (max-width: 600px) {
+    .about-layout {
+      gap: 40px;
+    }
+
     .about-img-box img {
-      width: 280px;
-      height: 350px;
+      width: 260px;
+      height: 320px;
     }
 
     .about-right h2 {
-      font-size: 32px;
+      font-size: 28px;
     }
 
     .about-text p {
-      font-size: 15px;
+      font-size: 14px;
     }
 
     .friend-links {
       grid-template-columns: 1fr;
+      width: 100%;
+    }
+
+    .link-card {
+      padding: 14px 16px;
+    }
+
+    .link-icon {
+      width: 42px;
+      height: 42px;
+      font-size: 20px;
+    }
+
+    .link-info h4 {
+      font-size: 14px;
+    }
+  }
+
+  /* 超小屏幕优化 */
+  @media (max-width: 375px) {
+    .about-img-box img {
+      width: 240px;
+      height: 300px;
+    }
+
+    .about-right h2 {
+      font-size: 24px;
+    }
+
+    .about-text p {
+      font-size: 13px;
+    }
+
+    .section-tag {
+      font-size: 12px;
+      padding: 6px 16px;
     }
   }
 </style>

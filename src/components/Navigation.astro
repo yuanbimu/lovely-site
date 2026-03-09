@@ -12,7 +12,7 @@ const navItems = [
 <header class="glass-nav">
   <nav class="nav-content">
     {navItems.slice(0, 3).map(item => (
-      <a href={item.href} class="nav-link">{item.label}</a>
+      <a href={item.href} class="nav-link desktop-only">{item.label}</a>
     ))}
 
     <a href="/" class="logo-wrapper">
@@ -20,10 +20,44 @@ const navItems = [
     </a>
 
     {navItems.slice(3).map(item => (
-      <a href={item.href} class="nav-link">{item.label}</a>
+      <a href={item.href} class="nav-link desktop-only">{item.label}</a>
     ))}
+
+    <!-- 移动端汉堡菜单按钮 -->
+    <button class="hamburger-btn mobile-only" aria-label="菜单" aria-expanded="false" onclick="toggleMenu()">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
   </nav>
+
+  <!-- 移动端菜单 -->
+  <div class="mobile-menu" id="mobileMenu">
+    {navItems.map(item => (
+      <a href={item.href} class="mobile-nav-link" onclick="closeMenu()">{item.label}</a>
+    ))}
+  </div>
 </header>
+
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    const btn = document.querySelector('.hamburger-btn');
+    menu?.classList.toggle('active');
+    btn?.classList.toggle('active');
+    btn?.setAttribute('aria-expanded', menu?.classList.contains('active') ? 'true' : 'false');
+    document.body.classList.toggle('menu-open');
+  }
+
+  function closeMenu() {
+    const menu = document.getElementById('mobileMenu');
+    const btn = document.querySelector('.hamburger-btn');
+    menu?.classList.remove('active');
+    btn?.classList.remove('active');
+    btn?.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('menu-open');
+  }
+</script>
 
 <style>
   .glass-nav {
@@ -35,7 +69,7 @@ const navItems = [
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(196, 167, 125, 0.2);
+    border-bottom: 1px solid rgba(196, 167, 71, 0.2);
   }
 
   .nav-content {
@@ -84,6 +118,85 @@ const navItems = [
     transform: scale(1.05);
   }
 
+  /* 汉堡菜单按钮 */
+  .hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 24px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: var(--z-hamburger);
+  }
+
+  .hamburger-line {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: #6B5637;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+
+  .hamburger-btn.active .hamburger-line:nth-child(1) {
+    transform: translateY(10.5px) rotate(45deg);
+  }
+
+  .hamburger-btn.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger-btn.active .hamburger-line:nth-child(3) {
+    transform: translateY(-10.5px) rotate(-45deg);
+  }
+
+  /* 移动端菜单 */
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    z-index: var(--z-hamburger);
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-menu.active {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .mobile-nav-link {
+    display: block;
+    padding: 16px 20px;
+    color: #6B5637;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .mobile-nav-link:hover {
+    background: rgba(214, 235, 248, 0.5);
+    color: #4A90D9;
+  }
+
+  /* 防止滚动 */
+  body.menu-open {
+    overflow: hidden;
+  }
+
+  /* 响应式 */
   @media (max-width: 900px) {
     .nav-content {
       gap: 10px;
@@ -101,18 +214,33 @@ const navItems = [
   }
 
   @media (max-width: 600px) {
-    .nav-content {
-      height: 60px;
-      gap: 8px;
+    .desktop-only {
+      display: none;
     }
 
-    .nav-link {
-      padding: 6px 10px;
-      font-size: 12px;
+    .mobile-only {
+      display: flex;
+    }
+
+    .nav-content {
+      height: 60px;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .logo-wrapper {
+      margin: 0;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     .logo-img {
       height: 28px;
+    }
+
+    .hamburger-btn {
+      display: flex;
     }
   }
 </style>
