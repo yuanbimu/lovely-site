@@ -24,7 +24,7 @@ const navItems = [
     ))}
 
     <!-- 移动端汉堡菜单按钮 -->
-    <button class="hamburger-btn mobile-only" aria-label="菜单" aria-expanded="false" onclick="toggleMenu()">
+    <button class="hamburger-btn mobile-only" aria-label="菜单" aria-expanded="false" id="hamburgerBtn">
       <span class="hamburger-line"></span>
       <span class="hamburger-line"></span>
       <span class="hamburger-line"></span>
@@ -34,29 +34,49 @@ const navItems = [
   <!-- 移动端菜单 -->
   <div class="mobile-menu" id="mobileMenu">
     {navItems.map(item => (
-      <a href={item.href} class="mobile-nav-link" onclick="closeMenu()">{item.label}</a>
+      <a href={item.href} class="mobile-nav-link">{item.label}</a>
     ))}
   </div>
 </header>
 
-<script>
-  function toggleMenu() {
+<script is:inline>
+  (function() {
+    const btn = document.getElementById('hamburgerBtn');
     const menu = document.getElementById('mobileMenu');
-    const btn = document.querySelector('.hamburger-btn');
-    menu?.classList.toggle('active');
-    btn?.classList.toggle('active');
-    btn?.setAttribute('aria-expanded', menu?.classList.contains('active') ? 'true' : 'false');
-    document.body.classList.toggle('menu-open');
-  }
-
-  function closeMenu() {
-    const menu = document.getElementById('mobileMenu');
-    const btn = document.querySelector('.hamburger-btn');
-    menu?.classList.remove('active');
-    btn?.classList.remove('active');
-    btn?.setAttribute('aria-expanded', 'false');
-    document.body.classList.remove('menu-open');
-  }
+    
+    if (!btn || !menu) return;
+    
+    function toggleMenu() {
+      menu.classList.toggle('active');
+      btn.classList.toggle('active');
+      btn.setAttribute('aria-expanded', menu.classList.contains('active') ? 'true' : 'false');
+      document.body.classList.toggle('menu-open');
+    }
+    
+    function closeMenu() {
+      menu.classList.remove('active');
+      btn.classList.remove('active');
+      btn.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('menu-open');
+    }
+    
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+    
+    // 点击菜单项关闭菜单
+    menu.querySelectorAll('.mobile-nav-link').forEach(function(link) {
+      link.addEventListener('click', closeMenu);
+    });
+    
+    // 点击外部关闭菜单
+    document.addEventListener('click', function(e) {
+      if (!btn.contains(e.target) && !menu.contains(e.target) && menu.classList.contains('active')) {
+        closeMenu();
+      }
+    });
+  })();
 </script>
 
 <style>
@@ -129,7 +149,7 @@ const navItems = [
     background: transparent;
     border: none;
     cursor: pointer;
-    z-index: var(--z-hamburger);
+    z-index: 1500;
   }
 
   .hamburger-line {
@@ -164,13 +184,14 @@ const navItems = [
     backdrop-filter: blur(20px);
     padding: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    z-index: var(--z-hamburger);
+    z-index: 1499;
     transform: translateY(-100%);
     opacity: 0;
     transition: all 0.3s ease;
   }
 
   .mobile-menu.active {
+    display: block;
     transform: translateY(0);
     opacity: 1;
   }
@@ -184,6 +205,7 @@ const navItems = [
     border-radius: 12px;
     margin-bottom: 8px;
     transition: all 0.3s ease;
+    text-decoration: none;
   }
 
   .mobile-nav-link:hover {
@@ -215,27 +237,31 @@ const navItems = [
 
   @media (max-width: 600px) {
     .desktop-only {
-      display: none;
+      display: none !important;
     }
 
     .mobile-only {
-      display: flex;
+      display: flex !important;
     }
 
     .nav-content {
       height: 60px;
       justify-content: space-between;
       padding: 0 20px;
+      position: relative;
     }
 
     .logo-wrapper {
       margin: 0;
       position: absolute;
       left: 50%;
-      transform: translateX(-50%);
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
 
     .logo-img {
+      height: 42px;
+    }
       height: 28px;
     }
 

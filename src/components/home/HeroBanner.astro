@@ -68,6 +68,7 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
     align-items: center;
     justify-content: center;
     position: relative;
+    overflow: hidden;
     background: linear-gradient(180deg, #FFF8F0 0%, #F5EDE3 30%, #E8F4FC 100%);
   }
 
@@ -91,9 +92,18 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
     width: 600px;
     height: 600px;
     background: linear-gradient(135deg, #D6EBF8 0%, #B3D9F2 100%);
-    bottom: -200px;
-    right: -200px;
-    opacity: 0.5;
+    bottom: -250px;
+    right: -250px;
+    opacity: 0.35;
+  }
+
+  .orb-3 {
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+    top: 40%;
+    right: -50px;
+    opacity: 0.15;
   }
 
   .orb-3 {
@@ -108,23 +118,27 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
   /* 移动端背景球体调整 */
   @media (max-width: 600px) {
     .orb-1 {
-      width: 250px;
-      height: 250px;
-      top: -80px;
-      left: -80px;
+      width: 200px;
+      height: 200px;
+      top: -60px;
+      left: -100px;
+      opacity: 0.4;
     }
 
     .orb-2 {
-      width: 300px;
-      height: 300px;
-      bottom: -100px;
-      right: -100px;
+      width: 250px;
+      height: 250px;
+      bottom: -80px;
+      right: -120px;
+      opacity: 0.35;
     }
 
     .orb-3 {
-      width: 150px;
-      height: 150px;
-      right: 5%;
+      width: 120px;
+      height: 120px;
+      top: 40%;
+      right: -20px;
+      opacity: 0.15;
     }
   }
 
