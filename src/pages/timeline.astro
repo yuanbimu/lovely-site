@@ -1,0 +1,269 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+
+interface TimelineEvent {
+  date: string;
+  title: string;
+  content: string;
+  color: string;
+  icon: string;
+}
+
+const timelineEvents: TimelineEvent[] = [
+  {
+    date: "2020-04-26",
+    title: "在B站發表第一條動態",
+    content: "",
+    color: "blue",
+    icon: "mdi-star"
+  },
+  {
+    date: "2020-04-28",
+    title: "投稿第一個視頻，展示了自己的立繪",
+    content: "",
+    color: "blue",
+    icon: "mdi-play-circle"
+  },
+  {
+    date: "2020-04-29",
+    title: "投稿自我介紹視頻",
+    content: "在視頻末尾，誤認已經切斷直播而用本音發出「早知道這樣我還不如回老家種地呢」的名言。種田系偶像的起源",
+    color: "green",
+    icon: "mdi-microphone"
+  }
+];
+---
+
+<Layout title="时间线 - 東愛璃Lovely">
+  <Navigation />
+  
+  <main class="timeline-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <h1 class="page-title">时间线</h1>
+        <p class="page-subtitle">记录東愛璃Lovely的成长历程</p>
+      </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="timeline-section">
+      <div class="container">
+        <div class="timeline">
+          {timelineEvents.map((event, index) => (
+            <div class={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}>
+              <div class="timeline-content">
+                <div class="timeline-date">{event.date}</div>
+                <h3 class="timeline-title">{event.title}</h3>
+                {event.content && <p class="timeline-desc">{event.content}</p>}
+              </div>
+              <div class={`timeline-dot ${event.color}`}>
+                <span class="timeline-icon">{event.icon === 'mdi-star' ? '⭐' : event.icon === 'mdi-play-circle' ? '▶️' : '🎤'}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <Footer />
+</Layout>
+
+<style>
+  .timeline-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #FAF6F0 0%, #F5EDE3 100%);
+  }
+
+  .hero-section {
+    padding: 140px 20px 60px;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(107, 86, 55, 0.05) 0%, rgba(74, 144, 217, 0.05) 100%);
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    color: #6B5637;
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+
+  .page-subtitle {
+    font-size: 1.1rem;
+    color: #8B7355;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .timeline-section {
+    padding: 60px 20px 100px;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .timeline {
+    position: relative;
+    padding: 20px 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #4A90D9, #6B5637);
+    border-radius: 2px;
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 50px;
+    display: flex;
+    align-items: center;
+  }
+
+  .timeline-item.left {
+    justify-content: flex-start;
+  }
+
+  .timeline-item.right {
+    justify-content: flex-end;
+  }
+
+  .timeline-content {
+    width: 42%;
+    padding: 24px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(107, 86, 55, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .timeline-content:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  .timeline-item.left .timeline-content {
+    margin-right: auto;
+    margin-left: 0;
+  }
+
+  .timeline-item.right .timeline-content {
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  .timeline-date {
+    font-size: 0.85rem;
+    color: #4A90D9;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .timeline-title {
+    font-size: 1.1rem;
+    color: #6B5637;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .timeline-desc {
+    font-size: 0.95rem;
+    color: #8B7355;
+    line-height: 1.6;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border: 3px solid;
+    z-index: 10;
+  }
+
+  .timeline-dot.blue {
+    border-color: #4A90D9;
+  }
+
+  .timeline-dot.green {
+    border-color: #4CAF50;
+  }
+
+  .timeline-icon {
+    font-size: 1.2rem;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .page-title {
+      font-size: 2rem;
+    }
+
+    .timeline::before {
+      left: 30px;
+    }
+
+    .timeline-item {
+      justify-content: flex-start !important;
+      padding-left: 70px;
+    }
+
+    .timeline-content {
+      width: 100%;
+      margin: 0 !important;
+    }
+
+    .timeline-dot {
+      left: 30px;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 40px;
+    }
+
+    .timeline-icon {
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-section {
+      padding: 120px 16px 40px;
+    }
+
+    .timeline-section {
+      padding: 40px 16px 60px;
+    }
+
+    .timeline-content {
+      padding: 16px;
+    }
+
+    .timeline-title {
+      font-size: 1rem;
+    }
+
+    .timeline-desc {
+      font-size: 0.9rem;
+    }
+  }
+</style>

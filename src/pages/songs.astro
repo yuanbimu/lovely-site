@@ -1,0 +1,413 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+
+interface Song {
+  title: string;
+  artist: string;
+  description?: string;
+  tags?: string[];
+}
+
+// 歌單數據（待填充）
+const songs: Song[] = [
+  // 這裡可以添加東愛璃唱過的歌曲
+  // { title: "歌曲名", artist: "原唱", description: "描述", tags: ["tag1", "tag2"] }
+];
+
+const categories = [
+  { name: "全部", count: songs.length },
+  { name: "中文", count: 0 },
+  { name: "日文", count: 0 },
+  { name: "翻唱", count: 0 },
+  { name: "原創", count: 0 },
+];
+---
+
+<Layout title="歌单 - 東愛璃Lovely">
+  <Navigation />
+  
+  <main class="songs-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <h1 class="page-title">歌单</h1>
+        <p class="page-subtitle">東愛璃Lovely的歌曲收藏</p>
+        <div class="search-box">
+          <input 
+            type="text" 
+            placeholder="搜索歌曲..." 
+            class="search-input"
+            disabled
+          />
+          <span class="search-icon">🔍</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories-section">
+      <div class="container">
+        <div class="category-tabs">
+          {categories.map((cat, index) => (
+            <button 
+              class={`category-tab ${index === 0 ? 'active' : ''}`}
+              disabled
+            >
+              {cat.name}
+              <span class="category-count">{cat.count}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Songs List -->
+    <section class="songs-section">
+      <div class="container">
+        {songs.length > 0 ? (
+          <div class="songs-grid">
+            {songs.map((song, index) => (
+              <div class="song-card">
+                <div class="song-number">{String(index + 1).padStart(2, '0')}</div>
+                <div class="song-info">
+                  <h3 class="song-title">{song.title}</h3>
+                  <p class="song-artist">{song.artist}</p>
+                  {song.description && <p class="song-desc">{song.description}</p>}
+                  {song.tags && (
+                    <div class="song-tags">
+                      {song.tags.map(tag => (
+                        <span class="song-tag">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div class="song-play">
+                  <button class="play-btn" disabled title="播放功能开发中">
+                    <span class="play-icon">▶</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div class="empty-state">
+            <div class="empty-icon">🎵</div>
+            <h3 class="empty-title">歌单正在整理中</h3>
+            <p class="empty-desc">这里将会收录東愛璃Lovely唱过的歌曲</p>
+            <p class="empty-hint">敬请期待...</p>
+          </div>
+        )}
+      </div>
+    </section>
+  </main>
+  
+  <Footer />
+</Layout>
+
+<style>
+  .songs-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #FAF6F0 0%, #F5EDE3 100%);
+  }
+
+  .hero-section {
+    padding: 140px 20px 40px;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(107, 86, 55, 0.05) 0%, rgba(74, 144, 217, 0.05) 100%);
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    color: #6B5637;
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+
+  .page-subtitle {
+    font-size: 1.1rem;
+    color: #8B7355;
+    margin-bottom: 30px;
+  }
+
+  .search-box {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 14px 50px 14px 20px;
+    border: 2px solid rgba(107, 86, 55, 0.2);
+    border-radius: 30px;
+    font-size: 1rem;
+    background: white;
+    color: #6B5637;
+    transition: all 0.3s ease;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #4A90D9;
+    box-shadow: 0 4px 15px rgba(74, 144, 217, 0.15);
+  }
+
+  .search-input:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+  }
+
+  .search-icon {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    opacity: 0.5;
+  }
+
+  .categories-section {
+    padding: 20px;
+    border-bottom: 1px solid rgba(107, 86, 55, 0.1);
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .category-tabs {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .category-tab {
+    padding: 10px 20px;
+    border: none;
+    background: white;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    color: #6B5637;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(107, 86, 55, 0.15);
+  }
+
+  .category-tab:hover:not(:disabled) {
+    background: #6B5637;
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .category-tab.active {
+    background: #6B5637;
+    color: white;
+  }
+
+  .category-tab:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .category-count {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    background: rgba(107, 86, 55, 0.1);
+    border-radius: 12px;
+  }
+
+  .category-tab.active .category-count {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .songs-section {
+    padding: 40px 20px 100px;
+  }
+
+  .songs-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .song-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(107, 86, 55, 0.08);
+    transition: all 0.3s ease;
+  }
+
+  .song-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .song-number {
+    font-size: 0.9rem;
+    color: #8B7355;
+    font-weight: 600;
+    min-width: 40px;
+    text-align: center;
+  }
+
+  .song-info {
+    flex: 1;
+  }
+
+  .song-title {
+    font-size: 1.1rem;
+    color: #6B5637;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .song-artist {
+    font-size: 0.9rem;
+    color: #8B7355;
+  }
+
+  .song-desc {
+    font-size: 0.85rem;
+    color: #999;
+    margin-top: 8px;
+  }
+
+  .song-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .song-tag {
+    padding: 4px 10px;
+    background: rgba(74, 144, 217, 0.1);
+    color: #4A90D9;
+    border-radius: 12px;
+    font-size: 0.75rem;
+  }
+
+  .play-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #4A90D9, #6B5637);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .play-btn:hover:not(:disabled) {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(74, 144, 217, 0.4);
+  }
+
+  .play-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .play-icon {
+    font-size: 1.2rem;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.6;
+  }
+
+  .empty-title {
+    font-size: 1.5rem;
+    color: #6B5637;
+    margin-bottom: 12px;
+  }
+
+  .empty-desc {
+    font-size: 1rem;
+    color: #8B7355;
+    margin-bottom: 8px;
+  }
+
+  .empty-hint {
+    font-size: 0.9rem;
+    color: #999;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .page-title {
+      font-size: 2rem;
+    }
+
+    .song-card {
+      padding: 16px;
+      gap: 12px;
+    }
+
+    .song-number {
+      min-width: 30px;
+    }
+
+    .song-title {
+      font-size: 1rem;
+    }
+
+    .play-btn {
+      width: 40px;
+      height: 40px;
+    }
+
+    .category-tabs {
+      gap: 8px;
+    }
+
+    .category-tab {
+      padding: 8px 14px;
+      font-size: 0.85rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-section {
+      padding: 120px 16px 30px;
+    }
+
+    .songs-section {
+      padding: 30px 16px 60px;
+    }
+
+    .search-box {
+      margin: 0 -4px;
+    }
+
+    .song-card {
+      padding: 14px;
+    }
+
+    .song-number {
+      font-size: 0.8rem;
+    }
+  }
+</style>
