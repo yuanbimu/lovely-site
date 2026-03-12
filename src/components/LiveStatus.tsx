@@ -56,13 +56,13 @@ export default function LiveStatus() {
     }
     
     try {
-      console.log('[LiveStatus] Fetching from /api/live...');
-      const response = await fetch('/api/live', {
+      // Add cache-busting parameter for manual refresh to bypass browser cache
+      const cacheBuster = isManual ? `?t=${Date.now()}` : '';
+      const response = await fetch(`/api/live${cacheBuster}`, {
         headers: {
           'Accept': 'application/json',
         },
       });
-      
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }

@@ -5,14 +5,14 @@
     "showFansCount": true
   },
   "site": {
-    "title": "東愛璃Lovely - 秧歌星的狍子窝",
-    "description": "東愛璃Lovely的非官方应援站",
-    "author": "東愛璃Lovely"
+    "title": "东爱璃Lovely - 秧歌星的狍子窝",
+    "description": "东爱璃Lovely的非官方应援站",
+    "author": "东爱璃Lovely"
   },
   "profile": {
-    "name": "東愛璃Lovely",
+    "name": "东爱璃Lovely",
     "nickname": "狍子",
-    "avatar": "/images/avatar.webp",
+    "avatar": "https://i0.hdslb.com/bfs/face/fc07a1669559a0758ff8ee6f1b0eda5f3196d5dc.webp",
     "avatarApi": "https://api.bilibili.com/x/web-interface/card?mid={{UID}}",
     "uid": "3821157",
     "bio": "温柔可爱的虚拟偶像，秧歌星的偶像",
@@ -28,9 +28,9 @@
     ]
   },
   "stats": {
-    "fans": 311983,
+    "fans": 311986,
     "following": 824,
-    "lastUpdated": "2026-03-12T04:19:43.599295",
+    "lastUpdated": "2026-03-12",
     "avatar": "/images/avatar.webp"
   },
   "liveStatus": {
@@ -45,7 +45,7 @@
       "type": "text",
       "content": "今天也是元气满满的一天！💪 感谢大家的支持~",
       "images": [],
-      "author": "東愛璃Lovely",
+      "author": "东爱璃Lovely",
       "time": "2024-02-05T10:30:00",
       "stats": {
         "likes": 1234,
@@ -60,7 +60,7 @@
       "images": [
         "https://placehold.co/600x400/8B6F47/FFFFFF?text=Sample+Image+1"
       ],
-      "author": "東愛璃Lovely",
+      "author": "东爱璃Lovely",
       "time": "2024-02-04T15:20:00",
       "stats": {
         "likes": 2345,

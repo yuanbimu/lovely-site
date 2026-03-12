@@ -99,3 +99,73 @@ export async function getLiveStatus(db: D1Database) {
     checkedAt: result.checked_at
   };
 }
+  return {
+    isLive: result.is_live === 1,
+    title: result.title || '',
+    roomId: result.room_id || '',
+    url: result.url || '',
+    checkedAt: result.checked_at
+  };
+}
+
+// ========== Timeline Events ==========
+
+export interface TimelineEventData {
+  id: string;
+  date: string;
+  title: string;
+  content?: string;
+  color?: string;
+  icon?: string;
+  sort_order?: number;
+}
+
+export async function saveTimelineEvent(db: D1Database, event: TimelineEventData) {
+  await db.prepare(`
+    INSERT OR REPLACE INTO timeline_events 
+    (id, date, title, content, color, icon, sort_order, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).bind(
+    event.id,
+    event.date,
+    event.title,
+    event.content || null,
+    event.color || 'blue',
+    event.icon || 'mdi-star',
+    event.sort_order || 0,
+    Date.now(),
+    Date.now()
+  ).run();
+}
+
+export async function getTimelineEvents(db: D1Database) {
+  const result = await db
+    .prepare('SELECT * FROM timeline_events ORDER BY date DESC, sort_order ASC')
+    .all();
+  return result.results || [];
+}
+
+export async function deleteTimelineEvent(db: D1Database, id: string) {
+  await db.prepare('DELETE FROM timeline_events WHERE id = ?').bind(id).run();
+}
+
+export async function bulkSaveTimelineEvents(db: D1Database, events: TimelineEventData[]) {
+  // 使用事务批量导入
+  const statements = events.map(event => db.prepare(`
+    INSERT OR REPLACE INTO timeline_events 
+    (id, date, title, content, color, icon, sort_order, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).bind(
+    event.id,
+    event.date,
+    event.title,
+    event.content || null,
+    event.color || 'blue',
+    event.icon || 'mdi-star',
+    event.sort_order || 0,
+    Date.now(),
+    Date.now()
+  ));
+  
+  await db.batch(statements);
+}

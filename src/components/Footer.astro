@@ -1,4 +1,6 @@
 ---
+import SiteUptime from './SiteUptime';
+
 const currentYear = new Date().getFullYear();
 ---
 
@@ -11,10 +13,8 @@ const currentYear = new Date().getFullYear();
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <div class="footer-logo">東愛璃Lovely</div>
-        <p class="footer-desc">
-          東愛璃Lovely的非官方应援站
-        </p>
+        <div class="footer-logo">东爱璃Lovely</div>
+        <p class="footer-desc">东爱璃Lovely的非官方应援站</p>
         <p class="license-text">
           内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a> 协议<br>
           Made with 💙 by 秧歌星
@@ -23,7 +23,10 @@ const currentYear = new Date().getFullYear();
 
       <div class="footer-links">
         <h4>站点状态</h4>
-        <p class="copyright">© {currentYear} 東愛璃Lovely应援站</p>
+        <div class="uptime-wrapper">
+          <SiteUptime client:load />
+        </div>
+        <p class="copyright">© {currentYear} 东爱璃Lovely应援站</p>
         <a href="https://icp.gov.moe/?keyword=20250130" target="_blank" rel="noopener noreferrer" class="icp-link">ICP备案</a>
       </div>
 
@@ -96,23 +99,6 @@ const currentYear = new Date().getFullYear();
     right: -100px;
   }
 
-  /* 移动端装饰球体调整 */
-  @media (max-width: 600px) {
-    .deco-1 {
-      width: 250px;
-      height: 250px;
-      top: -60px;
-      left: -60px;
-    }
-
-    .deco-2 {
-      width: 200px;
-      height: 200px;
-      bottom: -60px;
-      right: -60px;
-    }
-  }
-
   .container {
     max-width: 1100px;
     margin: 0 auto;
@@ -153,54 +139,16 @@ const currentYear = new Date().getFullYear();
     line-height: 1.7;
   }
 
-  .license-text {
-    color: #8B6F47;
-    font-size: 13px;
-    opacity: 0.7;
-    line-height: 1.7;
-  }
-
   .license-text a {
     color: #6B5637;
-    text-decoration: none;
-  }
-
-  .license-text a:hover {
     text-decoration: underline;
   }
 
-  .footer-links h4 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #6B5637;
-    margin: 0 0 18px 0;
-    padding-bottom: 10px;
-    border-bottom: 2px solid rgba(196, 167, 125, 0.3);
-    display: inline-block;
+  .license-text a:hover {
+    color: #4A90D9;
   }
 
-  .copyright {
-    color: #8B6F47;
-    font-size: 14px;
-    margin: 0 0 12px 0;
-  }
-
-  .icp-link {
-    display: inline-block;
-    color: #6B5637;
-    font-size: 13px;
-    text-decoration: none;
-    padding: 6px 14px;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 20px;
-    transition: all 0.3s ease;
-  }
-
-  .icp-link:hover {
-    background: rgba(255, 255, 255, 0.8);
-    transform: translateY(-2px);
-  }
-
+  .footer-links h4,
   .footer-colors h4 {
     font-size: 16px;
     font-weight: 600;
@@ -211,31 +159,77 @@ const currentYear = new Date().getFullYear();
     display: inline-block;
   }
 
+  .uptime-wrapper {
+    margin: 12px 0 16px 0;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+  }
+
+  .copyright {
+    color: #8B6F47;
+    font-size: 13px;
+    margin: 12px 0 10px 0;
+  }
+
+  .icp-link {
+    display: inline-block;
+    color: #6B5637;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 8px 18px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
+    border-radius: 25px;
+    border: 1px solid rgba(196, 167, 125, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(107, 86, 55, 0.1);
+    margin-top: 8px;
+  }
+
+  .icp-link:hover {
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(107, 86, 55, 0.15);
+    border-color: rgba(196, 167, 125, 0.5);
+  }
+
   .palette-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
   }
 
   .color-dot-wrapper {
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+  }
+
+  .color-dot-wrapper:hover {
+    background: rgba(255, 255, 255, 0.7);
+    transform: scale(1.02);
   }
 
   .color-dot {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 8px;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.5);
   }
 
   .color-dot-wrapper span {
-    font-size: 12px;
+    font-size: 11px;
     color: #6B5637;
     font-family: 'SF Mono', Monaco, monospace;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: 0.5px;
   }
 
   .footer-divider {
@@ -295,10 +289,6 @@ const currentYear = new Date().getFullYear();
       text-align: center;
     }
 
-    .palette-grid {
-      justify-content: center;
-    }
-
     .color-dot-wrapper {
       justify-content: center;
     }
@@ -308,7 +298,6 @@ const currentYear = new Date().getFullYear();
     }
   }
 
-  /* 超小屏幕优化 */
   @media (max-width: 375px) {
     .footer-logo {
       font-size: 20px;

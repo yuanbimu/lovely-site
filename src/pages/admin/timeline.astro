@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navigation from '../../components/Navigation.astro';
+import TimelineAdmin from '../../components/TimelineAdmin';
+---
+
+<Layout title="Timeline 管理 - 东爱璃 Lovely">
+  <Navigation />
+  <main class="admin-page">
+    <TimelineAdmin client:load />
+  </main>
+</Layout>
+
+<style>
+  .admin-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #FAF6F0 0%, #F5EDE3 100%);
+  }
+</style>

@@ -16,7 +16,7 @@ const ogImageUrl = image.startsWith('http') ? image : getSiteUrl(image);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content={pageDesc}>
-  <meta name="keywords" content="東愛璃Lovely, 狍子, 虚拟偶像, Vtuber, B站, 应援站">
+  <meta name="keywords" content="东爱璃Lovely, 狍子, 虚拟偶像, Vtuber, B站, 应援站">
   <meta name="author" content={site.author}>
   <meta name="theme-color" content="#6B5637">
   
@@ -49,7 +49,9 @@ const ogImageUrl = image.startsWith('http') ? image : getSiteUrl(image);
   </style>
 </head>
 <body class="min-h-screen bg-bg-cream">
+  <body class="min-h-screen bg-bg-cream">
   <main id="main-content">
     <slot />
   </main>
+  </body>
 </body>

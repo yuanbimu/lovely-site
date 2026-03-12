@@ -1,0 +1,425 @@
+.timeline-admin-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FAF6F0 0%, #F5EDE3 100%);
+  padding: 20px;
+}
+
+.login-card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(107, 86, 55, 0.15);
+  max-width: 400px;
+  width: 100%;
+}
+
+.login-card h1 {
+  font-size: 24px;
+  color: #6B5637;
+  margin: 0 0 12px 0;
+  text-align: center;
+}
+
+.login-desc {
+  color: #8B6F47;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+
+.token-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #E8D4C0;
+  border-radius: 12px;
+  font-size: 16px;
+  margin-bottom: 16px;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.token-input:focus {
+  outline: none;
+  border-color: #9d84b7;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(157, 132, 183, 0.3);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background: rgba(255, 100, 100, 0.1);
+  color: #c62828;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* 管理后台主界面 */
+.timeline-admin {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #FAF6F0 0%, #F5EDE3 100%);
+  padding: 40px 20px;
+}
+
+.admin-header {
+  max-width: 900px;
+  margin: 0 auto 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-header h1 {
+  font-size: 32px;
+  color: #6B5637;
+  margin: 0;
+}
+
+.logout-btn {
+  padding: 10px 20px;
+  background: transparent;
+  border: 2px solid #9d84b7;
+  color: #9d84b7;
+  border-radius: 50px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #9d84b7;
+  color: white;
+}
+
+.success-message {
+  background: rgba(76, 175, 80, 0.1);
+  color: #2e7d32;
+  padding: 14px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.error-message-display {
+  background: rgba(255, 100, 100, 0.1);
+  color: #c62828;
+  padding: 14px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 导入区域 */
+.import-section {
+  max-width: 900px;
+  margin: 0 auto 40px;
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(139, 111, 71, 0.08);
+}
+
+.import-section h2 {
+  font-size: 22px;
+  color: #6B5637;
+  margin: 0 0 12px 0;
+}
+
+.import-hint {
+  color: #8B6F47;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.import-textarea {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid #E8D4C0;
+  border-radius: 12px;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 13px;
+  resize: vertical;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+
+.import-textarea:focus {
+  outline: none;
+  border-color: #9d84b7;
+}
+
+.import-btn {
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #4A90D9 0%, #357ABD 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.import-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(74, 144, 217, 0.3);
+}
+
+.import-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 事件列表 */
+.events-section {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(139, 111, 71, 0.08);
+}
+
+.events-section h2 {
+  font-size: 22px;
+  color: #6B5637;
+  margin: 0 0 20px 0;
+}
+
+.loading {
+  text-align: center;
+  color: #8B6F47;
+  padding: 40px;
+}
+
+.empty-state {
+  text-align: center;
+  color: #8B6F47;
+  padding: 60px 20px;
+  font-size: 16px;
+}
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.event-card {
+  background: #FAF6F0;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(157, 132, 183, 0.1);
+}
+
+.event-date {
+  font-size: 13px;
+  color: #4A90D9;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.event-title {
+  font-size: 18px;
+  color: #6B5637;
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+
+.event-desc {
+  color: #8B6F47;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 12px 0;
+}
+
+.event-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.event-meta span {
+  color: #8B6F47;
+  background: rgba(139, 111, 71, 0.05);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.event-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-btn, .delete-btn {
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #4A90D9 0%, #357ABD 100%);
+  color: white;
+}
+
+.edit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(74, 144, 217, 0.3);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #FF6B6B 0%, #E85A7A 100%);
+  color: white;
+}
+
+.delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+/* 编辑表单 */
+.event-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.edit-input {
+  padding: 12px 16px;
+  border: 2px solid #E8D4C0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: #9d84b7;
+}
+
+.edit-input-small {
+  width: auto;
+  max-width: 200px;
+}
+
+.edit-textarea {
+  padding: 12px 16px;
+  border: 2px solid #E8D4C0;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+.edit-textarea:focus {
+  outline: none;
+  border-color: #9d84b7;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.save-btn, .cancel-btn {
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.cancel-btn {
+  background: #E0E0E0;
+  color: #666;
+}
+
+.cancel-btn:hover {
+  background: #D0D0D0;
+}
+
+/* 响应式 */
+@media (max-width: 600px) {
+  .admin-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .admin-header h1 {
+    font-size: 24px;
+  }
+
+  .import-section,
+  .events-section {
+    padding: 20px;
+  }
+
+  .event-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .event-actions,
+  .edit-actions {
+    flex-direction: column;
+  }
+
+  .edit-btn,
+  .delete-btn,
+  .save-btn,
+  .cancel-btn {
+    width: 100%;
+  }
+}

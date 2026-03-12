@@ -157,7 +157,33 @@ npx vitest path/to/test.test.ts
 
 ---
 
-## 响应式设计
+## 待办事项
+
+### 进行中
+
+- [x] 关于页面改进 - 见 `docs/about-page-plan.md`
+  - [x] 站点运行时间统计（已移至 Footer，全站可见）
+  - [x] 贡献者墙
+  - [x] 鸣谢部分重构（分层次）
+  - [ ] 文字内容优化（更有温度）
+  - [ ] 更新日志
+
+### 计划中
+
+- [ ] 动态数据同步（D1 + R2）- 见 `docs/dynamics-sync-notes.md`
+- [ ] 实时直播检测功能 - 见 `docs/live-status-plan.md`
+- [ ] 歌单内容填充
+- [ ] Pics 图片库页面
+
+### 已完成 ✅
+
+- [x] Timeline 时间线页面
+- [x] Songs 歌单页面（框架）
+- [x] 导航栏重新设计（Logo 置左）
+- [x] 直播状态检测功能
+- [x] 繁体字统一转换为简体
+
+---
 
 ### 断点系统
 

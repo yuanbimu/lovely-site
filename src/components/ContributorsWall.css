@@ -1,0 +1,152 @@
+.contributors-wall {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contributors-section {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(107, 86, 55, 0.1);
+}
+
+.contributors-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #6B5637;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.title-icon {
+  font-size: 16px;
+}
+
+/* 开发者卡片 */
+.contributors-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.contributor-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.contributor-card:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+.contributor-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #9d84b7, #6a4c93);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contributor-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.contributor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.contributor-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6B5637;
+}
+
+.contributor-role {
+  font-size: 11px;
+  color: #8B6F47;
+}
+
+/* 特别感谢列表 */
+.thanks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.thanks-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.thanks-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6B5637;
+  white-space: nowrap;
+}
+
+.thanks-desc {
+  font-size: 12px;
+  color: #8B6F47;
+}
+
+/* 技术依赖标签 */
+.tech-deps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tech-badge {
+  padding: 5px 10px;
+  background: rgba(74, 144, 217, 0.08);
+  color: #4A90D9;
+  border-radius: 16px;
+  font-size: 11px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.tech-badge:hover {
+  background: rgba(74, 144, 217, 0.15);
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+  .contributor-card {
+    padding: 8px 12px;
+  }
+  
+  .contributor-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
