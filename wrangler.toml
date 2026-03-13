@@ -1,15 +1,14 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "lovely-site"
+account_id = "9333b7020ce1a884f80bacfadfdeb4a4"
 compatibility_date = "2024-01-01"
 pages_build_output_dir = "./dist"
 
-# D1 数据库绑定
 [[d1_databases]]
 binding = "DB"
 database_name = "lovely-site-db"
 database_id = "1d74fc62-3a49-484c-bb48-170f5b0146e5"
 
-# R2 存储桶绑定
 [[r2_buckets]]
 binding = "IMAGES"
 bucket_name = "lovelymain"
