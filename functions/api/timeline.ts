@@ -5,15 +5,8 @@ import {
   deleteTimelineEvent,
   bulkSaveTimelineEvents
 } from '../lib/db.js';
-  getTimelineEvents, 
-  saveTimelineEvent, 
-  deleteTimelineEvent,
-  bulkSaveTimelineEvents,
-  type Env,
-  type TimelineEventData 
-} from '../lib/db';
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono();
 
 // 简单认证中间件
 const authMiddleware = async (c: any, next: any) => {
@@ -138,7 +131,7 @@ app.post('/bulk', authMiddleware, async (c): Promise<Response> => {
     }
     
     // 验证每个事件
-    const validatedEvents: TimelineEventData[] = body.events.map((e: any) => ({
+    const validatedEvents = body.events.map((e: any) => ({
       id: e.id || `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       date: e.date,
       title: e.title,
@@ -149,7 +142,7 @@ app.post('/bulk', authMiddleware, async (c): Promise<Response> => {
     }));
     
     // 检查必填字段
-    const invalidEvents = validatedEvents.filter(e => !e.date || !e.title);
+    const invalidEvents = validatedEvents.filter((e: any) => !e.date || !e.title);
     if (invalidEvents.length > 0) {
       return c.json({ 
         error: 'Some events are missing required fields (date, title)',
