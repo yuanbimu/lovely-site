@@ -13,7 +13,7 @@
     "init:db": "sh scripts/init-db.sh",
     "init:db:windows": "node scripts/init-db.js",
     "init:db:prod": "sh scripts/init-db.sh --prod",
-    "build": "npm run fetch-data && astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
