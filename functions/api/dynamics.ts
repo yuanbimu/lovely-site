@@ -1,8 +1,7 @@
 import { Hono } from 'hono';
-import { getDynamics } from '../lib/db';
-import type { Env } from '../lib/db';
+import { getDynamics } from '../lib/db.js';
 
-const app = new Hono<{ Bindings: Env }>();
+const app = new Hono();
 
 interface DynamicsResponse {
   data: any[];

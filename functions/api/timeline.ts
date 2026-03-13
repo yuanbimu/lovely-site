@@ -3,6 +3,11 @@ import {
   getTimelineEvents, 
   saveTimelineEvent, 
   deleteTimelineEvent,
+  bulkSaveTimelineEvents
+} from '../lib/db.js';
+  getTimelineEvents, 
+  saveTimelineEvent, 
+  deleteTimelineEvent,
   bulkSaveTimelineEvents,
   type Env,
   type TimelineEventData 
@@ -94,7 +99,7 @@ app.post('/', authMiddleware, async (c): Promise<Response> => {
     }
     
     // 生成 ID（如果没有提供）
-    const eventData: TimelineEventData = {
+    const eventData = {
       id: body.id || `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       date: body.date,
       title: body.title,
