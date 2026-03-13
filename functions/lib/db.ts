@@ -163,3 +163,87 @@ export async function bulkSaveTimelineEvents(db: D1Database, events: TimelineEve
   
   await db.batch(statements);
 }
+// ========== User Authentication ==========
+
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  password_hash: string;
+  role: 'admin' | 'editor' | 'viewer';
+  created_at: number;
+  updated_at: number;
+}
+
+export interface Session {
+  id: string;
+  user_id: string;
+  expires_at: number;
+  created_at: number;
+}
+
+export async function createUser(db: D1Database, user: Omit<User, 'created_at' | 'updated_at'>) {
+  const now = Date.now();
+  await db.prepare(`
+    INSERT INTO users (id, username, email, password_hash, role, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).bind(
+    user.id,
+    user.username,
+    user.email,
+    user.password_hash,
+    user.role,
+    now,
+    now
+  ).run();
+}
+
+export async function getUserByUsername(db: D1Database, username: string): Promise<User | null> {
+  const result = await db
+    .prepare('SELECT * FROM users WHERE username = ?')
+    .bind(username)
+    .first<User>();
+  return result;
+}
+
+export async function getUserById(db: D1Database, id: string): Promise<User | null> {
+  const result = await db
+    .prepare('SELECT * FROM users WHERE id = ?')
+    .bind(id)
+    .first<User>();
+  return result;
+}
+
+export async function createSession(db: D1Database, session: Omit<Session, 'created_at'>) {
+  await db.prepare(`
+    INSERT INTO sessions (id, user_id, expires_at, created_at)
+    VALUES (?, ?, ?, ?)
+  `).bind(
+    session.id,
+    session.user_id,
+    session.expires_at,
+    Date.now()
+  ).run();
+}
+
+export async function getSessionById(db: D1Database, id: string): Promise<Session | null> {
+  const result = await db
+    .prepare('SELECT * FROM sessions WHERE id = ? AND expires_at > ?')
+    .bind(id, Date.now())
+    .first<Session>();
+  return result;
+}
+
+export async function deleteSession(db: D1Database, id: string) {
+  await db.prepare('DELETE FROM sessions WHERE id = ?').bind(id).run();
+}
+
+export async function deleteExpiredSessions(db: D1Database) {
+  await db.prepare('DELETE FROM sessions WHERE expires_at < ?').bind(Date.now()).run();
+}
+
+export async function updateUserPassword(db: D1Database, userId: string, newPasswordHash: string) {
+  await db.prepare(`
+    UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?
+  `).bind(newPasswordHash, Date.now(), userId).run();
+}

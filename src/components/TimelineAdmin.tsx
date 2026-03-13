@@ -11,41 +11,44 @@ interface TimelineEvent {
   sort_order?: number;
 }
 
-interface ApiResponse {
-  data?: TimelineEvent[];
-  success?: boolean;
-  error?: string;
-  message?: string;
-  count?: number;
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: 'admin' | 'editor' | 'viewer';
 }
 
 const API_BASE = '/api/timeline';
+const AUTH_BASE = '/api/auth';
 
 export default function TimelineAdmin() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [token, setToken] = useState('');
+  // 認證狀態
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // 登錄表單
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
+  
+  // 時間線數據
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
-  // 导入文本框
+  // 導入文本框
   const [importText, setImportText] = useState('');
   
-  // 编辑状态
+  // 編輯狀態
   const [editingEvent, setEditingEvent] = useState<TimelineEvent | null>(null);
 
-  // 检查本地存储的 token
+  // 檢查登錄狀態
   useEffect(() => {
-    const savedToken = localStorage.getItem('timeline_admin_token');
-    if (savedToken) {
-      setToken(savedToken);
-      // 验证 token 是否有效
-      verifyToken(savedToken);
-    }
+    checkAuthStatus();
   }, []);
 
-  // 自动清除成功消息
+  // 自動清除成功消息
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => setSuccessMessage(null), 3000);
@@ -53,72 +56,144 @@ export default function TimelineAdmin() {
     }
   }, [successMessage]);
 
-  async function verifyToken(testToken: string) {
+  async function checkAuthStatus() {
     try {
-      const response = await fetch(API_BASE, {
-        headers: {
-          'Authorization': `Bearer ${testToken}`
-        }
+      const response = await fetch(`${AUTH_BASE}/me`, {
+        credentials: 'include' // 包含 Cookie
       });
       
       if (response.ok) {
-        setIsAuthenticated(true);
-        loadEvents();
-      } else {
-        localStorage.removeItem('timeline_admin_token');
-        setIsAuthenticated(false);
+        const data = await response.json();
+        if (data.user) {
+          setUser(data.user);
+          loadEvents();
+        }
       }
     } catch (err) {
-      console.error('Token verification failed:', err);
+      console.error('Auth check failed:', err);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    if (!token.trim()) {
-      setError('请输入 Token');
+    setLoginError(null);
+    setIsLoginLoading(true);
+
+    if (!loginForm.username.trim() || !loginForm.password.trim()) {
+      setLoginError('請輸入用戶名和密碼');
+      setIsLoginLoading(false);
       return;
     }
 
     try {
-      const response = await fetch(API_BASE, {
-        headers: {
-          'Authorization': `Bearer ${token.trim()}`
-        }
+      const response = await fetch(`${AUTH_BASE}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          username: loginForm.username.trim(),
+          password: loginForm.password.trim()
+        })
       });
 
-      if (response.ok) {
-        localStorage.setItem('timeline_admin_token', token.trim());
-        setIsAuthenticated(true);
+      const data = await response.json();
+
+      if (response.ok && data.user) {
+        setUser(data.user);
+        setLoginForm({ username: '', password: '' });
         setError(null);
         loadEvents();
+        setSuccessMessage(`歡迎回來，${data.user.username}！`);
       } else {
-        setError('Token 无效，请检查后重试');
-        localStorage.removeItem('timeline_admin_token');
+        setLoginError(data.error || '登錄失敗，請檢查用戶名和密碼');
       }
     } catch (err) {
-      setError('网络连接失败，请稍后重试');
+      setLoginError('網絡連接失敗，請稍後重試');
+    } finally {
+      setIsLoginLoading(false);
     }
+  }
+
+  async function handleLogout() {
+    try {
+      await fetch(`${AUTH_BASE}/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+    setUser(null);
+    setEvents([]);
   }
 
   async function loadEvents() {
     setLoading(true);
     try {
       const response = await fetch(API_BASE, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include'
       });
-
-      const result: ApiResponse = await response.json();
-
-      if (response.ok && result.data) {
-        setEvents(result.data);
+      if (response.ok) {
+        const data = await response.json();
+        setEvents(data.data || []);
       } else {
-        setError(result.error || '加载失败');
+        setError('加載數據失敗');
       }
     } catch (err) {
-      setError('加载数据失败');
+      setError('網絡錯誤，無法加載數據');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function saveEvent(event: TimelineEvent) {
+    setLoading(true);
+    try {
+      const response = await fetch(API_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(event)
+      });
+
+      if (response.ok) {
+        setEditingEvent(null);
+        loadEvents();
+        setSuccessMessage('保存成功！');
+      } else {
+        const data = await response.json();
+        setError(data.error || '保存失敗');
+      }
+    } catch (err) {
+      setError('網絡錯誤，保存失敗');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function deleteEvent(id: string) {
+    if (!confirm('確定要删除這個事件嗎？此操作不可撤銷。')) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE}/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        loadEvents();
+        setSuccessMessage('删除成功！');
+      } else {
+        const data = await response.json();
+        setError(data.error || '删除失敗');
+      }
+    } catch (err) {
+      setError('網絡錯誤，删除失敗');
     } finally {
       setLoading(false);
     }
@@ -126,126 +201,101 @@ export default function TimelineAdmin() {
 
   async function handleImport() {
     if (!importText.trim()) {
-      setError('请输入要导入的数据');
+      setError('請輸入要導入的數據');
       return;
     }
 
-    setLoading(true);
     try {
-      const jsonData = JSON.parse(importText);
-      const eventsToImport = Array.isArray(jsonData) ? jsonData : jsonData.events;
+      const lines = importText.trim().split('\n');
+      const events = lines.map(line => {
+        const parts = line.split('|');
+        return {
+          date: parts[0]?.trim() || '',
+          title: parts[1]?.trim() || '',
+          content: parts[2]?.trim() || ''
+        };
+      }).filter(e => e.date && e.title);
 
-      if (!Array.isArray(eventsToImport)) {
-        throw new Error('数据格式必须是数组或包含 events 数组的对象');
+      if (events.length === 0) {
+        setError('沒有有效的數據可導入');
+        return;
       }
 
+      setLoading(true);
       const response = await fetch(`${API_BASE}/bulk`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ events: eventsToImport })
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ events })
       });
 
-      const result: ApiResponse = await response.json();
-
-      if (response.ok && result.success) {
-        setSuccessMessage(`成功导入 ${result.count} 条事件`);
+      if (response.ok) {
+        const data = await response.json();
         setImportText('');
         loadEvents();
+        setSuccessMessage(`成功導入 ${data.count} 個事件！`);
       } else {
-        setError(result.error || '导入失败');
-      }
-    } catch (err: any) {
-      setError(err.message || 'JSON 解析失败，请检查格式');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleDelete(id: string) {
-    if (!confirm('确定要删除这条事件吗？')) return;
-
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_BASE}/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const result: ApiResponse = await response.json();
-
-      if (response.ok && result.success) {
-        setSuccessMessage('删除成功');
-        loadEvents();
-      } else {
-        setError(result.error || '删除失败');
+        const data = await response.json();
+        setError(data.error || '導入失敗');
       }
     } catch (err) {
-      setError('删除失败');
+      setError('數據格式錯誤或網絡錯誤');
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleSaveEdit() {
-    if (!editingEvent) return;
-
-    setLoading(true);
-    try {
-      const response = await fetch(API_BASE, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(editingEvent)
-      });
-
-      const result: ApiResponse = await response.json();
-
-      if (response.ok && result.success) {
-        setSuccessMessage('保存成功');
-        setEditingEvent(null);
-        loadEvents();
-      } else {
-        setError(result.error || '保存失败');
-      }
-    } catch (err) {
-      setError('保存失败');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function handleLogout() {
-    localStorage.removeItem('timeline_admin_token');
-    setToken('');
-    setIsAuthenticated(false);
-    setEvents([]);
-  }
-
-  if (!isAuthenticated) {
+  // 登錄界面
+  if (isLoading) {
     return (
-      <div className="timeline-admin-login">
-        <div className="login-card">
-          <h1>🔐 Timeline 管理后台</h1>
-          <p className="login-desc">请输入管理 Token</p>
-          <form onSubmit={handleLogin}>
-            <input
-              type="password"
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              placeholder="输入 Token"
-              className="token-input"
-              autoFocus
-            />
-            {error && <div className="error-message">{error}</div>}
-            <button type="submit" className="login-btn" disabled={loading}>
-              {loading ? '验证中...' : '进入后台'}
+      <div className="timeline-admin">
+        <div className="loading">加載中...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="timeline-admin">
+        <div className="login-container">
+          <h2>管理員登錄</h2>
+          <p className="login-description">請使用您的用戶名和密碼登錄以管理時間線</p>
+          
+          {loginError && (
+            <div className="error-message">{loginError}</div>
+          )}
+          
+          <form onSubmit={handleLogin} className="login-form">
+            <div className="form-group">
+              <label htmlFor="username">用戶名</label>
+              <input
+                type="text"
+                id="username"
+                value={loginForm.username}
+                onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
+                placeholder="輸入用戶名"
+                disabled={isLoginLoading}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="password">密碼</label>
+              <input
+                type="password"
+                id="password"
+                value={loginForm.password}
+                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                placeholder="輸入密碼"
+                disabled={isLoginLoading}
+              />
+            </div>
+            
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+              disabled={isLoginLoading}
+            >
+              {isLoginLoading ? '登錄中...' : '登錄'}
             </button>
           </form>
         </div>
@@ -253,132 +303,164 @@ export default function TimelineAdmin() {
     );
   }
 
+  // 檢查權限
+  if (user.role === 'viewer') {
+    return (
+      <div className="timeline-admin">
+        <div className="access-denied">
+          <h2>訪問被拒</h2>
+          <p>您的賬戶（{user.username}）沒有編輯權限。</p>
+          <p>需要管理員或編輯員權限才能管理時間線。</p>
+          <button onClick={handleLogout} className="btn btn-secondary">
+            登出
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="timeline-admin">
+      {/* 頭部信息 */}
       <div className="admin-header">
-        <h1>📋 Timeline 管理</h1>
-        <button onClick={handleLogout} className="logout-btn">退出登录</button>
-      </div>
-
-      {successMessage && (
-        <div className="success-message">{successMessage}</div>
-      )}
-
-      {error && (
-        <div className="error-message-display">{error}</div>
-      )}
-
-      {/* 导入区域 */}
-      <div className="import-section">
-        <h2>📥 导入数据</h2>
-        <p className="import-hint">
-          粘贴 JSON 格式的数据，可以是数组或包含 events 数组的对象
-        </p>
-        <textarea
-          value={importText}
-          onChange={(e) => setImportText(e.target.value)}
-          placeholder={`[
-  {
-    "date": "2024-01-01",
-    "title": "事件标题",
-    "content": "事件描述",
-    "color": "blue",
-    "icon": "mdi-star"
-  }
-]`}
-          className="import-textarea"
-          rows={10}
-        />
-        <button 
-          onClick={handleImport} 
-          className="import-btn"
-          disabled={loading || !importText.trim()}
-        >
-          {loading ? '导入中...' : '导入数据'}
+        <div className="user-info">
+          <span>當前用戶: <strong>{user.username}</strong></span>
+          <span className="user-role">角色: {user.role}</span>
+        </div>
+        <button onClick={handleLogout} className="btn btn-secondary btn-sm">
+          登出
         </button>
       </div>
 
-      {/* 事件列表 */}
-      <div className="events-section">
-        <h2>📝 现有事件 ({events.length})</h2>
-        {loading && !events.length ? (
-          <div className="loading">加载中...</div>
-        ) : events.length === 0 ? (
-          <div className="empty-state">暂无事件</div>
-        ) : (
-          <div className="events-list">
-            {events.map((event) => (
-              <div key={event.id} className="event-card">
-                {editingEvent?.id === event.id ? (
-                  // 编辑模式
-                  <div className="event-edit-form">
-                    <input
-                      type="text"
-                      value={editingEvent.date}
-                      onChange={(e) => setEditingEvent({...editingEvent, date: e.target.value})}
-                      placeholder="日期 (YYYY-MM-DD)"
-                      className="edit-input"
-                    />
-                    <input
-                      type="text"
-                      value={editingEvent.title}
-                      onChange={(e) => setEditingEvent({...editingEvent, title: e.target.value})}
-                      placeholder="标题"
-                      className="edit-input"
-                    />
-                    <textarea
-                      value={editingEvent.content || ''}
-                      onChange={(e) => setEditingEvent({...editingEvent, content: e.target.value})}
-                      placeholder="描述"
-                      className="edit-textarea"
-                      rows={3}
-                    />
-                    <input
-                      type="text"
-                      value={editingEvent.color || ''}
-                      onChange={(e) => setEditingEvent({...editingEvent, color: e.target.value})}
-                      placeholder="颜色 (blue/green/purple/red)"
-                      className="edit-input edit-input-small"
-                    />
-                    <input
-                      type="text"
-                      value={editingEvent.icon || ''}
-                      onChange={(e) => setEditingEvent({...editingEvent, icon: e.target.value})}
-                      placeholder="图标"
-                      className="edit-input edit-input-small"
-                    />
-                    <input
-                      type="number"
-                      value={editingEvent.sort_order || 0}
-                      onChange={(e) => setEditingEvent({...editingEvent, sort_order: parseInt(e.target.value) || 0})}
-                      placeholder="排序"
-                      className="edit-input edit-input-small"
-                    />
-                    <div className="edit-actions">
-                      <button onClick={handleSaveEdit} className="save-btn">保存</button>
-                      <button onClick={() => setEditingEvent(null)} className="cancel-btn">取消</button>
-                    </div>
-                  </div>
-                ) : (
-                  // 查看模式
-                  <div className="event-content">
-                    <div className="event-date">{event.date}</div>
-                    <h3 className="event-title">{event.title}</h3>
-                    {event.content && <p className="event-desc">{event.content}</p>}
-                    <div className="event-meta">
-                      <span className="event-color">颜色：{event.color}</span>
-                      <span className="event-icon">图标：{event.icon}</span>
-                      <span className="event-sort">排序：{event.sort_order}</span>
-                    </div>
-                    <div className="event-actions">
-                      <button onClick={() => setEditingEvent(event)} className="edit-btn">编辑</button>
-                      <button onClick={() => handleDelete(event.id)} className="delete-btn">删除</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+      {/* 成功/錯誤提示 */}
+      {successMessage && (
+        <div className="success-message">{successMessage}</div>
+      )}
+      {error && (
+        <div className="error-message">
+          {error}
+          <button onClick={() => setError(null)}>✕</button>
+        </div>
+      )}
+
+      {/* 導入區域 */}
+      <div className="import-section">
+        <h3>批量導入</h3>
+        <textarea
+          value={importText}
+          onChange={(e) => setImportText(e.target.value)}
+          placeholder="格式：日期|標題|內容（每行一個事件）&#10;例如：&#10;2024-01-01|新年快樂|祝大家新年快樂！&#10;2024-03-15|重要事件|這是一個重要事件"
+          rows={4}
+        />
+        <button 
+          onClick={handleImport} 
+          className="btn btn-primary"
+          disabled={loading}
+        >
+          {loading ? '導入中...' : '導入事件'}
+        </button>
+      </div>
+
+      {/* 編輯表單 */}
+      {editingEvent && (
+        <div className="edit-form">
+          <h3>{editingEvent.id ? '編輯事件' : '新建事件'}</h3>
+          <div className="form-row">
+            <div className="form-group">
+              <label>日期</label>
+              <input
+                type="date"
+                value={editingEvent.date}
+                onChange={(e) => setEditingEvent({ ...editingEvent, date: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>標題</label>
+              <input
+                type="text"
+                value={editingEvent.title}
+                onChange={(e) => setEditingEvent({ ...editingEvent, title: e.target.value })}
+                placeholder="事件標題"
+              />
+            </div>
           </div>
+          <div className="form-group">
+            <label>內容</label>
+            <textarea
+              value={editingEvent.content || ''}
+              onChange={(e) => setEditingEvent({ ...editingEvent, content: e.target.value })}
+              placeholder="事件詳細內容（可選）"
+              rows={3}
+            />
+          </div>
+          <div className="form-actions">
+            <button 
+              onClick={() => saveEvent(editingEvent)} 
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? '保存中...' : '保存'}
+            </button>
+            <button 
+              onClick={() => setEditingEvent(null)} 
+              className="btn btn-secondary"
+            >
+              取消
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 事件列表 */}
+      <div className="events-list">
+        <div className="list-header">
+          <h3>事件列表 ({events.length})</h3>
+          <button 
+            onClick={() => setEditingEvent({ id: '', date: '', title: '', content: '' })}
+            className="btn btn-primary btn-sm"
+          >
+            + 新建事件
+          </button>
+        </div>
+
+        {loading && events.length === 0 ? (
+          <div className="loading">加載中...</div>
+        ) : events.length === 0 ? (
+          <div className="empty-state">暫無事件，點擊上方按鈕創建第一個事件</div>
+        ) : (
+          <table className="events-table">
+            <thead>
+              <tr>
+                <th>日期</th>
+                <th>標題</th>
+                <th>內容</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              {events.map((event) => (
+                <tr key={event.id}>
+                  <td>{event.date}</td>
+                  <td>{event.title}</td>
+                  <td>{event.content?.substring(0, 50)}...</td>
+                  <td>
+                    <button 
+                      onClick={() => setEditingEvent(event)}
+                      className="btn btn-secondary btn-sm"
+                    >
+                      編輯
+                    </button>
+                    <button 
+                      onClick={() => deleteEvent(event.id)}
+                      className="btn btn-danger btn-sm"
+                    >
+                      删除
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

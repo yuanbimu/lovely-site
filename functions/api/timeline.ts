@@ -3,22 +3,49 @@ import {
   getTimelineEvents, 
   saveTimelineEvent, 
   deleteTimelineEvent,
-  bulkSaveTimelineEvents
+  bulkSaveTimelineEvents,
+  getSessionById,
+  getUserById
 } from '../lib/db.js';
 
 const app = new Hono();
 
-// 简单认证中间件
-const authMiddleware = async (c: any, next: any) => {
-  const token = c.req.header('Authorization');
-  const adminToken = c.env.ADMIN_TOKEN;
+// Session 認證中間件
+const requireAuth = async (c: any, next: any) => {
+  const sessionToken = c.req.cookie('session');
   
-  if (!adminToken) {
-    return c.json({ error: 'Admin token not configured' }, 500);
+  if (!sessionToken) {
+    return c.json({ error: '未登錄，請先登錄' }, 401);
   }
   
-  if (!token || token !== `Bearer ${adminToken}`) {
-    return c.json({ error: 'Unauthorized' }, 401);
+  const db = c.env.DB;
+  const session = await getSessionById(db, sessionToken);
+  
+  if (!session) {
+    // Session 過期，清除 Cookie
+    c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/');
+    return c.json({ error: 'Session 已過期，請重新登錄' }, 401);
+  }
+  
+  const user = await getUserById(db, session.user_id);
+  if (!user) {
+    return c.json({ error: '用戶不存在' }, 404);
+  }
+  
+  // 將用戶信息附加到上下文
+  c.set('user', user);
+  await next();
+};
+
+// 要求管理員或編輯員權限
+const requireEditor = async (c: any, next: any) => {
+  const user = c.get('user');
+  if (!user) {
+    return c.json({ error: '未登錄' }, 401);
+  }
+  
+  if (user.role !== 'admin' && user.role !== 'editor') {
+    return c.json({ error: '權限不足，需要編輯員或以上權限' }, 403);
   }
   
   await next();
@@ -78,16 +105,17 @@ app.get('/:id', async (c): Promise<Response> => {
   }
 });
 
-// POST /api/timeline - 创建/更新事件（需要认证）
-app.post('/', authMiddleware, async (c): Promise<Response> => {
+// POST /api/timeline - 创建/更新事件（需要認證）
+app.post('/', requireAuth, requireEditor, async (c): Promise<Response> => {
   try {
     const body = await c.req.json();
     const db = c.env.DB;
+    const user = c.get('user');
     
     // 验证必填字段
     if (!body.date || !body.title) {
       return c.json({ 
-        error: 'Missing required fields: date, title' 
+        error: '缺少必填字段：date, title' 
       }, 400);
     }
     
@@ -104,29 +132,32 @@ app.post('/', authMiddleware, async (c): Promise<Response> => {
     
     await saveTimelineEvent(db, eventData);
     
+    console.log(`[Timeline] User ${user.username} saved event: ${eventData.id}`);
+    
     return c.json({
       success: true,
       data: eventData,
-      message: 'Event saved successfully'
+      message: '事件保存成功'
     }, 201);
   } catch (error) {
     console.error('[Timeline API POST] Error:', error);
     return c.json({ 
-      error: 'Failed to save event',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      error: '保存事件失敗',
+      details: error instanceof Error ? error.message : '未知錯誤'
     }, 500);
   }
 });
 
-// POST /api/timeline/bulk - 批量导入事件（需要认证）
-app.post('/bulk', authMiddleware, async (c): Promise<Response> => {
+// POST /api/timeline/bulk - 批量导入事件（需要認證）
+app.post('/bulk', requireAuth, requireEditor, async (c): Promise<Response> => {
   try {
     const body = await c.req.json();
     const db = c.env.DB;
+    const user = c.get('user');
     
     if (!Array.isArray(body.events)) {
       return c.json({ 
-        error: 'Request body must contain an "events" array' 
+        error: '請求體必須包含 "events" 數組' 
       }, 400);
     }
     
@@ -145,43 +176,48 @@ app.post('/bulk', authMiddleware, async (c): Promise<Response> => {
     const invalidEvents = validatedEvents.filter((e: any) => !e.date || !e.title);
     if (invalidEvents.length > 0) {
       return c.json({ 
-        error: 'Some events are missing required fields (date, title)',
+        error: '部分事件缺少必填字段（date, title）',
         invalidCount: invalidEvents.length
       }, 400);
     }
     
     await bulkSaveTimelineEvents(db, validatedEvents);
     
+    console.log(`[Timeline] User ${user.username} imported ${validatedEvents.length} events`);
+    
     return c.json({
       success: true,
       count: validatedEvents.length,
-      message: `Successfully imported ${validatedEvents.length} events`
+      message: `成功導入 ${validatedEvents.length} 個事件`
     }, 201);
   } catch (error) {
     console.error('[Timeline API BULK] Error:', error);
     return c.json({ 
-      error: 'Failed to import events',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      error: '導入事件失敗',
+      details: error instanceof Error ? error.message : '未知錯誤'
     }, 500);
   }
 });
 
-// DELETE /api/timeline/:id - 删除事件（需要认证）
-app.delete('/:id', authMiddleware, async (c): Promise<Response> => {
+// DELETE /api/timeline/:id - 删除事件（需要認證）
+app.delete('/:id', requireAuth, requireEditor, async (c): Promise<Response> => {
   try {
     const id = c.req.param('id');
     const db = c.env.DB;
+    const user = c.get('user');
     
     await deleteTimelineEvent(db, id);
     
+    console.log(`[Timeline] User ${user.username} deleted event: ${id}`);
+    
     return c.json({
       success: true,
-      message: 'Event deleted successfully'
+      message: '事件删除成功'
     }, 200);
   } catch (error) {
     console.error('[Timeline API DELETE] Error:', error);
     return c.json({ 
-      error: 'Failed to delete event' 
+      error: '删除事件失敗' 
     }, 500);
   }
 });
