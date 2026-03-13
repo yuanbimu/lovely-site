@@ -7,7 +7,7 @@ pages_build_output_dir = "./dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "lovely-site-db"
-database_id = "YOUR_DATABASE_ID"
+database_id = "1d74fc62-3a49-484c-bb48-170f5b0146e5"
 
 # R2 存储桶绑定
 [[r2_buckets]]

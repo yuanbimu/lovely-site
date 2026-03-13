@@ -5,8 +5,11 @@
   "scripts": {
     "dev": "astro dev",
     "dev:cf": "wrangler pages dev -- astro dev",
-    "fetch-data": "node scripts/fetch-bilibili-data.js",
-    "sync-dynamics": "node scripts/sync-dynamics.js",
+    "config": "scripts/configure-cloudflare.bat",
+    "setup": "node scripts/setup-wrangler.js",
+    "setup:windows": "scripts/setup-wrangler.bat",
+    "setup:complete": "scripts/complete-setup.bat",
+    "login": "wrangler login",
     "init:db": "sh scripts/init-db.sh",
     "init:db:windows": "node scripts/init-db.js",
     "init:db:prod": "sh scripts/init-db.sh --prod",
@@ -22,6 +25,7 @@
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260301.1"
+    "@cloudflare/workers-types": "^4.20260301.1",
+    "better-sqlite3": "^12.6.2"
   }
 }
