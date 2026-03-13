@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { 
   getTimelineEvents, 
   saveTimelineEvent, 
@@ -9,6 +10,15 @@ import {
 } from '../lib/db.js';
 
 const app = new Hono();
+
+// 添加 CORS 中間件
+app.use('*', cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  maxAge: 86400
+}));
 
 // 獲取 Cookie 的輔助函數
 function getCookieValue(cookieHeader: string | null, name: string): string | null {
@@ -36,7 +46,7 @@ const requireAuth = async (c: any, next: any) => {
   const session = await getSessionById(db, sessionToken);
   
   if (!session) {
-    c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=None; Max-Age=0; Path=/', { append: true });
+    c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/', { append: true });
     return c.json({ error: 'Session 已過期，請重新登錄' }, 401);
   }
   

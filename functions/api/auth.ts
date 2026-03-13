@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { 
   createUser, 
   getUserByUsername, 
@@ -10,6 +11,15 @@ import {
 } from '../lib/db.js';
 
 const app = new Hono();
+
+// 添加 CORS 中間件
+app.use('*', cors({
+  origin: '*',
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  maxAge: 86400
+}));
 
 // 生成隨機 ID
 function generateId(): string {
@@ -63,13 +73,11 @@ app.post('/register', async (c): Promise<Response> => {
     
     const db = c.env.DB;
     
-    // 檢查用戶名是否已存在
     const existingUser = await getUserByUsername(db, username);
     if (existingUser) {
       return c.json({ error: '用戶名已存在' }, 409);
     }
     
-    // 創建用戶
     const userId = generateId();
     const passwordHash = await hashPassword(password);
     
@@ -103,21 +111,18 @@ app.post('/login', async (c): Promise<Response> => {
     
     const db = c.env.DB;
     
-    // 查找用戶
     const user = await getUserByUsername(db, username);
     if (!user) {
       return c.json({ error: '用戶名或密碼錯誤' }, 401);
     }
     
-    // 驗證密碼
     const isValid = await verifyPassword(password, user.password_hash);
     if (!isValid) {
       return c.json({ error: '用戶名或密碼錯誤' }, 401);
     }
     
-    // 創建 Session
     const sessionToken = generateSessionToken();
-    const expiresAt = Date.now() + (7 * 24 * 60 * 60 * 1000); // 7 days
+    const expiresAt = Date.now() + (7 * 24 * 60 * 60 * 1000);
     
     await createSession(db, {
       id: sessionToken,
@@ -125,8 +130,8 @@ app.post('/login', async (c): Promise<Response> => {
       expires_at: expiresAt
     });
     
-    // 設置 Cookie
-    c.header('Set-Cookie', `session=${sessionToken}; HttpOnly; Secure; SameSite=None; Max-Age=${7 * 24 * 60 * 60}; Path=/`, { append: true });
+    // 設置 Cookie - 使用 SameSite=Lax 以便在開發環境工作
+    c.header('Set-Cookie', `session=${sessionToken}; HttpOnly; Secure; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}; Path=/`, { append: true });
     
     return c.json({
       success: true,
@@ -155,8 +160,7 @@ app.post('/logout', async (c): Promise<Response> => {
       await deleteSession(db, sessionToken);
     }
     
-    // 清除 Cookie
-    c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=None; Max-Age=0; Path=/', { append: true });
+    c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/', { append: true });
     
     return c.json({ success: true, message: '已登出' });
   } catch (error) {
@@ -179,8 +183,7 @@ app.get('/me', async (c): Promise<Response> => {
     const session = await getSessionById(db, sessionToken);
     
     if (!session) {
-      // Session 無效，清除 Cookie
-      c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=None; Max-Age=0; Path=/', { append: true });
+      c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/', { append: true });
       return c.json({ error: 'Session 已過期' }, 401);
     }
     
@@ -236,13 +239,11 @@ app.post('/change-password', async (c): Promise<Response> => {
       return c.json({ error: '用戶不存在' }, 404);
     }
     
-    // 驗證當前密碼
     const isValid = await verifyPassword(currentPassword, user.password_hash);
     if (!isValid) {
       return c.json({ error: '當前密碼錯誤' }, 401);
     }
     
-    // 更新密碼
     const newPasswordHash = await hashPassword(newPassword);
     await updateUserPassword(db, user.id, newPasswordHash);
     
