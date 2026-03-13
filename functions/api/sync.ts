@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 
-const app = new Hono();
+const app = new Hono().basePath('/api/sync');
 
 app.post('/', async (c): Promise<Response> => {
   try {

@@ -10,7 +10,7 @@ import {
   updateUserPassword
 } from '../lib/db.js';
 
-const app = new Hono();
+const app = new Hono().basePath('/api/auth');
 
 // 添加 CORS 中間件
 app.use('*', cors({
@@ -255,3 +255,6 @@ app.post('/change-password', async (c): Promise<Response> => {
 });
 
 export default app;
+
+// Cloudflare Pages Functions 導出
+export const onRequest = app.fetch;

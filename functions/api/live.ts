@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 
-const app = new Hono();
+const app = new Hono().basePath('/api/live');
 
 const BILIBILI_UID = '3821157';
 
