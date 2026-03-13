@@ -10,23 +10,9 @@ import {
 
 const app = new Hono();
 
-// 獲取 Cookie 的輔助函數
-function getCookieValue(cookieHeader: string | null, name: string): string | null {
-  if (!cookieHeader) return null;
-  const cookies = cookieHeader.split(';');
-  for (const cookie of cookies) {
-    const [key, value] = cookie.trim().split('=');
-    if (key === name) {
-      return decodeURIComponent(value);
-    }
-  }
-  return null;
-}
-
 // Session 認證中間件
 const requireAuth = async (c: any, next: any) => {
-  const cookieHeader = c.req.header('Cookie');
-  const sessionToken = getCookieValue(cookieHeader, 'session');
+  const sessionToken = c.req.cookie('session');
   
   if (!sessionToken) {
     return c.json({ error: '未登錄，請先登錄' }, 401);
@@ -36,7 +22,8 @@ const requireAuth = async (c: any, next: any) => {
   const session = await getSessionById(db, sessionToken);
   
   if (!session) {
-    c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=None; Max-Age=0; Path=/', { append: true });
+    // Session 過期，清除 Cookie
+    c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/');
     return c.json({ error: 'Session 已過期，請重新登錄' }, 401);
   }
   
@@ -45,6 +32,7 @@ const requireAuth = async (c: any, next: any) => {
     return c.json({ error: '用戶不存在' }, 404);
   }
   
+  // 將用戶信息附加到上下文
   c.set('user', user);
   await next();
 };
@@ -69,13 +57,17 @@ app.get('/', async (c): Promise<Response> => {
     const db = c.env.DB;
     const events = await getTimelineEvents(db);
     
-    const parsedEvents = events.map((e: any) => ({ ...e }));
+    // 解析可能的 JSON 字段
+    const parsedEvents = events.map((e: any) => ({
+      ...e,
+      // 如果将来有 JSON 字段，在这里解析
+    }));
     
     return c.json({
       data: parsedEvents,
       total: parsedEvents.length
     }, 200, {
-      'Cache-Control': 'public, max-age=600',
+      'Cache-Control': 'public, max-age=600', // 10 分钟缓存
       'Content-Type': 'application/json'
     });
   } catch (error) {
@@ -104,7 +96,7 @@ app.get('/:id', async (c): Promise<Response> => {
     }
     
     return c.json(result, 200, {
-      'Cache-Control': 'public, max-age=3600',
+      'Cache-Control': 'public, max-age=3600', // 1 小时缓存
       'Content-Type': 'application/json'
     });
   } catch (error) {
@@ -120,10 +112,14 @@ app.post('/', requireAuth, requireEditor, async (c): Promise<Response> => {
     const db = c.env.DB;
     const user = c.get('user');
     
+    // 验证必填字段
     if (!body.date || !body.title) {
-      return c.json({ error: '缺少必填字段：date, title' }, 400);
+      return c.json({ 
+        error: '缺少必填字段：date, title' 
+      }, 400);
     }
     
+    // 生成 ID（如果没有提供）
     const eventData = {
       id: body.id || `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       date: body.date,
@@ -160,9 +156,12 @@ app.post('/bulk', requireAuth, requireEditor, async (c): Promise<Response> => {
     const user = c.get('user');
     
     if (!Array.isArray(body.events)) {
-      return c.json({ error: '請求體必須包含 "events" 數組' }, 400);
+      return c.json({ 
+        error: '請求體必須包含 "events" 數組' 
+      }, 400);
     }
     
+    // 验证每个事件
     const validatedEvents = body.events.map((e: any) => ({
       id: e.id || `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       date: e.date,
@@ -173,6 +172,7 @@ app.post('/bulk', requireAuth, requireEditor, async (c): Promise<Response> => {
       sort_order: e.sort_order || 0
     }));
     
+    // 检查必填字段
     const invalidEvents = validatedEvents.filter((e: any) => !e.date || !e.title);
     if (invalidEvents.length > 0) {
       return c.json({ 
@@ -216,7 +216,9 @@ app.delete('/:id', requireAuth, requireEditor, async (c): Promise<Response> => {
     }, 200);
   } catch (error) {
     console.error('[Timeline API DELETE] Error:', error);
-    return c.json({ error: '删除事件失敗' }, 500);
+    return c.json({ 
+      error: '删除事件失敗' 
+    }, 500);
   }
 });
 

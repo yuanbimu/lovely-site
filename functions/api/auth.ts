@@ -21,9 +21,8 @@ function generateSessionToken(): string {
   return `${Date.now()}_${Math.random().toString(36).substring(2, 15)}_${Math.random().toString(36).substring(2, 15)}`;
 }
 
-// 簡易密碼驗證（實際應使用 bcrypt）
+// 簡易密碼驗證
 async function hashPassword(password: string): Promise<string> {
-  // 在 Cloudflare Workers 中使用 Web Crypto API
   const encoder = new TextEncoder();
   const data = encoder.encode(password + 'lovely-site-salt');
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
@@ -36,21 +35,24 @@ async function verifyPassword(password: string, hash: string): Promise<boolean> 
   return hashed === hash;
 }
 
-// Cookie 設置選項
-const COOKIE_OPTIONS = {
-  httpOnly: true,
-  secure: true,
-  sameSite: 'strict',
-  maxAge: 7 * 24 * 60 * 60, // 7 days
-  path: '/'
-};
+// 獲取 Cookie 的輔助函數
+function getCookieValue(cookieHeader: string | null, name: string): string | null {
+  if (!cookieHeader) return null;
+  const cookies = cookieHeader.split(';');
+  for (const cookie of cookies) {
+    const [key, value] = cookie.trim().split('=');
+    if (key === name) {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}
 
 // 註冊（僅管理員可創建用戶）
 app.post('/register', async (c): Promise<Response> => {
   try {
     const { username, email, password, role = 'editor' } = await c.req.json();
     
-    // 驗證輸入
     if (!username || !email || !password) {
       return c.json({ error: '缺少必填字段' }, 400);
     }
@@ -124,7 +126,7 @@ app.post('/login', async (c): Promise<Response> => {
     });
     
     // 設置 Cookie
-    c.header('Set-Cookie', `session=${sessionToken}; HttpOnly; Secure; SameSite=Strict; Max-Age=${7 * 24 * 60 * 60}; Path=/`);
+    c.header('Set-Cookie', `session=${sessionToken}; HttpOnly; Secure; SameSite=None; Max-Age=${7 * 24 * 60 * 60}; Path=/`, { append: true });
     
     return c.json({
       success: true,
@@ -145,7 +147,8 @@ app.post('/login', async (c): Promise<Response> => {
 // 登出
 app.post('/logout', async (c): Promise<Response> => {
   try {
-    const sessionToken = c.req.cookie('session');
+    const cookieHeader = c.req.header('Cookie');
+    const sessionToken = getCookieValue(cookieHeader, 'session');
     
     if (sessionToken) {
       const db = c.env.DB;
@@ -153,7 +156,7 @@ app.post('/logout', async (c): Promise<Response> => {
     }
     
     // 清除 Cookie
-    c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/');
+    c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=None; Max-Age=0; Path=/', { append: true });
     
     return c.json({ success: true, message: '已登出' });
   } catch (error) {
@@ -165,7 +168,8 @@ app.post('/logout', async (c): Promise<Response> => {
 // 獲取當前用戶
 app.get('/me', async (c): Promise<Response> => {
   try {
-    const sessionToken = c.req.cookie('session');
+    const cookieHeader = c.req.header('Cookie');
+    const sessionToken = getCookieValue(cookieHeader, 'session');
     
     if (!sessionToken) {
       return c.json({ error: '未登錄' }, 401);
@@ -176,7 +180,7 @@ app.get('/me', async (c): Promise<Response> => {
     
     if (!session) {
       // Session 無效，清除 Cookie
-      c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/');
+      c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=None; Max-Age=0; Path=/', { append: true });
       return c.json({ error: 'Session 已過期' }, 401);
     }
     
@@ -203,7 +207,8 @@ app.get('/me', async (c): Promise<Response> => {
 // 修改密碼
 app.post('/change-password', async (c): Promise<Response> => {
   try {
-    const sessionToken = c.req.cookie('session');
+    const cookieHeader = c.req.header('Cookie');
+    const sessionToken = getCookieValue(cookieHeader, 'session');
     
     if (!sessionToken) {
       return c.json({ error: '未登錄' }, 401);
