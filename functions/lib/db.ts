@@ -4,9 +4,6 @@ export interface Env {
   DB: D1Database;
   IMAGES: R2Bucket;
 }
-  DB: D1Database;
-  IMAGES: R2Bucket;
-}
 
 export interface DynamicData {
   id: string;
@@ -96,14 +93,6 @@ export async function getLiveStatus(db: D1Database) {
   
   if (!result) return null;
   
-  return {
-    isLive: result.is_live === 1,
-    title: result.title || '',
-    roomId: result.room_id || '',
-    url: result.url || '',
-    checkedAt: result.checked_at
-  };
-}
   return {
     isLive: result.is_live === 1,
     title: result.title || '',
