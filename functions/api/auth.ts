@@ -10,7 +10,7 @@ import {
   updateUserPassword
 } from '../lib/db.js';
 
-const app = new Hono().basePath('/api/auth');
+const app = new Hono();
 
 // 添加 CORS 中間件
 app.use('*', cors({
@@ -20,6 +20,19 @@ app.use('*', cors({
   credentials: true,
   maxAge: 86400
 }));
+
+// 獲取 Cookie 的輔助函數
+function getCookieValue(cookieHeader: string | null, name: string): string | null {
+  if (!cookieHeader) return null;
+  const cookies = cookieHeader.split(';');
+  for (const cookie of cookies) {
+    const [key, value] = cookie.trim().split('=');
+    if (key === name) {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}
 
 // 生成隨機 ID
 function generateId(): string {
@@ -45,20 +58,7 @@ async function verifyPassword(password: string, hash: string): Promise<boolean> 
   return hashed === hash;
 }
 
-// 獲取 Cookie 的輔助函數
-function getCookieValue(cookieHeader: string | null, name: string): string | null {
-  if (!cookieHeader) return null;
-  const cookies = cookieHeader.split(';');
-  for (const cookie of cookies) {
-    const [key, value] = cookie.trim().split('=');
-    if (key === name) {
-      return decodeURIComponent(value);
-    }
-  }
-  return null;
-}
-
-// 註冊（僅管理員可創建用戶）
+// 註冊
 app.post('/register', async (c): Promise<Response> => {
   try {
     const { username, email, password, role = 'editor' } = await c.req.json();
@@ -130,7 +130,6 @@ app.post('/login', async (c): Promise<Response> => {
       expires_at: expiresAt
     });
     
-    // 設置 Cookie - 使用 SameSite=Lax 以便在開發環境工作
     c.header('Set-Cookie', `session=${sessionToken}; HttpOnly; Secure; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}; Path=/`, { append: true });
     
     return c.json({
@@ -254,7 +253,5 @@ app.post('/change-password', async (c): Promise<Response> => {
   }
 });
 
-export default app;
-
-// Cloudflare Pages Functions 導出
+// Cloudflare Pages Functions 標準導出
 export const onRequest = app.fetch;
