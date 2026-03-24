@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { getSongs, saveSong, deleteSong, getSessionById, getUserById } from '../lib/db.js';
 
-const app = new Hono();
+const app = new Hono().basePath('/api/songs');
 
 app.use('*', cors({
   origin: '*',

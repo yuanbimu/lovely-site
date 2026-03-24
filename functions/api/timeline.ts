@@ -9,7 +9,7 @@ import {
   getUserById
 } from '../lib/db.js';
 
-const app = new Hono();
+const app = new Hono().basePath('/api/timeline');
 
 // 添加 CORS 中間件
 app.use('*', cors({

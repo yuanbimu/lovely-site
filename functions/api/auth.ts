@@ -10,7 +10,7 @@ import {
   updateUserPassword
 } from '../lib/db.js';
 
-const app = new Hono();
+const app = new Hono().basePath('/api/auth');
 
 // 添加 CORS 中間件
 app.use('*', cors({

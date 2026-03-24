@@ -10,7 +10,7 @@ import {
   getSessionById
 } from '../lib/db.js';
 
-const app = new Hono();
+const app = new Hono().basePath('/api/users');
 
 app.use('*', cors({
   origin: '*',
