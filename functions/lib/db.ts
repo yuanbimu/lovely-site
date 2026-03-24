@@ -247,3 +247,57 @@ export async function updateUserPassword(db: D1Database, userId: string, newPass
     UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?
   `).bind(newPasswordHash, Date.now(), userId).run();
 }
+
+export async function getUsers(db: D1Database): Promise<User[]> {
+  const result = await db.prepare('SELECT id, username, email, role, created_at, updated_at FROM users ORDER BY created_at DESC').all<User>();
+  return result.results || [];
+}
+
+export async function updateUserRole(db: D1Database, userId: string, role: string) {
+  await db.prepare('UPDATE users SET role = ?, updated_at = ? WHERE id = ?').bind(role, Date.now(), userId).run();
+}
+
+export async function deleteUser(db: D1Database, userId: string) {
+  await db.prepare('DELETE FROM users WHERE id = ?').bind(userId).run();
+  await db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(userId).run();
+}
+
+// ========== Songs ==========
+
+export interface Song {
+  id: string;
+  title: string;
+  artist: string;
+  cover_url?: string;
+  url?: string;
+  release_date?: string;
+  created_at: number;
+  updated_at: number;
+}
+
+export async function getSongs(db: D1Database): Promise<Song[]> {
+  const result = await db.prepare('SELECT * FROM songs ORDER BY release_date DESC').all<Song>();
+  return result.results || [];
+}
+
+export async function saveSong(db: D1Database, song: Omit<Song, 'created_at' | 'updated_at'>) {
+  const now = Date.now();
+  await db.prepare(`
+    INSERT OR REPLACE INTO songs (id, title, artist, cover_url, url, release_date, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).bind(
+    song.id,
+    song.title,
+    song.artist || '東愛璃 Lovely',
+    song.cover_url || null,
+    song.url || null,
+    song.release_date || null,
+    now, // For UPSERT, created_at will be replaced, ideally we'd preserve it but keeping it simple for now
+    now
+  ).run();
+}
+
+export async function deleteSong(db: D1Database, id: string) {
+  await db.prepare('DELETE FROM songs WHERE id = ?').bind(id).run();
+}
+

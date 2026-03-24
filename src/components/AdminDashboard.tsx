@@ -18,6 +18,16 @@ interface TimelineEvent {
   sort_order?: number;
 }
 
+interface Song {
+  id: string;
+  title: string;
+  artist: string;
+  cover_url?: string;
+  url?: string;
+  release_date?: string;
+  created_at?: number;
+}
+
 const AUTH_API = '/api/auth';
 const TIMELINE_API = '/api/timeline';
 
@@ -37,6 +47,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({
     timelineCount: 0,
     userCount: 0,
+    songCount: 0,
     lastUpdate: null as string | null
   });
   
@@ -44,6 +55,10 @@ export default function AdminDashboard() {
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [editingEvent, setEditingEvent] = useState<TimelineEvent | null>(null);
   const [importText, setImportText] = useState('');
+
+  // 歌單數據
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [editingSong, setEditingSong] = useState<Song | null>(null);
   
   // 用戶管理
   const [users, setUsers] = useState<User[]>([]);
@@ -64,6 +79,7 @@ export default function AdminDashboard() {
       if (activeTab === 'dashboard') loadDashboardData();
       if (activeTab === 'timeline') loadTimelineData();
       if (activeTab === 'users' && user.role === 'admin') loadUsersData();
+      if (activeTab === 'songs') loadSongsData();
     }
   }, [user, activeTab]);
 
@@ -71,7 +87,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`${AUTH_API}/me`, { credentials: 'include' });
       if (res.ok) {
-        const data = await res.json();
+        const data: any = await res.json();
         setUser(data.user);
       }
     } catch (err) {
@@ -93,7 +109,7 @@ export default function AdminDashboard() {
         body: JSON.stringify(loginForm)
       });
       
-      const data = await res.json();
+      const data: any = await res.json();
       if (res.ok) {
         setUser(data.user);
         setLoginForm({ username: '', password: '' });
@@ -114,14 +130,20 @@ export default function AdminDashboard() {
 
   async function loadDashboardData() {
     try {
-      const [timelineRes] = await Promise.all([
-        fetch(TIMELINE_API, { credentials: 'include' })
+      const [timelineRes, usersRes, songsRes] = await Promise.all([
+        fetch(TIMELINE_API, { credentials: 'include' }),
+        user?.role === 'admin' ? fetch('/api/users', { credentials: 'include' }) : Promise.resolve({ ok: false, json: () => Promise.resolve({}) }),
+        fetch('/api/songs', { credentials: 'include' })
       ]);
       
-      const timelineData = await timelineRes.json();
+      const timelineData: any = await timelineRes.json();
+      const usersData: any = usersRes.ok ? await (usersRes as Response).json() : { data: [] };
+      const songsData: any = songsRes.ok ? await (songsRes as Response).json() : { data: [] };
+
       setStats({
         timelineCount: timelineData.data?.length || 0,
-        userCount: 0,
+        userCount: usersData.data?.length || 0,
+        songCount: songsData.data?.length || 0,
         lastUpdate: new Date().toISOString()
       });
     } catch (err) {
@@ -132,7 +154,7 @@ export default function AdminDashboard() {
   async function loadTimelineData() {
     try {
       const res = await fetch(TIMELINE_API, { credentials: 'include' });
-      const data = await res.json();
+      const data: any = await res.json();
       setEvents(data.data || []);
     } catch (err) {
       showMessage('error', '加載時間線失敗');
@@ -140,8 +162,124 @@ export default function AdminDashboard() {
   }
 
   async function loadUsersData() {
-    // 這裡需要一個獲取所有用戶的 API
-    // 暫時留空
+    try {
+      const res = await fetch('/api/users', { credentials: 'include' });
+      const data: any = await res.json();
+      if (data.success) {
+        setUsers(data.data || []);
+      } else {
+        showMessage('error', data.error || '加載用戶失敗');
+      }
+    } catch {
+      showMessage('error', '網絡錯誤');
+    }
+  }
+
+  async function handleAddUser(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(newUser)
+      });
+      const data: any = await res.json();
+      if (res.ok) {
+        setShowUserForm(false);
+        setNewUser({ username: '', email: '', password: '', role: 'editor' });
+        loadUsersData();
+        loadDashboardData();
+        showMessage('success', '用戶添加成功');
+      } else {
+        showMessage('error', data.error || '添加失敗');
+      }
+    } catch {
+      showMessage('error', '網絡錯誤');
+    }
+  }
+
+  async function handleUpdateRole(id: string, role: string) {
+    try {
+      const res = await fetch(`/api/users/${id}/role`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ role })
+      });
+      if (res.ok) {
+        loadUsersData();
+        showMessage('success', '權限已更新');
+      } else {
+        showMessage('error', '更新失敗');
+      }
+    } catch {
+      showMessage('error', '網絡錯誤');
+    }
+  }
+
+  async function handleDeleteUser(id: string) {
+    if (!confirm('確定刪除該用戶？')) return;
+    try {
+      const res = await fetch(`/api/users/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      const data: any = await res.json();
+      if (res.ok) {
+        loadUsersData();
+        loadDashboardData();
+        showMessage('success', '刪除成功');
+      } else {
+        showMessage('error', data.error || '刪除失敗');
+      }
+    } catch {
+      showMessage('error', '網絡錯誤');
+    }
+  }
+
+  async function loadSongsData() {
+    try {
+      const res = await fetch('/api/songs', { credentials: 'include' });
+      const data: any = await res.json();
+      setSongs(data.data || []);
+    } catch {
+      showMessage('error', '加載歌單失敗');
+    }
+  }
+
+  async function handleSaveSong() {
+    if (!editingSong) return;
+    try {
+      const res = await fetch('/api/songs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(editingSong)
+      });
+      if (res.ok) {
+        setEditingSong(null);
+        loadSongsData();
+        showMessage('success', '保存成功');
+      } else {
+        showMessage('error', '保存失敗');
+      }
+    } catch {
+      showMessage('error', '網絡錯誤');
+    }
+  }
+
+  async function handleDeleteSong(id: string) {
+    if (!confirm('確定刪除該歌曲？')) return;
+    try {
+      const res = await fetch(`/api/songs/${id}`, { method: 'DELETE', credentials: 'include' });
+      if (res.ok) {
+        loadSongsData();
+        showMessage('success', '刪除成功');
+      }
+    } catch {
+      showMessage('error', '刪除失敗');
+    }
   }
 
   async function saveEvent(event: TimelineEvent) {
@@ -158,7 +296,7 @@ export default function AdminDashboard() {
         loadTimelineData();
         showMessage('success', '保存成功！');
       } else {
-        const data = await res.json();
+        const data: any = await res.json();
         showMessage('error', data.error || '保存失敗');
       }
     } catch {
@@ -287,6 +425,12 @@ export default function AdminDashboard() {
           >
             <span>📅</span> 時間線管理
           </button>
+          <button 
+            className={activeTab === 'songs' ? 'active' : ''}
+            onClick={() => setActiveTab('songs')}
+          >
+            <span>🎵</span> 歌單管理
+          </button>
           {user.role === 'admin' && (
             <button 
               className={activeTab === 'users' ? 'active' : ''}
@@ -331,7 +475,7 @@ export default function AdminDashboard() {
               </div>
               <div className="stat-card">
                 <div className="stat-icon">🎵</div>
-                <div className="stat-value">0</div>
+                <div className="stat-value">{stats.songCount}</div>
                 <div className="stat-label">歌單數量</div>
               </div>
             </div>
@@ -435,11 +579,163 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Songs Tab */}
+        {activeTab === 'songs' && (
+          <div className="tab-content">
+            <h1>歌單管理</h1>
+            
+            {editingSong && (
+              <div className="section edit-section">
+                <h3>{editingSong.id ? '編輯歌曲' : '新增歌曲'}</h3>
+                <div className="form-grid">
+                  <input
+                    type="text"
+                    value={editingSong.title}
+                    onChange={e => setEditingSong({...editingSong, title: e.target.value})}
+                    placeholder="歌名 (必填)"
+                  />
+                  <input
+                    type="text"
+                    value={editingSong.artist}
+                    onChange={e => setEditingSong({...editingSong, artist: e.target.value})}
+                    placeholder="歌手"
+                  />
+                  <input
+                    type="date"
+                    value={editingSong.release_date || ''}
+                    onChange={e => setEditingSong({...editingSong, release_date: e.target.value})}
+                    placeholder="發佈時間"
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={editingSong.cover_url || ''}
+                  onChange={e => setEditingSong({...editingSong, cover_url: e.target.value})}
+                  placeholder="封面圖片 URL"
+                  style={{ width: '100%', marginBottom: '1rem', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
+                />
+                <input
+                  type="text"
+                  value={editingSong.url || ''}
+                  onChange={e => setEditingSong({...editingSong, url: e.target.value})}
+                  placeholder="歌曲連結 (Bilibili/網易雲 等)"
+                  style={{ width: '100%', marginBottom: '1rem', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
+                />
+                <div className="form-actions">
+                  <button onClick={handleSaveSong}>保存</button>
+                  <button className="btn-secondary" onClick={() => setEditingSong(null)}>取消</button>
+                </div>
+              </div>
+            )}
+            
+            <div className="section">
+              <div className="section-header">
+                <h3>歌曲列表 ({songs.length})</h3>
+                <button onClick={() => setEditingSong({ id: '', title: '', artist: '東愛璃 Lovely' })}>
+                  + 新增
+                </button>
+              </div>
+              
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>封面</th>
+                    <th>歌名 / 歌手</th>
+                    <th>發佈日</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {songs.map(song => (
+                    <tr key={song.id}>
+                      <td>
+                        {song.cover_url ? (
+                          <img src={song.cover_url} alt="cover" style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ width: '40px', height: '40px', background: '#eee', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🎵</div>
+                        )}
+                      </td>
+                      <td>
+                        <strong>{song.title}</strong>
+                        <div style={{ fontSize: '0.85em', color: '#666' }}>{song.artist}</div>
+                      </td>
+                      <td>{song.release_date || '-'}</td>
+                      <td className="actions">
+                        {song.url && <a href={song.url} target="_blank" rel="noreferrer" style={{ marginRight: '8px', color: '#8B6F47' }}>連結</a>}
+                        <button onClick={() => setEditingSong(song)}>編輯</button>
+                        <button className="btn-danger" onClick={() => handleDeleteSong(song.id)}>删除</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* Users Tab */}
         {activeTab === 'users' && user.role === 'admin' && (
           <div className="tab-content">
-            <h1>用戶管理</h1>
-            <p>用戶管理功能開發中...</p>
+            <div className="section-header">
+              <h1>用戶管理</h1>
+              <button onClick={() => setShowUserForm(!showUserForm)}>
+                {showUserForm ? '取消' : '+ 新增管理員'}
+              </button>
+            </div>
+            
+            {showUserForm && (
+              <div className="section edit-section">
+                <h3>新建用戶</h3>
+                <form onSubmit={handleAddUser} className="form-grid">
+                  <input required type="text" placeholder="用戶名" value={newUser.username} onChange={e => setNewUser({...newUser, username: e.target.value})} />
+                  <input required type="email" placeholder="Email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} />
+                  <input required type="password" placeholder="密碼" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} />
+                  <select value={newUser.role} onChange={e => setNewUser({...newUser, role: e.target.value})}>
+                    <option value="admin">管理員 (admin)</option>
+                    <option value="editor">編輯者 (editor)</option>
+                    <option value="viewer">檢視者 (viewer)</option>
+                  </select>
+                  <div className="form-actions">
+                    <button type="submit">保存</button>
+                  </div>
+                </form>
+              </div>
+            )}
+            
+            <div className="section">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>用戶名</th>
+                    <th>Email</th>
+                    <th>權限</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map(u => (
+                    <tr key={u.id}>
+                      <td>{u.username}</td>
+                      <td>{u.email}</td>
+                      <td>
+                        <select 
+                          value={u.role} 
+                          onChange={(e) => handleUpdateRole(u.id, e.target.value)}
+                          disabled={u.id === user.id}
+                        >
+                          <option value="admin">管理員 (admin)</option>
+                          <option value="editor">編輯者 (editor)</option>
+                          <option value="viewer">檢視者 (viewer)</option>
+                        </select>
+                      </td>
+                      <td className="actions">
+                        <button className="btn-danger" onClick={() => handleDeleteUser(u.id)} disabled={u.id === user.id}>刪除</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </main>
