@@ -59,15 +59,58 @@ CREATE TABLE IF NOT EXISTS timeline_events (
 );
 
 -- =====================================================
--- 5. 创建索引
+-- 5. 用户表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  username TEXT UNIQUE NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  role TEXT DEFAULT 'editor',
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+-- =====================================================
+-- 6. Sessions 表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS sessions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  expires_at INTEGER NOT NULL,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- =====================================================
+-- 7. 歌单表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS songs (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  artist TEXT NOT NULL,
+  cover_url TEXT,
+  url TEXT,
+  release_date TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+-- =====================================================
+-- 8. 创建索引
 -- =====================================================
 CREATE INDEX IF NOT EXISTS idx_dynamics_publish_time ON dynamics(publish_time DESC);
 CREATE INDEX IF NOT EXISTS idx_dynamics_type ON dynamics(type);
 CREATE INDEX IF NOT EXISTS idx_timeline_date ON timeline_events(date DESC);
 CREATE INDEX IF NOT EXISTS idx_timeline_sort ON timeline_events(sort_order);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at);
+CREATE INDEX IF NOT EXISTS idx_songs_created ON songs(created_at DESC);
 
 -- =====================================================
--- 6. 初始化 Timeline 数据 (东爱璃早期重要事件)
+-- 9. 初始化 Timeline 数据 (东爱璃早期重要事件)
 -- =====================================================
 INSERT OR REPLACE INTO timeline_events 
 (id, date, title, content, color, icon, sort_order, created_at, updated_at)

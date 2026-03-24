@@ -33,26 +33,19 @@ wrangler login
 ```
 
 执行后会：
-1. 自动打开浏览器
-2. 登录你的 Cloudflare 账号
-3. 授权 Wrangler 访问
-4. 自动返回终端完成认证
+### 1. 登录 Cloudflare
 
-### 方法二：API Token 登录
-
-1. 访问 https://dash.cloudflare.com/profile/api-tokens
-2. 创建新 Token → 选择 "Edit Cloudflare Workers" 模板
-3. 复制 Token
-4. 执行：
-   ```bash
-   wrangler login --api-token
-   # 粘贴你的 Token
-   ```
-
-### 方法三：检查登录状态
+在本地终端运行：
 
 ```bash
-wrangler whoami
+npx wrangler login
+```
+
+这会自动打开浏览器。登录您的 Cloudflare 账号并点击“授权”。
+
+登录成功后，您可以使用以下命令验证：
+```bash
+npx wrangler whoami
 ```
 
 成功登录后会显示你的账号信息。

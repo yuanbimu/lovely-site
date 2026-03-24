@@ -6,77 +6,15 @@
 
 ---
 
-## 🔑 步驟 1：創建 Cloudflare API Token
+## 🔑 步骤 1：登录 Cloudflare
 
-### 1.1 登錄 Cloudflare Dashboard
+确保您已经安装了 Node.js，然后在终端运行：
 
-訪問：https://dash.cloudflare.com/
-
-### 1.2 創建 API Token
-
-1. 點擊右上角用戶名 → **My Profile**
-2. 左側菜單選擇 **API Tokens**
-3. 點擊 **Create Token**
-4. 選擇 **Custom token** 模板
-
-### 1.3 配置 Token 權限
-
-| 權限 | 設置 |
-|------|------|
-| **Token name** | `lovely-site-d1-r2` |
-| **Account** | 你的賬戶 |
-| **Permissions** | 添加以下權限： |
-| | Account:Read |
-| | D1:Edit |
-| | R2:Edit |
-| | Cloudflare Pages:Edit |
-| | Zone:Read (如果管理自定義域名) |
-
-### 1.4 保存 Token
-
-1. 點擊 **Continue to summary**
-2. 確認權限無誤
-3. 點擊 **Create Token**
-4. **立即複製 Token**（只顯示一次！）
-
----
-
-## 🔧 步驟 2：設置環境變量
-
-### 選項 A：臨時設置（當前終端）
-
-**PowerShell:**
-```powershell
-$env:CLOUDFLARE_API_TOKEN = "你的_token_這裡"
-```
-
-**CMD:**
-```cmd
-set CLOUDFLARE_API_TOKEN=你的_token_這裡
-```
-
-**Bash (Git Bash/WSL):**
 ```bash
-export CLOUDFLARE_API_TOKEN="你的_token_這裡"
+npx wrangler login
 ```
 
-### 選項 B：更新 .env 文件
-
-編輯 `lovely-site/.env` 文件：
-
-```env
-CLOUDFLARE_ACCOUNT_ID=你的_account_id
-CLOUDFLARE_API_TOKEN=你的_token_這裡
-```
-
-### 選項 C：系統環境變量（Windows）
-
-1. 按 `Win + R`，輸入 `sysdm.cpl`，回車
-2. 點擊 **高級** → **環境變量**
-3. 在 **用戶變量** 中點擊 **新建**
-4. 變量名：`CLOUDFLARE_API_TOKEN`
-5. 變量值：你的 Token
-6. 確定保存
+这将打开浏览器。请选择您的 Cloudflare 账户并授权登录。登录成功后，您就可以直接管理 D1 和 R2 资源，无需配置复杂的 API Token。
 
 ---
 

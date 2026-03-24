@@ -20,14 +20,14 @@ console.log('===================================\n');
 // 步骤 1: 检查登录状态
 console.log('[1/5] 检查 Cloudflare 登录状态...');
 try {
-  execSync('wrangler whoami', { stdio: 'ignore' });
+  execSync('npx wrangler whoami', { stdio: 'ignore' });
   console.log('✓ 已登录 Cloudflare\n');
 } catch (error) {
-  console.log('⚠️  需要登录 Cloudflare\n');
-  console.log('即将打开浏览器，请完成登录授权...\n');
+  console.log('⚠️  您当前未登录 Cloudflare');
+  console.log('即将打开浏览器，请在浏览器中完成登录授权...\n');
   
   try {
-    execSync('wrangler login', { stdio: 'inherit' });
+    execSync('npx wrangler login', { stdio: 'inherit' });
     console.log('✓ 登录成功\n');
   } catch (loginError) {
     console.error('❌ 登录失败');

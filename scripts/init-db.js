@@ -16,10 +16,10 @@ console.log('🚀 初始化 D1 数据库...\n');
 try {
   // 检查 wrangler 是否安装
   try {
-    execSync('wrangler --version', { stdio: 'ignore' });
+    execSync('npx wrangler --version', { stdio: 'ignore' });
   } catch (error) {
     console.error('❌ 错误：未找到 wrangler 命令行工具');
-    console.error('请先安装：npm install -g wrangler\n');
+    console.error('请先通过以下命令安装：npm install -D wrangler\n');
     process.exit(1);
   }
 
@@ -27,7 +27,7 @@ try {
   const sqlFile = join(__dirname, 'init-db.sql');
   console.log(`📄 执行 SQL 文件：${sqlFile}\n`);
   
-  execSync(`wrangler d1 execute lovely-site-db --local --file="${sqlFile}"`, {
+  execSync(`npx wrangler d1 execute lovely-site-db --local --file="${sqlFile}"`, {
     stdio: 'inherit'
   });
 
