@@ -1,13 +1,13 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "lovely-site"
-account_id = "9333b7020ce1a884f80bacfadfdeb4a4"
+account_id = "adf0a8d2240708e4a3c5f0ebcb6b9be8"
 compatibility_date = "2024-01-01"
 pages_build_output_dir = "./dist"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "lovely-site-db"
-database_id = "1d74fc62-3a49-484c-bb48-170f5b0146e5"
+database_id = "ed2f83e9-07b8-4d2f-b0e7-788c4cfee4a0"
 
 [[r2_buckets]]
 binding = "IMAGES"
