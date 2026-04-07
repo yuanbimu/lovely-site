@@ -307,6 +307,7 @@ export interface Showcase {
   id: string;
   name: string;
   description?: string;
+  folder?: string;
   image_url?: string;
   sort_order?: number;
   created_at: number;
@@ -321,12 +322,13 @@ export async function getShowcases(db: D1Database): Promise<Showcase[]> {
 export async function saveShowcase(db: D1Database, showcase: Omit<Showcase, 'created_at' | 'updated_at'>) {
   const now = Date.now();
   await db.prepare(`
-    INSERT OR REPLACE INTO showcases (id, name, description, image_url, sort_order, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT OR REPLACE INTO showcases (id, name, description, folder, image_url, sort_order, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     showcase.id,
     showcase.name,
     showcase.description || null,
+    showcase.folder || null,
     showcase.image_url || null,
     showcase.sort_order || 0,
     now,

@@ -32,6 +32,7 @@ interface Showcase {
   id: string;
   name: string;
   description?: string;
+  folder?: string;
   image_url?: string;
   sort_order?: number;
   created_at?: number;
@@ -73,11 +74,18 @@ export default function AdminDashboard() {
   const [showcases, setShowcases] = useState<Showcase[]>([]);
   const [editingShowcase, setEditingShowcase] = useState<Showcase | null>(null);
 const [showImagePicker, setShowImagePicker] = useState(false);
-const [r2Files, setR2Files] = useState<{key: string, url: string}[]>([]);
+const [r2Files, setR2Files] = useState<{type: string, name?: string, key: string, url: string}[]>([]);
+const [r2Folders, setR2Folders] = useState<{name: string, key: string}[]>([]);
 const [imagePickerType, setImagePickerType] = useState<'cover' | 'image'>('image');
 const [showUploader, setShowUploader] = useState(false);
 const [uploadFolder, setUploadFolder] = useState('showcase');
 const [uploading, setUploading] = useState(false);
+
+// 过滤当前目录的文件
+const currentFolderFiles = r2Files.filter(f => {
+  if (!uploadFolder) return true;
+  return f.key.startsWith(uploadFolder + '/');
+});
   
   // 用戶管理
   const [users, setUsers] = useState<User[]>([]);
@@ -352,8 +360,9 @@ const [uploading, setUploading] = useState(false);
     try {
       const res = await fetch('/api/r2-files', { credentials: 'include' });
       const data = await res.json();
-      if (data.success) {
-        setR2Files(data.data || []);
+      if (data.success && data.data) {
+        setR2Folders(data.data.folders || []);
+        setR2Files(data.data.files || []);
         setShowImagePicker(true);
       }
     } catch {
@@ -390,7 +399,10 @@ const [uploading, setUploading] = useState(false);
         // 刷新文件列表
         const listRes = await fetch('/api/r2-files', { credentials: 'include' });
         const listData = await listRes.json();
-        if (listData.success) setR2Files(listData.data || []);
+        if (listData.success && listData.data) {
+          setR2Folders(listData.data.folders || []);
+          setR2Files(listData.data.files || []);
+        }
       } else {
         showMessage('error', data.error || '上傳失敗');
       }
@@ -820,6 +832,14 @@ const [uploading, setUploading] = useState(false);
                     placeholder="名稱 (必填)"
                   />
                   <input
+                    type="text"
+                    value={editingShowcase.folder || ''}
+                    onChange={e => setEditingShowcase({...editingShowcase, folder: e.target.value})}
+                    placeholder="目錄名 (如 model-1)"
+                  />
+                </div>
+                <div className="form-grid">
+                  <input
                     type="number"
                     value={editingShowcase.sort_order || 0}
                     onChange={e => setEditingShowcase({...editingShowcase, sort_order: parseInt(e.target.value) || 0})}
@@ -1008,15 +1028,40 @@ const [uploading, setUploading] = useState(false);
             </div>
 
             <div style={{ overflow: 'auto', flex: 1 }}>
+              {/* 文件夹列表 */}
+              {r2Folders.length > 0 && (
+                <div style={{ marginBottom: '16px' }}>
+                  <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>📁 目錄</div>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {r2Folders.map(folder => (
+                      <button
+                        key={folder.name}
+                        onClick={() => setUploadFolder(folder.name)}
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: '16px',
+                          border: uploadFolder === folder.name ? '2px solid #6B5637' : '1px solid #ddd',
+                          background: uploadFolder === folder.name ? '#f5f0e8' : 'white',
+                          cursor: 'pointer',
+                          fontSize: '12px'
+                        }}
+                      >
+                        {folder.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
-                {r2Files.filter(f => f.key.match(/\.(jpg|jpeg|png|gif|webp)$/i)).map(file => (
+                {currentFolderFiles.filter(f => f.key.match(/\.(jpg|jpeg|png|gif|webp)$/i)).map(file => (
                   <div key={file.key} onClick={() => selectImage(file.url)} style={{ cursor: 'pointer', border: '2px solid transparent', borderRadius: '8px', overflow: 'hidden' }}>
                     <img src={file.url} alt={file.key} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover' }} />
                     <div style={{ fontSize: '10px', padding: '4px', color: '#666', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.key}</div>
                   </div>
                 ))}
               </div>
-              {r2Files.length === 0 && <p style={{ textAlign: 'center', color: '#999', padding: '40px' }}>暫無圖片文件，請上傳</p>}
+              {currentFolderFiles.length === 0 && <p style={{ textAlign: 'center', color: '#999', padding: '40px' }}>暫無圖片文件，請上傳</p>}
             </div>
           </div>
         </div>

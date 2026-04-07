@@ -81,6 +81,7 @@ export interface ShowcaseItem {
   id: string;
   name: string;
   description: string;
+  folder?: string;
   image: string;
 }
 

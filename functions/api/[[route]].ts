@@ -250,6 +250,7 @@ app.post('/api/showcases', requireAuth, requireEditor, async (c) => {
       id: body.id || `showcase_${Date.now()}`,
       name: body.name,
       description: body.description,
+      folder: body.folder,
       image_url: body.image_url,
       sort_order: body.sort_order || 0
     };
@@ -266,16 +267,27 @@ app.delete('/api/showcases/:id', requireAuth, requireEditor, async (c) => {
   return c.json({ success: true });
 });
 
-// R2 文件列表 API
+// R2 文件列表 API - 返回文件夾和文件分開的數據
 app.get('/api/r2-files', requireAuth, requireEditor, async (c) => {
   try {
     const prefix = c.req.query('prefix') || '';
-    const list = await c.env.IMAGES.list({ prefix });
+    const list = await c.env.IMAGES.list({ prefix, delimiter: '/' });
+    
+    // 文件夾（目錄）
+    const folders = (list.delimitedPrefixes || []).map(p => ({
+      type: 'folder',
+      name: p.replace(prefix, '').replace('/', ''),
+      key: p
+    }));
+    
+    // 文件
     const files = list.objects.map(obj => ({
+      type: 'file',
       key: obj.key,
       url: `https://cdn.yuanbimu.top/${obj.key}`
     }));
-    return c.json({ success: true, data: files });
+    
+    return c.json({ success: true, data: { folders, files } });
   } catch (err) {
     console.error('[R2] List error:', err);
     return c.json({ error: '獲取文件列表失敗' }, 500);
