@@ -149,7 +149,10 @@ export default function ShowcaseList() {
                   src={item.image_url}
                   alt={item.name}
                   onError={(e) => {
-                    e.currentTarget.style.display = 'none';
+                    // Fallback to placeholder if image fails
+                    const target = e.currentTarget;
+                    target.style.display = 'none';
+                    target.parentElement!.innerHTML = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:3rem;color:#C4A77D;">🖼️</div>';
                   }}
                 />
               ) : (
