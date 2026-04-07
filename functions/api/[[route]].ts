@@ -222,8 +222,12 @@ app.get('/api/live', async (c) => {
     const res = await fetch(`https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=3821157`);
     const data = await res.json() as any;
     if (data.code === 0 && data.data) {
-      const { live_status, title, room_id } = data.data;
-      return c.json({ isLive: live_status === 1, title: title || '', url: `https://live.bilibili.com/${room_id}` });
+      const { liveStatus, title, roomid } = data.data;
+      return c.json({ 
+        isLive: liveStatus === 1, 
+        title: title || '', 
+        url: roomid ? `https://live.bilibili.com/${roomid}` : '' 
+      });
     }
     return c.json({ isLive: false });
   } catch { return c.json({ isLive: false }); }
