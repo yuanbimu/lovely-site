@@ -80,20 +80,7 @@ export default function TimelineList() {
 
   return (
     <div className="timeline">
-      {events.map((event, index) => (
-        <div key={index} className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}>
-          <div className="timeline-content">
-            <div className="timeline-date">{event.date}</div>
-            <h3 className="timeline-title">{event.title}</h3>
-            {event.content && <p className="timeline-desc">{event.content}</p>}
-          </div>
-          <div className={`timeline-dot ${event.color || 'blue'}`}>
-            <span className="timeline-icon">{event.icon || '⭐'}</span>
-          </div>
-        </div>
-      ))}
-      
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style>{`
         .timeline {
           position: relative;
           padding: 20px 0;
@@ -175,7 +162,6 @@ export default function TimelineList() {
         .timeline-dot.green { border-color: #4CAF50; }
         .timeline-icon { font-size: 1.2rem; }
         
-        /* 响应式设计 */
         @media (max-width: 768px) {
           .timeline::before { left: 30px; }
           .timeline-item {
@@ -216,7 +202,19 @@ export default function TimelineList() {
           animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-      `}} />
+      `}</style>
+      {events.map((event, index) => (
+        <div key={index} className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}>
+          <div className="timeline-content">
+            <div className="timeline-date">{event.date}</div>
+            <h3 className="timeline-title">{event.title}</h3>
+            {event.content && <p className="timeline-desc">{event.content}</p>}
+          </div>
+          <div className={`timeline-dot ${event.color || 'blue'}`}>
+            <span className="timeline-icon">{event.icon || '⭐'}</span>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
