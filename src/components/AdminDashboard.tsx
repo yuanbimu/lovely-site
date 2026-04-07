@@ -1003,28 +1003,33 @@ const currentFolderFiles = r2Files.filter(f => {
             {/* 上傳區域 */}
             <div style={{ marginBottom: '16px', padding: '12px', background: '#f5f5f5', borderRadius: '8px' }}>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', padding: '8px 12px', background: '#4A90D9', color: 'white', borderRadius: '8px', fontSize: '14px' }}>
+                  <span>📤</span>
+                  <span>上傳圖片</span>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={e => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (file) handleUpload(file);
+                    }}
+                    disabled={uploading}
+                    style={{ display: 'none' }}
+                  />
+                </label>
                 <select 
                   value={uploadFolder} 
                   onChange={e => setUploadFolder(e.target.value)}
-                  style={{ padding: '8px', borderRadius: '8px', border: '1px solid #ddd' }}
+                  style={{ padding: '8px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '14px' }}
                 >
+                  <option value="">選擇目錄</option>
                   <option value="showcase">showcase (櫥窗)</option>
                   <option value="covers">covers (封面)</option>
                   <option value="avatars">avatars (頭像)</option>
-                  <option value="">根目錄</option>
                 </select>
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  onChange={e => {
-                    const file = (e.target as HTMLInputElement).files?.[0];
-                    if (file) handleUpload(file);
-                  }}
-                  disabled={uploading}
-                  style={{ flex: 1, minWidth: '150px' }}
-                />
-                {uploading && <span style={{ color: '#4A90D9' }}>上傳中...</span>}
+                {uploading && <span style={{ color: '#4A90D9', fontSize: '14px' }}>上傳中...</span>}
               </div>
+              {uploadFolder && <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>當前目錄: <strong>{uploadFolder}</strong></div>}
             </div>
 
             <div style={{ overflow: 'auto', flex: 1 }}>
