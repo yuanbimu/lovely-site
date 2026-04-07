@@ -301,7 +301,13 @@ export default function AdminDashboard() {
     try {
       const res = await fetch('/api/showcases', { credentials: 'include' });
       const data: any = await res.json();
-      setShowcases(data.data || []);
+      const loadedShowcases = data.data || [];
+      setShowcases(loadedShowcases);
+      
+      // 如果沒有數據，自動導入靜態數據
+      if (loadedShowcases.length === 0) {
+        await importStaticShowcases();
+      }
     } catch {
       showMessage('error', '加載櫥窗失敗');
     }
@@ -341,7 +347,7 @@ export default function AdminDashboard() {
     }
   }
 
-  // 導入靜態櫥窗數據
+  // 自動導入靜態櫥窗數據（僅在數據庫為空時執行）
   async function importStaticShowcases() {
     const staticShowcases = [
       { id: "model-1", name: "偶像服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-1.jpg", sort_order: 1 },
@@ -378,21 +384,13 @@ export default function AdminDashboard() {
       { id: "model-32", name: "？？服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-32.jpg", sort_order: 32 },
     ];
 
-    try {
-      let successCount = 0;
-      for (const showcase of staticShowcases) {
-        const res = await fetch('/api/showcases', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(showcase)
-        });
-        if (res.ok) successCount++;
-      }
-      loadShowcasesData();
-      showMessage('success', `成功導入 ${successCount} 個櫥窗`);
-    } catch {
-      showMessage('error', '導入失敗');
+    for (const showcase of staticShowcases) {
+      await fetch('/api/showcases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(showcase)
+      });
     }
   }
 
@@ -839,14 +837,9 @@ export default function AdminDashboard() {
             <div className="section">
               <div className="section-header">
                 <h3>櫥窗列表 ({showcases.length})</h3>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button onClick={importStaticShowcases} style={{ background: '#4A90D9' }}>
-                    導入靜態數據
-                  </button>
-                  <button onClick={() => setEditingShowcase({ id: '', name: '', sort_order: 0 })}>
-                    + 新增
-                  </button>
-                </div>
+                <button onClick={() => setEditingShowcase({ id: '', name: '', sort_order: 0 })}>
+                  + 新增
+                </button>
               </div>
               
               <table className="data-table">
