@@ -6,7 +6,7 @@ interface LiveStatusData {
   title: string;
   url: string;
   roomId: string;
-  lastChecked: string;
+  lastChecked?: string;
   error?: string;
 }
 
@@ -15,8 +15,11 @@ type StatusState = 'loading' | 'live' | 'offline' | 'error';
 const BILIBILI_UID = '3821157';
 
 // Format relative time (e.g., "2分钟前")
-function formatRelativeTime(dateString: string): string {
+function formatRelativeTime(dateString: string | undefined): string {
+  if (!dateString) return '刚刚';
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '刚刚';
+  
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
@@ -31,8 +34,10 @@ function formatRelativeTime(dateString: string): string {
 }
 
 // Format time for tooltip (e.g., "2026-03-12 14:30")
-function formatExactTime(dateString: string): string {
+function formatExactTime(dateString: string | undefined): string {
+  if (!dateString) return '-';
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return '-';
   return date.toLocaleString('zh-CN', {
     year: 'numeric',
     month: '2-digit',

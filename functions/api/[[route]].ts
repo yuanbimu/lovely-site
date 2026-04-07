@@ -226,11 +226,12 @@ app.get('/api/live', async (c) => {
       return c.json({ 
         isLive: liveStatus === 1, 
         title: title || '', 
-        url: roomid ? `https://live.bilibili.com/${roomid}` : '' 
+        url: roomid ? `https://live.bilibili.com/${roomid}` : '',
+        lastChecked: new Date().toISOString()
       });
     }
-    return c.json({ isLive: false });
-  } catch { return c.json({ isLive: false }); }
+    return c.json({ isLive: false, lastChecked: new Date().toISOString() });
+  } catch { return c.json({ isLive: false, lastChecked: new Date().toISOString() }); }
 });
 
 export const onRequest = (context) => app.fetch(context.request, context.env, context);
