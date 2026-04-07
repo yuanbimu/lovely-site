@@ -282,6 +282,42 @@ app.get('/api/r2-files', requireAuth, requireEditor, async (c) => {
   }
 });
 
+// R2 上傳 API
+app.post('/api/r2-upload', requireAuth, requireEditor, async (c) => {
+  try {
+    const formData = await c.req.parseBody();
+    const file = formData['file'] as File;
+    
+    if (!file) {
+      return c.json({ error: '請選擇文件' }, 400);
+    }
+
+    const filename = formData['filename'] as string || file.name;
+    const folder = formData['folder'] as string || '';
+    const key = folder ? `${folder}/${filename}` : filename;
+    
+    const arrayBuffer = await file.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    
+    await c.env.IMAGES.put(key, uint8Array, {
+      httpMetadata: {
+        contentType: file.type || 'application/octet-stream'
+      }
+    });
+
+    return c.json({ 
+      success: true, 
+      data: { 
+        key, 
+        url: `https://cdn.yuanbimu.top/${key}` 
+      } 
+    });
+  } catch (err) {
+    console.error('[R2] Upload error:', err);
+    return c.json({ error: '上傳失敗' }, 500);
+  }
+});
+
 app.get('/api/dynamics', async (c) => {
   const limit = Math.min(parseInt(c.req.query('limit') || '20', 10), 50);
   const offset = parseInt(c.req.query('offset') || '0', 10);

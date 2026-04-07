@@ -75,6 +75,9 @@ export default function AdminDashboard() {
 const [showImagePicker, setShowImagePicker] = useState(false);
 const [r2Files, setR2Files] = useState<{key: string, url: string}[]>([]);
 const [imagePickerType, setImagePickerType] = useState<'cover' | 'image'>('image');
+const [showUploader, setShowUploader] = useState(false);
+const [uploadFolder, setUploadFolder] = useState('showcase');
+const [uploading, setUploading] = useState(false);
   
   // 用戶管理
   const [users, setUsers] = useState<User[]>([]);
@@ -365,6 +368,37 @@ const [imagePickerType, setImagePickerType] = useState<'cover' | 'image'>('image
       setEditingShowcase(editingShowcase ? { ...editingShowcase, image_url: url } : null);
     }
     setShowImagePicker(false);
+  }
+
+  async function handleUpload(file: File) {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', uploadFolder);
+      
+      const res = await fetch('/api/r2-upload', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        showMessage('success', '上傳成功！');
+        // 刷新文件列表
+        const listRes = await fetch('/api/r2-files', { credentials: 'include' });
+        const listData = await listRes.json();
+        if (listData.success) setR2Files(listData.data || []);
+      } else {
+        showMessage('error', data.error || '上傳失敗');
+      }
+    } catch {
+      showMessage('error', '上傳失敗');
+    } finally {
+      setUploading(false);
+    }
   }
 
   async function saveEvent(event: TimelineEvent) {
@@ -938,22 +972,51 @@ const [imagePickerType, setImagePickerType] = useState<'cover' | 'image'>('image
           zIndex: 1000
         }}>
           <div style={{
-            background: 'white', borderRadius: '16px', padding: '20px', maxWidth: '600px', maxHeight: '80vh',
+            background: 'white', borderRadius: '16px', padding: '20px', maxWidth: '700px', maxHeight: '85vh',
             width: '90%', overflow: 'hidden', display: 'flex', flexDirection: 'column'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h3 style={{ margin: 0, color: '#6B5637' }}>選擇圖片</h3>
               <button onClick={() => setShowImagePicker(false)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
             </div>
+            
+            {/* 上傳區域 */}
+            <div style={{ marginBottom: '16px', padding: '12px', background: '#f5f5f5', borderRadius: '8px' }}>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <select 
+                  value={uploadFolder} 
+                  onChange={e => setUploadFolder(e.target.value)}
+                  style={{ padding: '8px', borderRadius: '8px', border: '1px solid #ddd' }}
+                >
+                  <option value="showcase">showcase (櫥窗)</option>
+                  <option value="covers">covers (封面)</option>
+                  <option value="avatars">avatars (頭像)</option>
+                  <option value="">根目錄</option>
+                </select>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={e => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (file) handleUpload(file);
+                  }}
+                  disabled={uploading}
+                  style={{ flex: 1, minWidth: '150px' }}
+                />
+                {uploading && <span style={{ color: '#4A90D9' }}>上傳中...</span>}
+              </div>
+            </div>
+
             <div style={{ overflow: 'auto', flex: 1 }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
                 {r2Files.filter(f => f.key.match(/\.(jpg|jpeg|png|gif|webp)$/i)).map(file => (
                   <div key={file.key} onClick={() => selectImage(file.url)} style={{ cursor: 'pointer', border: '2px solid transparent', borderRadius: '8px', overflow: 'hidden' }}>
                     <img src={file.url} alt={file.key} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover' }} />
+                    <div style={{ fontSize: '10px', padding: '4px', color: '#666', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.key}</div>
                   </div>
                 ))}
               </div>
-              {r2Files.length === 0 && <p style={{ textAlign: 'center', color: '#999' }}>暫無圖片文件</p>}
+              {r2Files.length === 0 && <p style={{ textAlign: 'center', color: '#999', padding: '40px' }}>暫無圖片文件，請上傳</p>}
             </div>
           </div>
         </div>
