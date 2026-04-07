@@ -381,7 +381,11 @@ const currentFolderFiles = r2Files.filter(f => {
         } else if (folders.length > 0) {
           setUploadFolder(folders[0].name); // 默认选第一个目录
         } else {
-          setUploadFolder(''); // 无目录时清空
+          // 无目录时创建默认文件夹 '櫥窗'
+          const defaultFolder = '櫥窗';
+          folders = [{ name: defaultFolder, key: defaultFolder + '/' }];
+          setR2Folders(folders);
+          setUploadFolder(defaultFolder);
         }
         
         setShowImagePicker(true);
