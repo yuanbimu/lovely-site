@@ -19,6 +19,9 @@ import {
   getSongs,
   saveSong,
   deleteSong,
+  getShowcases,
+  saveShowcase,
+  deleteShowcase,
   type Env
 } from '../lib/db';
 
@@ -231,6 +234,35 @@ app.post('/api/songs', requireAuth, requireEditor, async (c) => {
 
 app.delete('/api/songs/:id', requireAuth, requireEditor, async (c) => {
   await deleteSong(c.env.DB, c.req.param('id'));
+  return c.json({ success: true });
+});
+
+// Showcase API
+app.get('/api/showcases', async (c) => {
+  const showcases = await getShowcases(c.env.DB);
+  return c.json({ success: true, data: showcases });
+});
+
+app.post('/api/showcases', requireAuth, requireEditor, async (c) => {
+  try {
+    const body = await c.req.json();
+    const showcaseData = {
+      id: body.id || `showcase_${Date.now()}`,
+      name: body.name,
+      description: body.description,
+      image_url: body.image_url,
+      sort_order: body.sort_order || 0
+    };
+    await saveShowcase(c.env.DB, showcaseData);
+    return c.json({ success: true, data: showcaseData });
+  } catch (err) {
+    console.error('[Showcase] Save error:', err);
+    return c.json({ error: '保存失败' }, 500);
+  }
+});
+
+app.delete('/api/showcases/:id', requireAuth, requireEditor, async (c) => {
+  await deleteShowcase(c.env.DB, c.req.param('id'));
   return c.json({ success: true });
 });
 

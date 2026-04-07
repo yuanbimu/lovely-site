@@ -28,6 +28,15 @@ interface Song {
   created_at?: number;
 }
 
+interface Showcase {
+  id: string;
+  name: string;
+  description?: string;
+  image_url?: string;
+  sort_order?: number;
+  created_at?: number;
+}
+
 const AUTH_API = '/api/auth';
 const TIMELINE_API = '/api/timeline';
 
@@ -60,6 +69,10 @@ export default function AdminDashboard() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [editingSong, setEditingSong] = useState<Song | null>(null);
   
+  // 櫥窗數據
+  const [showcases, setShowcases] = useState<Showcase[]>([]);
+  const [editingShowcase, setEditingShowcase] = useState<Showcase | null>(null);
+  
   // 用戶管理
   const [users, setUsers] = useState<User[]>([]);
   const [showUserForm, setShowUserForm] = useState(false);
@@ -80,6 +93,7 @@ export default function AdminDashboard() {
       if (activeTab === 'timeline') loadTimelineData();
       if (activeTab === 'users' && user.role === 'admin') loadUsersData();
       if (activeTab === 'songs') loadSongsData();
+      if (activeTab === 'showcase') loadShowcasesData();
     }
   }, [user, activeTab]);
 
@@ -282,6 +296,51 @@ export default function AdminDashboard() {
     }
   }
 
+  // 櫥窗管理函數
+  async function loadShowcasesData() {
+    try {
+      const res = await fetch('/api/showcases', { credentials: 'include' });
+      const data: any = await res.json();
+      setShowcases(data.data || []);
+    } catch {
+      showMessage('error', '加載櫥窗失敗');
+    }
+  }
+
+  async function handleSaveShowcase() {
+    if (!editingShowcase) return;
+    try {
+      const res = await fetch('/api/showcases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(editingShowcase)
+      });
+      if (res.ok) {
+        setEditingShowcase(null);
+        loadShowcasesData();
+        showMessage('success', '保存成功');
+      } else {
+        showMessage('error', '保存失敗');
+      }
+    } catch {
+      showMessage('error', '網絡錯誤');
+    }
+  }
+
+  async function handleDeleteShowcase(id: string) {
+    if (!confirm('確定刪除該櫥窗？')) return;
+    try {
+      const res = await fetch(`/api/showcases/${id}`, { method: 'DELETE', credentials: 'include' });
+      if (res.ok) {
+        loadShowcasesData();
+        showMessage('success', '刪除成功');
+      }
+    } catch {
+      showMessage('error', '刪除失敗');
+    }
+  }
+
   async function saveEvent(event: TimelineEvent) {
     try {
       const res = await fetch(TIMELINE_API, {
@@ -430,6 +489,12 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab('songs')}
           >
             <span>🎵</span> 歌單管理
+          </button>
+          <button 
+            className={activeTab === 'showcase' ? 'active' : ''}
+            onClick={() => setActiveTab('showcase')}
+          >
+            <span>🖼️</span> 櫥窗管理
           </button>
           {user.role === 'admin' && (
             <button 
@@ -664,6 +729,93 @@ export default function AdminDashboard() {
                         {song.url && <a href={song.url} target="_blank" rel="noreferrer" style={{ marginRight: '8px', color: '#8B6F47' }}>連結</a>}
                         <button onClick={() => setEditingSong(song)}>編輯</button>
                         <button className="btn-danger" onClick={() => handleDeleteSong(song.id)}>删除</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Showcase Tab */}
+        {activeTab === 'showcase' && (
+          <div className="tab-content">
+            <h1>櫥窗管理</h1>
+            
+            {editingShowcase && (
+              <div className="section edit-section">
+                <h3>{editingShowcase.id ? '編輯櫥窗' : '新增櫥窗'}</h3>
+                <div className="form-grid">
+                  <input
+                    type="text"
+                    value={editingShowcase.name}
+                    onChange={e => setEditingShowcase({...editingShowcase, name: e.target.value})}
+                    placeholder="名稱 (必填)"
+                  />
+                  <input
+                    type="number"
+                    value={editingShowcase.sort_order || 0}
+                    onChange={e => setEditingShowcase({...editingShowcase, sort_order: parseInt(e.target.value) || 0})}
+                    placeholder="排序"
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={editingShowcase.description || ''}
+                  onChange={e => setEditingShowcase({...editingShowcase, description: e.target.value})}
+                  placeholder="描述"
+                  style={{ width: '100%', marginBottom: '1rem', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
+                />
+                <input
+                  type="text"
+                  value={editingShowcase.image_url || ''}
+                  onChange={e => setEditingShowcase({...editingShowcase, image_url: e.target.value})}
+                  placeholder="圖片 URL"
+                  style={{ width: '100%', marginBottom: '1rem', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
+                />
+                <div className="form-actions">
+                  <button onClick={handleSaveShowcase}>保存</button>
+                  <button className="btn-secondary" onClick={() => setEditingShowcase(null)}>取消</button>
+                </div>
+              </div>
+            )}
+            
+            <div className="section">
+              <div className="section-header">
+                <h3>櫥窗列表 ({showcases.length})</h3>
+                <button onClick={() => setEditingShowcase({ id: '', name: '', sort_order: 0 })}>
+                  + 新增
+                </button>
+              </div>
+              
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>圖片</th>
+                    <th>名稱 / 描述</th>
+                    <th>排序</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {showcases.map(showcase => (
+                    <tr key={showcase.id}>
+                      <td>
+                        {showcase.image_url ? (
+                          <img src={showcase.image_url} alt={showcase.name} style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ width: '60px', height: '60px', background: '#eee', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🖼️</div>
+                        )}
+                      </td>
+                      <td>
+                        <strong>{showcase.name}</strong>
+                        {showcase.description && <div style={{ fontSize: '0.85em', color: '#666' }}>{showcase.description}</div>}
+                      </td>
+                      <td>{showcase.sort_order || 0}</td>
+                      <td className="actions">
+                        <button onClick={() => setEditingShowcase(showcase)}>編輯</button>
+                        <button className="btn-danger" onClick={() => handleDeleteShowcase(showcase.id)}>删除</button>
                       </td>
                     </tr>
                   ))}

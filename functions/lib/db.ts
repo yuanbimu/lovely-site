@@ -301,3 +301,40 @@ export async function deleteSong(db: D1Database, id: string) {
   await db.prepare('DELETE FROM songs WHERE id = ?').bind(id).run();
 }
 
+// ========== Showcase (橱窗) ==========
+
+export interface Showcase {
+  id: string;
+  name: string;
+  description?: string;
+  image_url?: string;
+  sort_order?: number;
+  created_at: number;
+  updated_at: number;
+}
+
+export async function getShowcases(db: D1Database): Promise<Showcase[]> {
+  const result = await db.prepare('SELECT * FROM showcases ORDER BY sort_order ASC, created_at DESC').all<Showcase>();
+  return result.results || [];
+}
+
+export async function saveShowcase(db: D1Database, showcase: Omit<Showcase, 'created_at' | 'updated_at'>) {
+  const now = Date.now();
+  await db.prepare(`
+    INSERT OR REPLACE INTO showcases (id, name, description, image_url, sort_order, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).bind(
+    showcase.id,
+    showcase.name,
+    showcase.description || null,
+    showcase.image_url || null,
+    showcase.sort_order || 0,
+    now,
+    now
+  ).run();
+}
+
+export async function deleteShowcase(db: D1Database, id: string) {
+  await db.prepare('DELETE FROM showcases WHERE id = ?').bind(id).run();
+}
+
