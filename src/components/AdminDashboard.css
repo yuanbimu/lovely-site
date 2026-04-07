@@ -78,6 +78,7 @@
 .admin-dashboard {
   display: flex;
   min-height: 100vh;
+  position: relative;
 }
 
 /* Sidebar */
@@ -86,12 +87,14 @@
   background: white;
   border-right: 1px solid rgba(0,0,0,0.05);
   padding: 1.5rem;
-  position: fixed;
+  position: sticky;
   height: 100vh;
   left: 0;
   top: 0;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
+  z-index: 100;
 }
 
 .sidebar-header {
@@ -194,10 +197,10 @@
 /* Main Content */
 .admin-main {
   flex: 1;
-  margin-left: 260px;
   padding: 2rem;
   background: #FAF6F0;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .tab-content h1 {
