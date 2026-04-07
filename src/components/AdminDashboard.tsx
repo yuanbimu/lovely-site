@@ -355,13 +355,27 @@ const currentFolderFiles = r2Files.filter(f => {
     }
   }
 
-  async function openImagePicker(type: 'cover' | 'image') {
+  async function openImagePicker(type: 'cover' | 'image', folder?: string) {
     setImagePickerType(type);
+    
+    // 如果传入了 folder 或 editingShowcase 有 folder，则自动设置
+    const targetFolder = folder || (type === 'image' ? editingShowcase?.folder : '');
+    if (targetFolder) {
+      setUploadFolder(targetFolder);
+    }
+    
     try {
       const res = await fetch('/api/r2-files', { credentials: 'include' });
       const data = await res.json();
       if (data.success && data.data) {
-        setR2Folders(data.data.folders || []);
+        let folders = data.data.folders || [];
+        
+        // 如果目标目录不在列表中，动态添加
+        if (targetFolder && !folders.find((f: { name: string }) => f.name === targetFolder)) {
+          folders = [...folders, { name: targetFolder, key: targetFolder + '/' }];
+        }
+        
+        setR2Folders(folders);
         setR2Files(data.data.files || []);
         setShowImagePicker(true);
       }
@@ -861,7 +875,7 @@ const currentFolderFiles = r2Files.filter(f => {
                     ) : (
                       <div style={{ width: '80px', height: '100px', background: '#eee', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🖼️</div>
                     )}
-                    <button type="button" onClick={() => openImagePicker('image')} style={{ padding: '8px 16px', background: '#4A90D9', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+                    <button type="button" onClick={() => openImagePicker('image', editingShowcase?.folder)} style={{ padding: '8px 16px', background: '#4A90D9', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
                       選擇圖片
                     </button>
                   </div>
