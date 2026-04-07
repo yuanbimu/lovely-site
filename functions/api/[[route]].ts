@@ -266,6 +266,22 @@ app.delete('/api/showcases/:id', requireAuth, requireEditor, async (c) => {
   return c.json({ success: true });
 });
 
+// R2 文件列表 API
+app.get('/api/r2-files', requireAuth, requireEditor, async (c) => {
+  try {
+    const prefix = c.req.query('prefix') || '';
+    const list = await c.env.IMAGES.list({ prefix });
+    const files = list.objects.map(obj => ({
+      key: obj.key,
+      url: `https://cdn.yuanbimu.top/${obj.key}`
+    }));
+    return c.json({ success: true, data: files });
+  } catch (err) {
+    console.error('[R2] List error:', err);
+    return c.json({ error: '獲取文件列表失敗' }, 500);
+  }
+});
+
 app.get('/api/dynamics', async (c) => {
   const limit = Math.min(parseInt(c.req.query('limit') || '20', 10), 50);
   const offset = parseInt(c.req.query('offset') || '0', 10);

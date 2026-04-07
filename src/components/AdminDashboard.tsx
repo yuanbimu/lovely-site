@@ -72,6 +72,9 @@ export default function AdminDashboard() {
   // 櫥窗數據
   const [showcases, setShowcases] = useState<Showcase[]>([]);
   const [editingShowcase, setEditingShowcase] = useState<Showcase | null>(null);
+const [showImagePicker, setShowImagePicker] = useState(false);
+const [r2Files, setR2Files] = useState<{key: string, url: string}[]>([]);
+const [imagePickerType, setImagePickerType] = useState<'cover' | 'image'>('image');
   
   // 用戶管理
   const [users, setUsers] = useState<User[]>([]);
@@ -339,6 +342,29 @@ export default function AdminDashboard() {
     } catch {
       showMessage('error', '刪除失敗');
     }
+  }
+
+  async function openImagePicker(type: 'cover' | 'image') {
+    setImagePickerType(type);
+    try {
+      const res = await fetch('/api/r2-files', { credentials: 'include' });
+      const data = await res.json();
+      if (data.success) {
+        setR2Files(data.data || []);
+        setShowImagePicker(true);
+      }
+    } catch {
+      showMessage('error', '獲取文件列表失敗');
+    }
+  }
+
+  function selectImage(url: string) {
+    if (imagePickerType === 'cover') {
+      setEditingSong(editingSong ? { ...editingSong, cover_url: url } : null);
+    } else {
+      setEditingShowcase(editingShowcase ? { ...editingShowcase, image_url: url } : null);
+    }
+    setShowImagePicker(false);
   }
 
   async function saveEvent(event: TimelineEvent) {
@@ -672,13 +698,19 @@ export default function AdminDashboard() {
                     placeholder="發佈時間"
                   />
                 </div>
-                <input
-                  type="text"
-                  value={editingSong.cover_url || ''}
-                  onChange={e => setEditingSong({...editingSong, cover_url: e.target.value})}
-                  placeholder="封面圖片 URL"
-                  style={{ width: '100%', marginBottom: '1rem', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
-                />
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>封面圖片</label>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    {editingSong.cover_url ? (
+                      <img src={editingSong.cover_url} alt="cover" style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '60px', height: '60px', background: '#eee', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🎵</div>
+                    )}
+                    <button type="button" onClick={() => openImagePicker('cover')} style={{ padding: '8px 16px', background: '#4A90D9', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+                      選擇圖片
+                    </button>
+                  </div>
+                </div>
                 <input
                   type="text"
                   value={editingSong.url || ''}
@@ -767,13 +799,19 @@ export default function AdminDashboard() {
                   placeholder="描述"
                   style={{ width: '100%', marginBottom: '1rem', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
                 />
-                <input
-                  type="text"
-                  value={editingShowcase.image_url || ''}
-                  onChange={e => setEditingShowcase({...editingShowcase, image_url: e.target.value})}
-                  placeholder="圖片 URL"
-                  style={{ width: '100%', marginBottom: '1rem', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
-                />
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>櫥窗圖片</label>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    {editingShowcase.image_url ? (
+                      <img src={editingShowcase.image_url} alt="showcase" style={{ width: '80px', height: '100px', borderRadius: '8px', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '80px', height: '100px', background: '#eee', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🖼️</div>
+                    )}
+                    <button type="button" onClick={() => openImagePicker('image')} style={{ padding: '8px 16px', background: '#4A90D9', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+                      選擇圖片
+                    </button>
+                  </div>
+                </div>
                 <div className="form-actions">
                   <button onClick={handleSaveShowcase}>保存</button>
                   <button className="btn-secondary" onClick={() => setEditingShowcase(null)}>取消</button>
@@ -891,6 +929,35 @@ export default function AdminDashboard() {
           </div>
         )}
       </main>
+
+      {/* 圖片選擇器 Modal */}
+      {showImagePicker && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white', borderRadius: '16px', padding: '20px', maxWidth: '600px', maxHeight: '80vh',
+            width: '90%', overflow: 'hidden', display: 'flex', flexDirection: 'column'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ margin: 0, color: '#6B5637' }}>選擇圖片</h3>
+              <button onClick={() => setShowImagePicker(false)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
+            </div>
+            <div style={{ overflow: 'auto', flex: 1 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
+                {r2Files.filter(f => f.key.match(/\.(jpg|jpeg|png|gif|webp)$/i)).map(file => (
+                  <div key={file.key} onClick={() => selectImage(file.url)} style={{ cursor: 'pointer', border: '2px solid transparent', borderRadius: '8px', overflow: 'hidden' }}>
+                    <img src={file.url} alt={file.key} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover' }} />
+                  </div>
+                ))}
+              </div>
+              {r2Files.length === 0 && <p style={{ textAlign: 'center', color: '#999' }}>暫無圖片文件</p>}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
