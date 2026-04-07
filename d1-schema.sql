@@ -76,6 +76,17 @@ CREATE TABLE IF NOT EXISTS songs (
   updated_at INTEGER NOT NULL
 );
 
+-- 橱窗表
+CREATE TABLE IF NOT EXISTS showcases (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT,
+  image_url TEXT,
+  sort_order INTEGER DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
 -- 创建索引
 CREATE INDEX IF NOT EXISTS idx_dynamics_publish_time ON dynamics(publish_time DESC);
 CREATE INDEX IF NOT EXISTS idx_dynamics_type ON dynamics(type);

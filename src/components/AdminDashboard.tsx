@@ -301,13 +301,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch('/api/showcases', { credentials: 'include' });
       const data: any = await res.json();
-      const loadedShowcases = data.data || [];
-      setShowcases(loadedShowcases);
-      
-      // 如果沒有數據，自動導入靜態數據
-      if (loadedShowcases.length === 0) {
-        await importStaticShowcases();
-      }
+      setShowcases(data.data || []);
     } catch {
       showMessage('error', '加載櫥窗失敗');
     }
@@ -344,53 +338,6 @@ export default function AdminDashboard() {
       }
     } catch {
       showMessage('error', '刪除失敗');
-    }
-  }
-
-  // 自動導入靜態櫥窗數據（僅在數據庫為空時執行）
-  async function importStaticShowcases() {
-    const staticShowcases = [
-      { id: "model-1", name: "偶像服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-1.jpg", sort_order: 1 },
-      { id: "model-2", name: "宅服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-2.jpg", sort_order: 2 },
-      { id: "model-3", name: "JK服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-3.jpg", sort_order: 3 },
-      { id: "model-4", name: "睡衣", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-4.jpg", sort_order: 4 },
-      { id: "model-5", name: "袋鼠服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-5.jpg", sort_order: 5 },
-      { id: "model-6", name: "诗紫苑", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-6.jpg", sort_order: 6 },
-      { id: "model-7", name: "泳装", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-7.jpg", sort_order: 7 },
-      { id: "model-8", name: "高马尾", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-8.jpg", sort_order: 8 },
-      { id: "model-9", name: "紫色偶像服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-9.jpg", sort_order: 9 },
-      { id: "model-10", name: "天使服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-10.jpg", sort_order: 10 },
-      { id: "model-11", name: "旗袍", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-11.jpg", sort_order: 11 },
-      { id: "model-12", name: "机娘", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-12.jpg", sort_order: 12 },
-      { id: "model-13", name: "儿童服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-13.jpg", sort_order: 13 },
-      { id: "model-14", name: "练习生服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-14.jpg", sort_order: 14 },
-      { id: "model-15", name: "女仆装", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-15.jpg", sort_order: 15 },
-      { id: "model-16", name: "璃月服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-16.jpg", sort_order: 16 },
-      { id: "model-17", name: "兔女郎", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-17.jpg", sort_order: 17 },
-      { id: "model-18", name: "冬季睡衣", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-18.jpg", sort_order: 18 },
-      { id: "model-19", name: "王道偶像服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-19.jpg", sort_order: 19 },
-      { id: "model-20", name: "女巫服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-20.jpg", sort_order: 20 },
-      { id: "model-21", name: "弓箭手服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-21.jpg", sort_order: 21 },
-      { id: "model-22", name: "圣女服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-22.jpg", sort_order: 22 },
-      { id: "model-23", name: "社畜服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-23.jpg", sort_order: 23 },
-      { id: "model-24", name: "星光服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-24.jpg", sort_order: 24 },
-      { id: "model-25", name: "恶魔服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-25.jpg", sort_order: 25 },
-      { id: "model-26", name: "炼金服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-26.jpg", sort_order: 26 },
-      { id: "model-27", name: "和服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-27.jpg", sort_order: 27 },
-      { id: "model-28", name: "玉女服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-28.jpg", sort_order: 28 },
-      { id: "model-29", name: "重置宅服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-29.jpg", sort_order: 29 },
-      { id: "model-30", name: "运动服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-30.jpg", sort_order: 30 },
-      { id: "model-31", name: "幼稚园", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-31.jpg", sort_order: 31 },
-      { id: "model-32", name: "？？服", description: "待編寫", image_url: "https://cdn.yuanbimu.top/showcase/model-32.jpg", sort_order: 32 },
-    ];
-
-    for (const showcase of staticShowcases) {
-      await fetch('/api/showcases', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(showcase)
-      });
     }
   }
 
