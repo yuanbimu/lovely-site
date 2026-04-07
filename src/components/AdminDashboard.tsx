@@ -81,9 +81,9 @@ const [showUploader, setShowUploader] = useState(false);
 const [uploadFolder, setUploadFolder] = useState('showcase');
 const [uploading, setUploading] = useState(false);
 
-// 过滤当前目录的文件
+// 过滤当前目录的文件（排除根目录的文件）
 const currentFolderFiles = r2Files.filter(f => {
-  if (!uploadFolder) return true;
+  if (!uploadFolder) return false; // 不显示根目录文件
   return f.key.startsWith(uploadFolder + '/');
 });
   
@@ -360,9 +360,6 @@ const currentFolderFiles = r2Files.filter(f => {
     
     // 如果传入了 folder 或 editingShowcase 有 folder，则自动设置
     const targetFolder = folder || (type === 'image' ? editingShowcase?.folder : '');
-    if (targetFolder) {
-      setUploadFolder(targetFolder);
-    }
     
     try {
       const res = await fetch('/api/r2-files', { credentials: 'include' });
@@ -377,6 +374,16 @@ const currentFolderFiles = r2Files.filter(f => {
         
         setR2Folders(folders);
         setR2Files(data.data.files || []);
+        
+        // 自动设置目录（优先使用传入的 folder）
+        if (targetFolder) {
+          setUploadFolder(targetFolder);
+        } else if (folders.length > 0) {
+          setUploadFolder(folders[0].name); // 默认选第一个目录
+        } else {
+          setUploadFolder(''); // 无目录时清空
+        }
+        
         setShowImagePicker(true);
       }
     } catch {
@@ -1037,9 +1044,9 @@ const currentFolderFiles = r2Files.filter(f => {
                   style={{ padding: '8px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '14px' }}
                 >
                   <option value="">選擇目錄</option>
-                  <option value="showcase">showcase (櫥窗)</option>
-                  <option value="covers">covers (封面)</option>
-                  <option value="avatars">avatars (頭像)</option>
+                  {r2Folders.map(folder => (
+                    <option key={folder.name} value={folder.name}>{folder.name}</option>
+                  ))}
                 </select>
                 {uploading && <span style={{ color: '#4A90D9', fontSize: '14px' }}>上傳中...</span>}
               </div>
