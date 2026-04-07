@@ -210,6 +210,30 @@ app.get('/api/songs', async (c) => {
   return c.json({ success: true, data: songs });
 });
 
+app.post('/api/songs', requireAuth, requireEditor, async (c) => {
+  try {
+    const body = await c.req.json();
+    const songData = {
+      id: body.id || `song_${Date.now()}`,
+      title: body.title,
+      artist: body.artist || '东爱璃 Lovely',
+      cover_url: body.cover_url,
+      url: body.url,
+      release_date: body.release_date
+    };
+    await saveSong(c.env.DB, songData);
+    return c.json({ success: true, data: songData });
+  } catch (err) {
+    console.error('[Songs] Save error:', err);
+    return c.json({ error: '保存失败' }, 500);
+  }
+});
+
+app.delete('/api/songs/:id', requireAuth, requireEditor, async (c) => {
+  await deleteSong(c.env.DB, c.req.param('id'));
+  return c.json({ success: true });
+});
+
 app.get('/api/dynamics', async (c) => {
   const limit = Math.min(parseInt(c.req.query('limit') || '20', 10), 50);
   const offset = parseInt(c.req.query('offset') || '0', 10);
