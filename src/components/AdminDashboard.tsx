@@ -73,6 +73,8 @@ export default function AdminDashboard() {
   // 櫥窗數據
   const [showcases, setShowcases] = useState<Showcase[]>([]);
   const [editingShowcase, setEditingShowcase] = useState<Showcase | null>(null);
+  const [maxShowcaseSort, setMaxShowcaseSort] = useState(0);
+  const [folderImages, setFolderImages] = useState<{key: string, url: string}[]>([]); // Images in current folder
 const [showImagePicker, setShowImagePicker] = useState(false);
 const [r2Files, setR2Files] = useState<{type: string, name?: string, key: string, url: string}[]>([]);
 const [r2Folders, setR2Folders] = useState<{name: string, key: string}[]>([]);
@@ -315,11 +317,70 @@ const currentFolderFiles = r2Files.filter(f => {
     try {
       const res = await fetch('/api/showcases', { credentials: 'include' });
       const data: any = await res.json();
-      setShowcases(data.data || []);
+      const showcasesData = data.data || [];
+      setShowcases(showcasesData);
+      
+      // Calculate max sort_order for new showcase default
+      const maxSort = showcasesData.reduce((max: number, s: Showcase) => 
+        Math.max(max, s.sort_order || 0), 0);
+      setMaxShowcaseSort(maxSort);
     } catch {
       showMessage('error', '加載櫥窗失敗');
     }
   }
+
+  // Load images from R2 folder for editing showcase
+  async function loadFolderImages(folder: string) {
+    if (!folder) {
+      setFolderImages([]);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/r2-files?prefix=${encodeURIComponent(folder)}`, { credentials: 'include' });
+      const data = await res.json();
+      if (data.success && data.data) {
+        // Filter to only image files in the folder
+        const images = (data.data.files || []).filter((f: { key: string, url: string }) => 
+          f.key.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+        ).map((f: { key: string, url: string }) => ({ key: f.key, url: f.url }));
+        setFolderImages(images);
+      }
+    } catch {
+      showMessage('error', '加載圖片失敗');
+    }
+  }
+
+  // Delete image from R2
+  async function deleteR2Image(key: string) {
+    if (!confirm('確定刪除該圖片？')) return;
+    try {
+      const res = await fetch(`/api/r2-files/${encodeURIComponent(key)}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (res.ok) {
+        showMessage('success', '刪除成功');
+        // Refresh folder images
+        if (editingShowcase?.folder) {
+          loadFolderImages(editingShowcase.folder);
+        }
+      } else {
+        showMessage('error', '刪除失敗');
+      }
+    } catch {
+      showMessage('error', '刪除失敗');
+    }
+  }
+
+  // Update editingShowcase to also trigger folder image loading
+  const setEditingShowcaseWithImages = (showcase: Showcase | null) => {
+    setEditingShowcase(showcase);
+    if (showcase?.folder) {
+      loadFolderImages(showcase.folder);
+    } else {
+      setFolderImages([]);
+    }
+  };
 
   async function handleSaveShowcase() {
     if (!editingShowcase) return;
@@ -358,8 +419,20 @@ const currentFolderFiles = r2Files.filter(f => {
   async function openImagePicker(type: 'cover' | 'image', folder?: string) {
     setImagePickerType(type);
     
-    // 如果传入了 folder 或 editingShowcase 有 folder，则自动设置
-    const targetFolder = folder || (type === 'image' ? editingShowcase?.folder : '');
+    // 櫥窗圖片：驗證 folder
+    if (type === 'image') {
+      // 新增櫥窗時：允許上傳（API 會自動生成 model-{N} 目錄）
+      // 編輯櫥窗時：需要已有 folder
+      if (editingShowcase?.id && !editingShowcase?.folder) {
+        showMessage('error', '請先在櫥窗編輯表單中填寫「目錄名稱」');
+        return;
+      }
+      // 強制使用 editingShowcase.folder 作為目標目錄
+      folder = editingShowcase?.folder;
+    }
+    
+    // 封面圖片：保持原有邏輯
+    const targetFolder = folder || '';
     
     try {
       const res = await fetch('/api/r2-files', { credentials: 'include' });
@@ -406,11 +479,23 @@ const currentFolderFiles = r2Files.filter(f => {
 
   async function handleUpload(file: File) {
     if (!file) return;
+    
+    // 櫥窗圖片：強制驗證目錄名稱
+    if (imagePickerType === 'image' && !editingShowcase?.folder) {
+      showMessage('error', '請先保存櫥窗的目錄名稱');
+      return;
+    }
+    
+    // 強制使用 editingShowcase.folder 上傳
+    const targetFolder = imagePickerType === 'image' && editingShowcase?.folder 
+      ? editingShowcase.folder 
+      : uploadFolder;
+    
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('folder', uploadFolder);
+      formData.append('folder', targetFolder);
       
       const res = await fetch('/api/r2-upload', {
         method: 'POST',
@@ -856,12 +941,15 @@ const currentFolderFiles = r2Files.filter(f => {
                     onChange={e => setEditingShowcase({...editingShowcase, name: e.target.value})}
                     placeholder="名稱 (必填)"
                   />
-                  <input
-                    type="text"
-                    value={editingShowcase.folder || ''}
-                    onChange={e => setEditingShowcase({...editingShowcase, folder: e.target.value})}
-                    placeholder="目錄名 (如 model-1)"
-                  />
+                  {/* Folder is auto-generated by API - only show when editing existing showcase */}
+                  {editingShowcase.id && (
+                    <input
+                      type="text"
+                      value={editingShowcase.folder || ''}
+                      onChange={e => setEditingShowcase({...editingShowcase, folder: e.target.value})}
+                      placeholder="目錄名 (如 model-1)"
+                    />
+                  )}
                 </div>
                 <div className="form-grid">
                   <input
@@ -891,6 +979,89 @@ const currentFolderFiles = r2Files.filter(f => {
                     </button>
                   </div>
                 </div>
+                
+                {/* Folder images - only show when editing existing showcase with folder */}
+                {editingShowcase.id && editingShowcase.folder && folderImages.length > 0 && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>
+                      目錄圖片 ({folderImages.length})
+                    </label>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {folderImages.map((img, idx) => (
+                        <div key={idx} style={{ position: 'relative', width: '80px', height: '80px' }}>
+                          <img 
+                            src={img.url} 
+                            alt={`${img.key}`}
+                            style={{ width: '100%', height: '100%', borderRadius: '8px', objectFit: 'cover' }}
+                          />
+                          <button
+                            onClick={() => deleteR2Image(img.key)}
+                            style={{
+                              position: 'absolute',
+                              top: '-6px',
+                              right: '-6px',
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              background: '#ff4444',
+                              color: 'white',
+                              border: 'none',
+                              cursor: 'pointer',
+                              fontSize: '12px',
+                              lineHeight: '1',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Upload to folder - show when editing existing showcase */}
+                {editingShowcase.id && editingShowcase.folder && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>上傳圖片到此目錄</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file || !editingShowcase?.folder) return;
+                        
+                        setUploading(true);
+                        try {
+                          const formData = new FormData();
+                          formData.append('file', file);
+                          formData.append('folder', editingShowcase.folder);
+                          
+                          const res = await fetch('/api/r2-upload', {
+                            method: 'POST',
+                            credentials: 'include',
+                            body: formData
+                          });
+                          
+                          const data = await res.json();
+                          if (data.success) {
+                            showMessage('success', '上傳成功！');
+                            loadFolderImages(editingShowcase.folder);
+                          } else {
+                            showMessage('error', data.error || '上傳失敗');
+                          }
+                        } catch {
+                          showMessage('error', '上傳失敗');
+                        } finally {
+                          setUploading(false);
+                        }
+                      }}
+                      style={{ width: '100%', padding: '0.5rem' }}
+                    />
+                  </div>
+                )}
                 <div className="form-actions">
                   <button onClick={handleSaveShowcase}>保存</button>
                   <button className="btn-secondary" onClick={() => setEditingShowcase(null)}>取消</button>
@@ -901,7 +1072,7 @@ const currentFolderFiles = r2Files.filter(f => {
             <div className="section">
               <div className="section-header">
                 <h3>櫥窗列表 ({showcases.length})</h3>
-                <button onClick={() => setEditingShowcase({ id: '', name: '', sort_order: 0 })}>
+                <button onClick={() => setEditingShowcase({ id: '', name: '', sort_order: maxShowcaseSort + 1 })}>
                   + 新增
                 </button>
               </div>
@@ -931,7 +1102,7 @@ const currentFolderFiles = r2Files.filter(f => {
                       </td>
                       <td>{showcase.sort_order || 0}</td>
                       <td className="actions">
-                        <button onClick={() => setEditingShowcase(showcase)}>編輯</button>
+                        <button onClick={() => setEditingShowcaseWithImages(showcase)}>編輯</button>
                         <button className="btn-danger" onClick={() => handleDeleteShowcase(showcase.id)}>删除</button>
                       </td>
                     </tr>

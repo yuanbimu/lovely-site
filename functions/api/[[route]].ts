@@ -240,17 +240,72 @@ app.delete('/api/songs/:id', requireAuth, requireEditor, async (c) => {
 // Showcase API
 app.get('/api/showcases', async (c) => {
   const showcases = await getShowcases(c.env.DB);
+  
+  // Migration: Fill empty folder fields with their ID on first run
+  for (const showcase of showcases) {
+    if (!showcase.folder && showcase.id) {
+      await updateShowcaseFolder(c.env.DB, showcase.id, showcase.id);
+      showcase.folder = showcase.id;
+    }
+  }
+  
   return c.json({ success: true, data: showcases });
 });
+
+// Get max model number from existing showcases
+async function getMaxModelNumber(db: D1Database): Promise<number> {
+  const showcases = await getShowcases(db);
+  let maxNum = 0;
+  for (const s of showcases) {
+    const match = s.id?.match(/^model-(\d+)$/);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num > maxNum) maxNum = num;
+    }
+    const folderMatch = s.folder?.match(/^model-(\d+)$/);
+    if (folderMatch) {
+      const num = parseInt(folderMatch[1], 10);
+      if (num > maxNum) maxNum = num;
+    }
+  }
+  return maxNum;
+}
+
+// Update showcase folder
+async function updateShowcaseFolder(db: D1Database, id: string, folder: string) {
+  const now = Date.now();
+  await db.prepare(`
+    UPDATE showcases SET folder = ?, updated_at = ? WHERE id = ?
+  `).bind(folder, now, id).run();
+}
 
 app.post('/api/showcases', requireAuth, requireEditor, async (c) => {
   try {
     const body = await c.req.json();
+    
+    // Auto-generate folder if not provided
+    let folder = body.folder;
+    let id = body.id;
+    
+    if (!folder && !id) {
+      // Both missing - auto-generate model-{N}
+      const maxNum = await getMaxModelNumber(c.env.DB);
+      const newNum = maxNum + 1;
+      id = `model-${newNum}`;
+      folder = id;
+    } else if (!folder && id) {
+      // folder missing but id provided - use id as folder
+      folder = id;
+    } else if (folder && !id) {
+      // id missing but folder provided - use folder as id
+      id = folder;
+    }
+    
     const showcaseData = {
-      id: body.id || `showcase_${Date.now()}`,
+      id,
       name: body.name,
       description: body.description,
-      folder: body.folder,
+      folder,
       image_url: body.image_url,
       sort_order: body.sort_order || 0
     };
@@ -291,6 +346,24 @@ app.get('/api/r2-files', requireAuth, requireEditor, async (c) => {
   } catch (err) {
     console.error('[R2] List error:', err);
     return c.json({ error: '獲取文件列表失敗' }, 500);
+  }
+});
+
+// R2 文件刪除 API
+app.delete('/api/r2-files/:key', requireAuth, requireEditor, async (c) => {
+  try {
+    const key = c.req.param('key');
+    
+    if (!key) {
+      return c.json({ error: '缺少文件 key' }, 400);
+    }
+
+    await c.env.IMAGES.delete(key);
+    
+    return c.json({ success: true });
+  } catch (err) {
+    console.error('[R2] Delete error:', err);
+    return c.json({ error: '刪除失敗' }, 500);
   }
 });
 
