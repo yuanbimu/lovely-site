@@ -1,0 +1,32 @@
+{
+  "active_plan": "C:\\Users\\Cashier\\Desktop\\reLovelyProject\\lovely-site\\.sisyphus\\plans\\admin-improvements.md",
+  "started_at": "2026-04-08T03:58:12.428Z",
+  "session_ids": [
+    "ses_294c26654ffezMcnfXiP8oLdyX"
+  ],
+  "session_origins": {
+    "ses_294c26654ffezMcnfXiP8oLdyX": "direct"
+  },
+  "plan_name": "admin-improvements",
+  "agent": "atlas",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "Admin布局修复 - CSS居中+3列网格",
+      "session_id": "ses_294c0a957ffeyoCUT81NlauO7N",
+      "agent": "Sisyphus-Junior",
+      "category": "visual-engineering",
+      "updated_at": "2026-04-08T04:01:13.064Z"
+    },
+    "todo:2": {
+      "task_key": "todo:2",
+      "task_label": "2",
+      "task_title": "R2图片迁移 - showcase图片移动到model-x目录",
+      "session_id": "ses_294b4699affe35bqZZoxL1KzH8",
+      "agent": "Sisyphus-Junior",
+      "category": "writing",
+      "updated_at": "2026-04-08T04:14:37.026Z"
+    }
+  }
+}

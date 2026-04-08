@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Showcase {
   id: string;
@@ -14,6 +14,41 @@ export default function ShowcaseList() {
   const [loading, setLoading] = useState(true);
   const [folderImages, setFolderImages] = useState<Record<string, string[]>>({});
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
+  const hoveredIdRef = useRef<string | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // 自动切换图片 (每3秒)
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      // 只有不在悬停且有多个图片时才自动切换
+      setCurrentImageIndex(prev => {
+        const newIndex: Record<string, number> = { ...prev };
+        showcases.forEach(s => {
+          const total = getTotalImages(s);
+          if (total > 1 && hoveredIdRef.current !== s.id) {
+            const currentIdx = prev[s.id] || 0;
+            newIndex[s.id] = (currentIdx + 1) % total;
+          }
+        });
+        return newIndex;
+      });
+    }, 3000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [showcases]);
+
+  // 处理悬停状态 (用 ref 避免重置计时器)
+  const handleMouseEnter = (id: string) => {
+    hoveredIdRef.current = id;
+  };
+
+  const handleMouseLeave = () => {
+    hoveredIdRef.current = null;
+  };
 
   // 加载所有橱窗的图片
   useEffect(() => {
@@ -256,7 +291,12 @@ export default function ShowcaseList() {
           const currentImage = getCurrentImage(item);
           
           return (
-            <div key={item.id} className="model-card">
+            <div 
+              key={item.id} 
+              className="model-card"
+              onMouseEnter={() => handleMouseEnter(item.id)}
+              onMouseLeave={() => handleMouseLeave()}
+            >
               <div className="model-img">
                 {currentImage ? (
                   <img

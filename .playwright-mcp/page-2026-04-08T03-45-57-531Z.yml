@@ -1,0 +1,68 @@
+- main [ref=e2]:
+  - navigation [ref=e4]:
+    - link "Lovely Logo" [ref=e5] [cursor=pointer]:
+      - /url: /
+      - img "Lovely Logo" [ref=e6]
+    - generic [ref=e7]:
+      - link "首页" [ref=e8] [cursor=pointer]:
+        - /url: /
+      - link "关于" [ref=e9] [cursor=pointer]:
+        - /url: /about
+      - link "时间线" [ref=e10] [cursor=pointer]:
+        - /url: /timeline
+      - link "歌单" [ref=e11] [cursor=pointer]:
+        - /url: /songs
+      - link "橱窗" [ref=e12] [cursor=pointer]:
+        - /url: /showcase
+      - link "链接" [ref=e13] [cursor=pointer]:
+        - /url: /links
+  - main [ref=e14]:
+    - generic [ref=e16]:
+      - heading "歌单" [level=1] [ref=e17]
+      - paragraph [ref=e18]: 东爱璃Lovely的歌曲收藏
+    - paragraph [ref=e23]: 加载中...
+  - generic [ref=e25]:
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - generic [ref=e28]: 东爱璃Lovely
+        - paragraph [ref=e29]: 东爱璃Lovely的非官方应援站
+        - paragraph [ref=e30]:
+          - text: 内容遵循
+          - link "CC BY-NC-SA 4.0" [ref=e31] [cursor=pointer]:
+            - /url: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh
+          - text: 协议
+          - text: Made with 💙 by 秧歌星
+      - generic [ref=e32]:
+        - heading "站点状态" [level=4] [ref=e33]
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - generic [ref=e38]: ⏱️
+            - generic [ref=e39]: 本站已运行
+          - generic [ref=e40]:
+            - generic [ref=e41]:
+              - generic [ref=e42]: "392"
+              - generic [ref=e43]: 天
+            - generic [ref=e44]: ":"
+            - generic [ref=e45]:
+              - generic [ref=e46]: "11"
+              - generic [ref=e47]: 时
+            - generic [ref=e48]: ":"
+            - generic [ref=e49]:
+              - generic [ref=e50]: "45"
+              - generic [ref=e51]: 分
+            - generic [ref=e52]: ":"
+            - generic [ref=e53]:
+              - generic [ref=e54]: "57"
+              - generic [ref=e55]: 秒
+          - generic [ref=e56]: 自 2025/3/12 起
+        - paragraph [ref=e57]: © 2026 东爱璃Lovely应援站
+        - link "ICP备案" [ref=e58] [cursor=pointer]:
+          - /url: https://icp.gov.moe/?keyword=20250130
+      - generic [ref=e59]:
+        - heading "主题配色" [level=4] [ref=e60]
+        - generic [ref=e61]:
+          - generic [ref=e64]: "#6a4c93"
+          - generic [ref=e67]: "#C4A77D"
+          - generic [ref=e70]: "#7AB8E8"
+          - generic [ref=e73]: "#FFF8F0"
+    - paragraph [ref=e76]: Powered by Astro

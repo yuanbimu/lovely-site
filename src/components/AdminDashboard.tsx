@@ -749,18 +749,6 @@ const currentFolderFiles = r2Files.filter(f => {
           <div className="tab-content">
             <h1>時間線管理</h1>
             
-            {/* 導入區 */}
-            <div className="section import-section">
-              <h3>批量導入</h3>
-              <textarea
-                value={importText}
-                onChange={e => setImportText(e.target.value)}
-                placeholder="格式：日期|標題|內容&#10;2024-01-01|新年|內容描述"
-                rows={4}
-              />
-              <button onClick={handleImport}>導入事件</button>
-            </div>
-            
             {/* 編輯表單 */}
             {editingEvent && (
               <div className="section edit-section">

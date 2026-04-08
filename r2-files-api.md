@@ -1,0 +1,1 @@
+- generic [ref=e2]: "{\"success\":true,\"data\":{\"folders\":[{\"type\":\"folder\",\"name\":\"data\",\"key\":\"data/\"},{\"type\":\"folder\",\"name\":\"images\",\"key\":\"images/\"},{\"type\":\"folder\",\"name\":\"model-1\",\"key\":\"model-1/\"},{\"type\":\"folder\",\"name\":\"showcase\",\"key\":\"showcase/\"}],\"files\":[]}}"

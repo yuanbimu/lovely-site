@@ -1,0 +1,81 @@
+- generic [ref=e4]:
+  - complementary [ref=e12]:
+    - generic [ref=e13]:
+      - generic [ref=e14]: 🎀 东爱璃 Lovely
+      - generic [ref=e15]: 管理後台
+    - navigation [ref=e16]:
+      - button "📊 概覽" [ref=e17] [cursor=pointer]:
+        - generic [ref=e18]: 📊
+        - text: 概覽
+      - button "📅 時間線管理" [active] [ref=e19] [cursor=pointer]:
+        - generic [ref=e20]: 📅
+        - text: 時間線管理
+      - button "🎵 歌單管理" [ref=e21] [cursor=pointer]:
+        - generic [ref=e22]: 🎵
+        - text: 歌單管理
+      - button "🖼️ 櫥窗管理" [ref=e23] [cursor=pointer]:
+        - generic [ref=e24]: 🖼️
+        - text: 櫥窗管理
+      - button "👥 用戶管理" [ref=e25] [cursor=pointer]:
+        - generic [ref=e26]: 👥
+        - text: 用戶管理
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - generic [ref=e29]: admin
+        - generic [ref=e30]: admin
+      - button "登出" [ref=e31] [cursor=pointer]
+  - main [ref=e32]:
+    - generic [ref=e56]:
+      - heading "時間線管理" [level=1] [ref=e57]
+      - generic [ref=e58]:
+        - heading "批量導入" [level=3] [ref=e59]
+        - textbox "格式：日期|標題|內容 2024-01-01|新年|內容描述" [ref=e60]:
+          - /placeholder: "格式：日期|標題|內容\n2024-01-01|新年|內容描述"
+        - button "導入事件" [ref=e61] [cursor=pointer]
+      - generic [ref=e62]:
+        - generic [ref=e63]:
+          - heading "事件列表 (5)" [level=3] [ref=e64]
+          - button "+ 新建" [ref=e65] [cursor=pointer]
+        - table [ref=e66]:
+          - rowgroup [ref=e67]:
+            - row "日期 標題 內容 操作" [ref=e68]:
+              - columnheader "日期" [ref=e69]
+              - columnheader "標題" [ref=e70]
+              - columnheader "內容" [ref=e71]
+              - columnheader "操作" [ref=e72]
+          - rowgroup [ref=e73]:
+            - row "2020-05-01 首次直播 进行了首次正式直播，与观众互动。... 編輯 删除" [ref=e74]:
+              - cell "2020-05-01" [ref=e75]
+              - cell "首次直播" [ref=e76]
+              - cell "进行了首次正式直播，与观众互动。..." [ref=e77]
+              - cell "編輯 删除" [ref=e78]:
+                - button "編輯" [ref=e79] [cursor=pointer]
+                - button "删除" [ref=e80] [cursor=pointer]
+            - row "2020-04-29 投稿自我介绍视频 在视频末尾，误认已经切断直播而用本音发出「早知道这样我还不如回老家种地呢」的名言。种田系偶像的起源。... 編輯 删除" [ref=e81]:
+              - cell "2020-04-29" [ref=e82]
+              - cell "投稿自我介绍视频" [ref=e83]
+              - cell "在视频末尾，误认已经切断直播而用本音发出「早知道这样我还不如回老家种地呢」的名言。种田系偶像的起源。..." [ref=e84]
+              - cell "編輯 删除" [ref=e85]:
+                - button "編輯" [ref=e86] [cursor=pointer]
+                - button "删除" [ref=e87] [cursor=pointer]
+            - row "2020-04-28 投稿第一个视频，展示了自己的立绘 ... 編輯 删除" [ref=e88]:
+              - cell "2020-04-28" [ref=e89]
+              - cell "投稿第一个视频，展示了自己的立绘" [ref=e90]
+              - cell "..." [ref=e91]
+              - cell "編輯 删除" [ref=e92]:
+                - button "編輯" [ref=e93] [cursor=pointer]
+                - button "删除" [ref=e94] [cursor=pointer]
+            - row "2020-04-26 在 B 站发表第一条动态 ... 編輯 删除" [ref=e95]:
+              - cell "2020-04-26" [ref=e96]
+              - cell "在 B 站发表第一条动态" [ref=e97]
+              - cell "..." [ref=e98]
+              - cell "編輯 删除" [ref=e99]:
+                - button "編輯" [ref=e100] [cursor=pointer]
+                - button "删除" [ref=e101] [cursor=pointer]
+            - row "2020-04-04 test test... 編輯 删除" [ref=e102]:
+              - cell "2020-04-04" [ref=e103]
+              - cell "test" [ref=e104]
+              - cell "test..." [ref=e105]
+              - cell "編輯 删除" [ref=e106]:
+                - button "編輯" [ref=e107] [cursor=pointer]
+                - button "删除" [ref=e108] [cursor=pointer]

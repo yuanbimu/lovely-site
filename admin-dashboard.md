@@ -1,0 +1,7 @@
+- generic [ref=e5]:
+  - heading "管理後台登錄" [level=2] [ref=e6]
+  - paragraph [ref=e7]: 东爱璃 Lovely 应援站
+  - generic [ref=e8]:
+    - textbox "用戶名" [ref=e9]: admin
+    - textbox "密碼" [active] [ref=e10]: admin123
+    - button "登錄" [ref=e11] [cursor=pointer]
