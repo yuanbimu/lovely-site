@@ -1,0 +1,95 @@
+name: Auto PR & Merge
+
+on:
+  push:
+    branches-ignore:
+      - master
+      - '*.lock'
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get branch name
+        run: |
+          BRANCH_NAME=${GITHUB_HEAD_REF:-$(git rev-parse --abbrev-ref HEAD)}
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Check existing PR
+        id: check-pr
+        run: |
+          BRANCH=${{ env.BRANCH_NAME }}
+          # 检查是否已有该分支的 PR
+          pr=$(gh pr list --head "$BRANCH" --json number -q '.[0].number' 2>/dev/null || echo "")
+          if [ -n "$pr" ]; then
+            echo "EXISTS=true" >> $GITHUB_ENV
+            echo "PR_NUMBER=$pr" >> $GITHUB_ENV
+          else
+            echo "EXISTS=false" >> $GITHUB_ENV
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create PR (if not exists)
+        if: env.EXISTS == 'false'
+        run: |
+          # 获取 commit 信息
+          COMMITS=$(git log master..HEAD --oneline -5 2>/dev/null | head -n 1 || git log --oneline -1)
+          DESC=$(echo "$COMMITS" | cut -c1-100)
+          
+          # 创建 PR
+          PR_URL=$(gh pr create \
+            --title "$DESC" \
+            --body "Auto-created by GitHub Action" \
+            --base master \
+            --head ${{ env.BRANCH_NAME }} \
+            -q url)
+          
+          echo "PR_URL=$PR_URL" >> $GITHUB_ENV
+          echo "PR_NUMBER=$(echo $PR_URL | grep -oE '[0-9]+$')" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build check
+        run: |
+          npm ci
+          npm run build
+        continue-on-error: true
+        id: build
+
+      - name: Update PR status
+        if: always()
+        run: |
+          # 获取构建状态
+          if [ ${{ steps.build.outcome }} == "success" ]; then
+            STATUS="success"
+            MSG="✅ Build passed - Auto-merging to master"
+          else
+            STATUS="failure"
+            MSG="❌ Build failed - Please fix the errors"
+          fi
+          
+          # 更新 PR 状态
+          gh pr comment ${{ env.PR_NUMBER }} --body "$MSG"
+          
+          # 成功则合并
+          if [ "$STATUS" == "success" ]; then
+            gh pr merge ${{ env.PR_NUMBER }} --squash --delete-branch --auto
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify failure
+        if: steps.build.outcome == 'failure'
+        run: |
+          echo "Build failed - PR created for review"
+          exit 1
