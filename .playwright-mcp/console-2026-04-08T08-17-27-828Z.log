@@ -1,0 +1,4 @@
+[   45087ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:4321/node_modules/.vite/deps/@astrojs_react_client__js.js?v=e7fa5cff:20103
+[   45551ms] [LOG] [LiveStatus] Result: {isLive: false, title: , url: , roomId: 21692711, lastChecked: 2026-04-08T08:18:12.957Z} @ http://localhost:4321/src/components/LiveStatus.tsx:69
+[  322448ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:4321/@vite/client:1695
+[  324783ms] [ERROR] WebSocket connection to 'ws://localhost:4321/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:4321/@vite/client:1766
