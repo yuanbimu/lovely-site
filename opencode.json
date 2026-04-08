@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "permissions": {
+    "git": {
+      "push": {
+        "allowed": true,
+        "branches": ["main"],
+        "verifyBeforePush": true,
+        "prePushCommands": ["npm run build"]
+      },
+      "commit": {
+        "allowed": true,
+        "requireMessage": true
+      }
+    },
+    "hooks": {
+      "preCommit": [],
+      "postCommit": [],
+      "prePush": ["npm run build"]
+    }
+  },
+  "rules": {
+    "language": {
+      "mode": "enforce",
+      "preferred": "zh-CN"
+    }
+  },
+  "environment": {
+    "worktreePath": null
+  }
+}
