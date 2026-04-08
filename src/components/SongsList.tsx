@@ -208,7 +208,6 @@ export default function SongsList() {
             onClick={() => setActiveCategory(cat.key)}
             style={{
               padding: '10px 20px',
-              border: 'none',
               background: activeCategory === cat.key ? '#6B5637' : 'white',
               borderRadius: '25px',
               fontSize: '0.9rem',
