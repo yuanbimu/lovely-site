@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import ShowcasePicker from './ShowcasePicker';
 
 interface AboutImageBoxProps {
@@ -9,9 +9,9 @@ interface AboutImageBoxProps {
 export default function AboutImageBox({ initialImage, profileName }: AboutImageBoxProps) {
   const [currentImage, setCurrentImage] = useState(initialImage);
 
-  const handleSelect = (imageUrl: string, showcaseName: string) => {
+  const handleSelect = useCallback((imageUrl: string, showcaseName: string) => {
     setCurrentImage(imageUrl);
-  };
+  }, []);
 
   return (
     <div className="about-img-box">
