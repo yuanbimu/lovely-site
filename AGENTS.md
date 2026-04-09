@@ -139,6 +139,58 @@ npx vitest path/to/test.test.ts
 
 ---
 
+## 开发准则 (强制)
+
+### 测试优先原则
+- **所有功能开发完成后必须进行测试**
+- 禁止未经验证的功能提交到代码库
+- 修复 bug 后必须验证修复有效
+
+### 测试清单
+
+#### 构建测试
+```bash
+npm run build
+```
+- 确保无 TypeScript 错误
+- 确保无 lint 错误
+
+#### 本地验证
+```bash
+npm run dev
+```
+- 页面正常加载
+- 功能正常工作
+
+#### 视觉检查 (如有 UI 修改)
+- 检查页面布局是否正常
+- 检查响应式是否正常
+- 检查动画效果是否流畅
+
+### 开发流程
+
+```
+需求确认 → 方案规划 → 编码实现 → 本地测试 → 代码审查 → 提交
+```
+
+**每一步都不可省略**
+
+### 提交前检查清单
+
+- [ ] 代码无 TypeScript 错误
+- [ ] `npm run build` 成功
+- [ ] 新功能在本地正常运作
+- [ ] 修改后的页面无明显问题
+
+### 代码质量
+
+- 禁止使用 `any` 类型
+- 禁止使用 `@ts-ignore`
+- 禁止空 catch 块 `catch(e) {}`
+- 错误需要被妥善处理
+
+---
+
 ## CI/CD
 
 **工作流**:
@@ -174,34 +226,6 @@ npx vitest path/to/test.test.ts
 | `/functions/AGENTS.md` | Cloudflare 边缘函数 |
 | `/src/pages/AGENTS.md` | 页面路由 + API 端点 |
 | `/functions/AGENTS.md` | Cloudflare 边缘函数 |
-
----
-
-## 待办事项
-
-### 进行中
-
-- [x] 关于页面改进 - 见 `docs/about-page-plan.md`
-  - [x] 站点运行时间统计（已移至 Footer，全站可见）
-  - [x] 贡献者墙
-  - [x] 鸣谢部分重构（分层次）
-  - [ ] 文字内容优化（更有温度）
-  - [ ] 更新日志
-
-### 计划中
-
-- [ ] 动态数据同步（D1 + R2）- 见 `docs/dynamics-sync-notes.md`
-- [ ] 实时直播检测功能 - 见 `docs/live-status-plan.md`
-- [ ] 歌单内容填充
-- [ ] Pics 图片库页面
-
-### 已完成 ✅
-
-- [x] Timeline 时间线页面
-- [x] Songs 歌单页面（框架）
-- [x] 导航栏重新设计（Logo 置左）
-- [x] 直播状态检测功能
-- [x] 繁体字统一转换为简体
 
 ---
 
