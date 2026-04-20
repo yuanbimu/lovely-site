@@ -1,0 +1,34 @@
+- main [ref=e2]:
+  - navigation [ref=e4]:
+    - link "Lovely Logo" [ref=e5] [cursor=pointer]:
+      - /url: /
+      - img "Lovely Logo" [ref=e6]
+    - generic [ref=e7]:
+      - link "首页" [ref=e8] [cursor=pointer]:
+        - /url: /
+      - link "关于" [ref=e9] [cursor=pointer]:
+        - /url: /about
+      - link "时间线" [ref=e10] [cursor=pointer]:
+        - /url: /timeline
+      - link "歌单" [ref=e11] [cursor=pointer]:
+        - /url: /songs
+      - link "橱窗" [ref=e12] [cursor=pointer]:
+        - /url: /showcase
+      - link "链接" [ref=e13] [cursor=pointer]:
+        - /url: /links
+  - main [ref=e14]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: Gallery
+        - heading "东爱璃的衣柜" [level=2] [ref=e19]
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - img "偶像服" [ref=e79]
+          - generic [ref=e80]:
+            - heading "偶像服" [level=4] [ref=e81]
+            - paragraph [ref=e82]: 待編寫
+        - generic [ref=e83]:
+          - img "宅服" [ref=e85]
+          - generic [ref=e86]:
+            - heading "宅服" [level=4] [ref=e87]
+            - paragraph [ref=e88]: 待編寫

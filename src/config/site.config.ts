@@ -18,11 +18,6 @@ export const SITE_CONFIG = {
     spaceUrl: 'https://space.bilibili.com/3821157',
   },
   
-  // 分页配置
-  pagination: {
-    dynamicsPerPage: 10,
-  },
-  
   // 图片配置
   images: {
     avatar: '/images/avatar.webp',

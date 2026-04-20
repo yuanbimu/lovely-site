@@ -1,7 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { 
-  getDynamics,
   getTimelineEvents, 
   saveTimelineEvent, 
   deleteTimelineEvent,
@@ -19,6 +18,8 @@ import {
   getSongs,
   saveSong,
   deleteSong,
+  getLiveStatus,
+  saveLiveStatus,
   getShowcases,
   saveShowcase,
   deleteShowcase,
@@ -404,27 +405,58 @@ app.post('/api/r2-upload', requireAuth, requireEditor, async (c) => {
 });
 
 app.get('/api/dynamics', async (c) => {
-  const limit = Math.min(parseInt(c.req.query('limit') || '20', 10), 50);
-  const offset = parseInt(c.req.query('offset') || '0', 10);
-  const dynamics = await getDynamics(c.env.DB, limit, offset);
-  return c.json({ data: dynamics, hasMore: dynamics.length === limit });
+  return c.json({ error: '动态功能暂时下线，后续将以新方案重新接入' }, 410);
 });
 
 app.get('/api/live', async (c) => {
   try {
+    const cachedStatus = await getLiveStatus(c.env.DB);
     const res = await fetch(`https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=3821157`);
     const data = await res.json() as any;
     if (data.code === 0 && data.data) {
       const { liveStatus, title, roomid } = data.data;
+      const status = {
+        is_live: liveStatus === 1,
+        title: title || '',
+        room_id: roomid ? String(roomid) : '',
+        url: roomid ? `https://live.bilibili.com/${roomid}` : ''
+      };
+      await saveLiveStatus(c.env.DB, status);
       return c.json({ 
-        isLive: liveStatus === 1, 
-        title: title || '', 
-        url: roomid ? `https://live.bilibili.com/${roomid}` : '',
+        isLive: status.is_live,
+        title: status.title,
+        url: status.url,
+        roomId: status.room_id,
         lastChecked: new Date().toISOString()
       });
     }
-    return c.json({ isLive: false, lastChecked: new Date().toISOString() });
-  } catch { return c.json({ isLive: false, lastChecked: new Date().toISOString() }); }
+
+    if (cachedStatus) {
+      return c.json({
+        isLive: cachedStatus.isLive,
+        title: cachedStatus.title,
+        url: cachedStatus.url,
+        roomId: cachedStatus.roomId,
+        lastChecked: new Date(cachedStatus.checkedAt).toISOString(),
+        stale: true
+      });
+    }
+
+    return c.json({ isLive: false, title: '', url: '', roomId: '', lastChecked: new Date().toISOString() });
+  } catch {
+    const cachedStatus = await getLiveStatus(c.env.DB);
+    if (cachedStatus) {
+      return c.json({
+        isLive: cachedStatus.isLive,
+        title: cachedStatus.title,
+        url: cachedStatus.url,
+        roomId: cachedStatus.roomId,
+        lastChecked: new Date(cachedStatus.checkedAt).toISOString(),
+        stale: true
+      });
+    }
+    return c.json({ isLive: false, title: '', url: '', roomId: '', lastChecked: new Date().toISOString() });
+  }
 });
 
-export const onRequest = (context) => app.fetch(context.request, context.env, context);
+export const onRequest = (context: { request: Request; env: Env; executionCtx: ExecutionContext }) => app.fetch(context.request, context.env, context.executionCtx);

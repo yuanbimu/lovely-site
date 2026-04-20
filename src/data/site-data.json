@@ -1,6 +1,5 @@
 {
   "config": {
-    "showDynamics": false,
     "showLiveStatus": true,
     "showFansCount": true
   },
@@ -33,41 +32,5 @@
     "lastUpdated": "2026-04-08T04:42:39.646747",
     "avatar": "/images/avatar.webp"
   },
-  "liveStatus": {
-    "isLive": false,
-    "title": "东爱璃Lovely的投稿视频",
-    "url": "",
-    "lastChecked": "2026-04-08T04:42:40.086893"
-  },
-  "dynamics": [
-    {
-      "id": "mock-001",
-      "type": "text",
-      "content": "今天也是元气满满的一天！💪 感谢大家的支持~",
-      "images": [],
-      "author": "东爱璃Lovely",
-      "time": "2024-02-05T10:30:00",
-      "stats": {
-        "likes": 1234,
-        "comments": 56,
-        "reposts": 23
-      }
-    },
-    {
-      "id": "mock-002",
-      "type": "image",
-      "content": "分享一张美图~",
-      "images": [
-        "https://placehold.co/600x400/8B6F47/FFFFFF?text=Sample+Image+1"
-      ],
-      "author": "东爱璃Lovely",
-      "time": "2024-02-04T15:20:00",
-      "stats": {
-        "likes": 2345,
-        "comments": 89,
-        "reposts": 23
-      }
-    }
-  ],
   "articles": []
 }

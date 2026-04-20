@@ -17,7 +17,6 @@ export interface Profile {
 
 // 站点配置
 export interface SiteConfig {
-  showDynamics: boolean;
   showLiveStatus: boolean;
   showFansCount: boolean;
 }
@@ -43,25 +42,6 @@ export interface LiveStatus {
   title: string;
   url: string;
   lastChecked: string;
-}
-
-// 动态
-export interface Dynamic {
-  id: string;
-  type: string;
-  content: string;
-  images: string[];
-  author: string;
-  time: string;
-  timestamp?: number;
-  stats: {
-    likes: number;
-    comments: number;
-    reposts: number;
-  };
-  origin_user?: string;
-  origin_content?: string;
-  origin_images?: string[];
 }
 
 // 文章
@@ -92,7 +72,6 @@ export interface SiteData {
   profile: Profile;
   stats: Stats;
   liveStatus: LiveStatus;
-  dynamics: Dynamic[];
   articles: Article[];
 }
 

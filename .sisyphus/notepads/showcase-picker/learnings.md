@@ -24,3 +24,21 @@
 ### Created
 - 2026-04-08
 - ShowcasePicker.tsx 组件
+
+---
+
+## Task 8 成果: 状态语义规则 (2026-04-16)
+
+### 新增文件
+- `.sisyphus/evidence/task-8_status_semantics.md` - 状态语义规则定义
+- `.sisyphus/evidence/task-8_status_counterexamples.md` - 状态语义反例
+
+### 核心规则
+1. **三级状态模型**: Plan → Execution → Verification
+2. **TODO [x] = 代码已写，不是验证通过**
+3. **AC [x] = 验证通过**
+4. **任务完成 = TODO [x] + AC [x]**
+
+### 解决的问题
+- showcase-picker.md: "TODO 已完成但 AC 未检查" 冲突
+- admin-improvements.md: "Final Verification 是口号" 问题

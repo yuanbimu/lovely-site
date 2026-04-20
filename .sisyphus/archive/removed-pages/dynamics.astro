@@ -1,0 +1,62 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navigation from '../components/Navigation.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="动态功能维护中 - 东爱璃Lovely">
+  <Navigation />
+  <main class="removed-page">
+    <section class="removed-section">
+      <div class="container-cute removed-card">
+        <h1>动态功能暂时下线</h1>
+        <p>动态模块将以新的数据方案重新接入，当前版本已先从全站入口移除。</p>
+        <a href="/" class="back-home">返回首页</a>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  .removed-page {
+    min-height: 100vh;
+    padding-top: 70px;
+    background: linear-gradient(180deg, #FFF8F0 0%, #F5EDE3 100%);
+  }
+
+  .removed-section {
+    padding: 96px 20px;
+  }
+
+  .removed-card {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 32px;
+    text-align: center;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  }
+
+  .removed-card h1 {
+    font-size: 32px;
+    color: #6B5637;
+    margin-bottom: 16px;
+  }
+
+  .removed-card p {
+    color: #8B7355;
+    line-height: 1.8;
+    margin-bottom: 24px;
+  }
+
+  .back-home {
+    display: inline-block;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: #6B5637;
+    color: white;
+    text-decoration: none;
+  }
+</style>

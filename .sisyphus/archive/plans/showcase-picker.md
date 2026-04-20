@@ -86,17 +86,24 @@
   **What to do**:
   - 创建 `src/components/home/ShowcasePicker.tsx`
   - 使用 `/api/showcases` 获取橱窗数据
-  - 实现了以下功能:
-    - 下拉选择框显示所有橱窗名称
-    - 随机按钮每次随机选择一个橱窗
-    - 通过 props 回调将选择的图片传回父组件
-    - 处理加载状态和空状态
-    - 移动端适配
+  - 实现下拉选择框和随机按钮
+  - 通过 props 回调将选择的图片传回父组件
+  - 处理加载状态和空状态
+  - 移动端适配
 
   **Must NOT do**:
   - 不创建新的 API 端点
   - 不修改数据库
   - 不做管理员功能
+
+  **Execution Record**:
+  - 组件已创建：`src/components/home/ShowcasePicker.tsx`
+  - 包含：下拉选择框、随机按钮、props 回调、状态管理
+
+  **Acceptance Criteria**:
+  - [x] 组件文件创建成功
+  - [x] 从 API 获取数据
+  - [x] 下拉菜单显示橱窗名称
 
   **Recommended Agent Profile**:
   > **Category**: visual-engineering
@@ -108,12 +115,7 @@
   - `src/components/ShowcaseList.tsx` - 现有的橱窗列表组件，使用相同的 API 获取数据
   - `src/components/home/AboutSection.astro` - 需要集成的目标组件
 
-  **Acceptance Criteria**:
-  - [ ] 组件文件创建成功
-  - [ ] 从 API 获取数据
-  - [ ] 下拉菜单显示橱窗名称
-
-- [x] 2. 集成到 AboutSection.astro
+- [ ] 2. 集成到 AboutSection.astro
 
   **What to do**:
   - 修改 `src/components/home/AboutSection.astro`
@@ -125,6 +127,9 @@
   **Must NOT do**:
   - 不破坏现有的 AboutSection 布局
   - 不影响其他功能
+
+  **Execution Record**:
+  - 待执行：修改 AboutSection.astro 集成 ShowcasePicker
 
   **Recommended Agent Profile**:
   > **Category**: visual-engineering
@@ -141,47 +146,78 @@
   - [ ] 随机按钮可点击
   - [ ] 选择后图片替换
 
-- [x] 3. 功能验证
+- [ ] 3. 功能验证
 
   **What to do**:
   - 使用 Playwright 验证功能
   - 测试下拉选择
   - 测试随机按钮
   - 测试图片替换
+  - 验证空状态处理
+
+  **Must NOT do**:
+  - 不修改生产环境数据
+  - 不破坏现有功能
+
+  **Execution Record**:
+  - 待执行：Playwright 自动化测试
 
   **QA Scenarios**:
 
-  Scenario: 下拉选择橱窗
-    Tool: playwright
-    Preconditions: 页面加载完成
-    Steps:
-      1. 打开主页 http://localhost:4321/
-      2. 滚动到 About 区域
-      3. 点击下拉选择框
-      4. 选择第二个选项
-      5. 检查图片是否变化
-    Expected Result: 图片变为选择的橱窗图片
+  **Happy Path - 下拉选择橱窗**:
+  - Tool: playwright
+  - Selector: `select[name="showcase-select"]`
+  - Preconditions: 
+    - 开发服务器运行 (`npm run dev`)
+    - API `/api/showcases` 返回非空数据
+  - Steps:
+    1. 打开主页 http://localhost:4321/
+    2. 滚动到 About 区域 (`#about-section`)
+    3. 等待下拉选择框加载完成
+    4. 点击下拉选择框
+    5. 选择第二个选项
+    6. 等待 500ms 过渡动画
+  - Assertion: `[data-showcase-image]` 元素的 `src` 属性值应改变
+  - Evidence: `.sisyphus/evidence/task-5-dropdown-select-success.png`
 
-  Scenario: 随机按钮
-    Tool: playwright
-    Preconditions: 页面加载完成
-    Steps:
-      1. 打开主页 http://localhost:4321/
-      2. 滚动到 About 区域
-      3. 点击随机按钮多次
-      4. 每次检查图片是否变化
-    Expected Result: 每次点击图片随机变化
+  **Happy Path - 随机按钮**:
+  - Tool: playwright
+  - Selector: `button[data-testid="random-showcase-btn"]`
+  - Preconditions: 
+    - 开发服务器运行 (`npm run dev`)
+  - Steps:
+    1. 打开主页 http://localhost:4321/
+    2. 滚动到 About 区域
+    3. 记录当前图片 URL
+    4. 点击随机按钮 3 次
+    5. 每次点击后记录图片 URL
+  - Assertion: 至少 2 次点击后图片 URL 发生变化
+  - Evidence: `.sisyphus/evidence/task-5-random-button-success.png`
 
-  Scenario: 空状态处理
-    Tool: playwright
-    Preconditions: API 无数据
-    Steps:
-      1. 模拟 API 返回空数组
-      2. 刷新页面
-      3. 检查按钮是否显示
-    Expected Result: 按钮仍显示，下拉菜单为空或显示提示
+  **Failure Path - 空数据处理**:
+  - Tool: playwright
+  - Selector: `select[name="showcase-select"]`
+  - Preconditions: 
+    - 拦截 API `/api/showcases` 返回 `{"success":true,"data":[]}`
+  - Steps:
+    1. 打开主页 http://localhost:4321/
+    2. 滚动到 About 区域
+    3. 检查按钮是否显示
+  - Assertion: 按钮区域仍可见，下拉菜单显示"暂无橱窗"或禁用状态
+  - Evidence: `.sisyphus/evidence/task-5-empty-state-failure.png`
 
-  **Evidence**: .sisyphus/evidence/task-{N}-{scenario-slug}.{ext}
+  **Failure Path - 网络错误处理**:
+  - Tool: playwright
+  - Preconditions: 
+    - 拦截 API `/api/showcases` 返回 500 错误
+  - Steps:
+    1. 打开主页 http://localhost:4321/
+    2. 滚动到 About 区域
+    3. 检查加载状态
+  - Assertion: 显示错误提示或重试按钮
+  - Evidence: `.sisyphus/evidence/task-5-network-error-failure.png`
+
+  **Evidence**: .sisyphus/evidence/task-5-{scenario-slug}.{ext}
 
 ---
 

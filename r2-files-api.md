@@ -1,1 +1,6 @@
-- generic [ref=e2]: "{\"success\":true,\"data\":{\"folders\":[{\"type\":\"folder\",\"name\":\"data\",\"key\":\"data/\"},{\"type\":\"folder\",\"name\":\"images\",\"key\":\"images/\"},{\"type\":\"folder\",\"name\":\"model-1\",\"key\":\"model-1/\"},{\"type\":\"folder\",\"name\":\"showcase\",\"key\":\"showcase/\"}],\"files\":[]}}"
+# 此文件已迁移
+
+原始快照内容已迁移至 `.sisyphus/evidence/evidence-r2-snapshot-api.md`。
+
+类型：证据快照 / API 响应快照
+来源计划：`project-plan-remediation`
