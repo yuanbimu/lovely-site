@@ -9,9 +9,9 @@ const aboutImage = profile.avatar;
 <section id="about" class="about-section">
   <div class="about-layout">
     <div class="about-left">
-      <AboutImageBox 
-        client:load 
-        initialImage={aboutImage} 
+      <AboutImageBox
+        client:load
+        initialImage={aboutImage}
         profileName={profile.name}
       />
     </div>
@@ -42,7 +42,7 @@ const aboutImage = profile.avatar;
             <h4>站点QQ群</h4>
             <p>W.I.P</p>
           </div>
-        </a>      
+        </a>
       </div>
     </div>
   </div>
@@ -67,7 +67,7 @@ const aboutImage = profile.avatar;
     flex-shrink: 0;
   }
 
-  /* 使用 :global 穿透到 React 組件 AboutImageBox */
+  /* 穿透到 React 组件 AboutImageBox */
   :global(.about-img-box) {
     position: relative;
   }
@@ -79,8 +79,6 @@ const aboutImage = profile.avatar;
     object-fit: cover;
     border-radius: 24px;
     box-shadow: 0 25px 80px rgba(139, 111, 71, 0.2);
-    position: relative;
-    z-index: 2;
     display: block;
   }
 
