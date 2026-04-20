@@ -88,6 +88,8 @@ const aboutImage = profile.avatar;
     margin-top: 24px;
     display: flex;
     justify-content: center;
+    position: relative;
+    z-index: 3;
   }
 
   :global(.img-backdrop) {
@@ -101,6 +103,7 @@ const aboutImage = profile.avatar;
     z-index: 1;
     opacity: 0.2;
     filter: blur(20px);
+    pointer-events: none;
   }
 
   .about-right {
