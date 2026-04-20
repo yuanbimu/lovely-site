@@ -34,22 +34,22 @@
 ## Work Objectives
 
 ### Concrete Deliverables
-- [ ] 创建 `docs/database-schema.md`
-- [ ] 输出 `showcase-picker` 代码现实与计划差异结论
-- [ ] 收敛 `showcase-diagnosis` 的待确认问题
-- [ ] 建立归档后索引与说明
+- [x] 创建 `docs/database-schema.md`
+- [x] 输出 `showcase-picker` 代码现实与计划差异结论
+- [x] 收敛 `showcase-diagnosis` 的待确认问题
+- [x] 建立归档后索引与说明
 
 ### Definition of Done
-- [ ] 仓库中仅保留本文件作为活跃计划
-- [ ] 旧计划与草稿全部迁移到归档目录
-- [ ] `docs/database-schema.md` 存在且内容可读
-- [ ] 剩余未完成项被明确关闭、执行或重新排期
+- [x] 仓库中仅保留本文件作为活跃计划
+- [x] 旧计划与草稿全部迁移到归档目录
+- [x] `docs/database-schema.md` 存在且内容可读
+- [x] 剩余未完成项被明确关闭、执行或重新排期
 
 ---
 
 ## TODOs
 
-- [ ] 1. 创建数据库结构文档
+- [x] 1. 创建数据库结构文档
 
   **What to do**:
   - 创建 `docs/database-schema.md`
@@ -61,11 +61,11 @@
   - 不伪造无法从代码确认的结构
 
   **Acceptance Criteria**:
-  - [ ] `docs/database-schema.md` 文件存在
-  - [ ] 至少覆盖 `users`、`timeline_events`、`songs`、`showcases`
-  - [ ] 字段说明清晰可读
+  - [x] `docs/database-schema.md` 文件存在
+  - [x] 至少覆盖 `users`、`timeline_events`、`songs`、`showcases`
+  - [x] 字段说明清晰可读
 
-- [ ] 2. 对齐 showcase-picker 计划状态与代码现实
+- [x] 2. 对齐 showcase-picker 计划状态与代码现实
 
   **What to do**:
   - 检查 `AboutImageBox.tsx`、`AboutSection.astro`、`ShowcasePicker.tsx`
@@ -77,11 +77,11 @@
   - 不把代码已完成项继续标记为未完成
 
   **Acceptance Criteria**:
-  - [ ] 组件接入方式有明确结论
-  - [ ] 功能验证缺口被明确记录
-  - [ ] 原计划与现状差异被说明
+  - [x] 组件接入方式有明确结论
+  - [x] 功能验证缺口被明确记录
+  - [x] 原计划与现状差异被说明
 
-- [ ] 3. 收敛橱窗诊断草稿中的开放问题
+- [x] 3. 收敛橱窗诊断草稿中的开放问题
 
   **What to do**:
   - 审查 `showcase-diagnosis` 中待确认问题
@@ -91,10 +91,10 @@
   - 不在无线上环境证据时假装问题已解决
 
   **Acceptance Criteria**:
-  - [ ] 每个开放问题都有结论或阻塞说明
-  - [ ] 不再保留模糊的“待确认”措辞
+  - [x] 每个开放问题都有结论或阻塞说明
+  - [x] 不再保留模糊的“待确认”措辞
 
-- [ ] 4. 补充归档索引说明
+- [x] 4. 补充归档索引说明
 
   **What to do**:
   - 说明归档目录中的旧计划清单
@@ -104,5 +104,5 @@
   - 不删除 evidence 与 notepads
 
   **Acceptance Criteria**:
-  - [ ] 归档目录有清晰索引说明
-  - [ ] 活跃计划入口唯一
+  - [x] 归档目录有清晰索引说明
+  - [x] 活跃计划入口唯一

@@ -1,16 +1,9 @@
 ---
 import siteData from '../../data/site-data.json';
-import configData from '../../data/config.json';
-import { getShowcaseImageUrl } from '../../config/site.config';
 import AboutImageBox from './AboutImageBox';
 
 const { profile } = siteData;
-const { showcase } = configData;
-
-// 使用第一張 showcase 圖片
-const aboutImage = showcase.length > 0 
-  ? getShowcaseImageUrl(showcase[0].image)
-  : profile.avatar;
+const aboutImage = profile.avatar;
 ---
 
 <section id="about" class="about-section">

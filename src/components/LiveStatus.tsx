@@ -7,7 +7,7 @@ interface LiveStatusData {
   url: string;
   roomId: string;
   lastChecked?: string;
-  error?: string;
+  stale?: boolean;
 }
 
 type StatusState = 'loading' | 'live' | 'offline' | 'error';
@@ -77,8 +77,8 @@ export default function LiveStatus() {
       
       setData(result);
       
-      // If API returns error field, treat as error state
-      if (result.error) {
+      // 本地/生产都以 stale 标记表示使用回退状态
+      if (result.stale) {
         setStatus('error');
       } else {
         setStatus(result.isLive ? 'live' : 'offline');

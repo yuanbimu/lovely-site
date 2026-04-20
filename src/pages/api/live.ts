@@ -10,7 +10,7 @@ interface LiveStatusResponse {
   url: string;
   roomId: string;
   lastChecked: string;
-  error?: string;
+  stale?: boolean;
 }
 
 // Fetch with timeout helper
@@ -94,14 +94,14 @@ export async function GET() {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[Live API] Error:', errorMessage);
     
-    // Return graceful degradation - assume offline
+    // 本地开发环境没有 D1 回退能力，失败时返回离线状态并标记为 stale
     const result: LiveStatusResponse = {
       isLive: false,
       title: '',
       url: '',
       roomId: '',
       lastChecked,
-      error: errorMessage,
+      stale: true,
     };
 
     return new Response(JSON.stringify(result), {

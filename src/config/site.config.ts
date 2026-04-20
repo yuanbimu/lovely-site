@@ -8,7 +8,6 @@ export const SITE_CONFIG = {
   // CDN 配置
   cdn: {
     domain: 'cdn.yuanbimu.top',
-    showcasePath: '/showcase',
   },
   
   // B站配置
@@ -38,11 +37,6 @@ export const SITE_CONFIG = {
 // 辅助函数：生成 CDN URL
 export function getCdnUrl(path: string): string {
   return `https://${SITE_CONFIG.cdn.domain}${path}`;
-}
-
-// 辅助函数：生成橱窗图片 URL
-export function getShowcaseImageUrl(imageName: string): string {
-  return getCdnUrl(`${SITE_CONFIG.cdn.showcasePath}/${imageName}`);
 }
 
 // 辅助函数：生成站点完整 URL

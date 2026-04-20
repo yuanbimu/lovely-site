@@ -56,15 +56,6 @@ export interface Article {
   tags?: string[];
 }
 
-// 橱窗项目
-export interface ShowcaseItem {
-  id: string;
-  name: string;
-  description: string;
-  folder?: string;
-  image: string;
-}
-
 // 站点数据（site-data.json 的完整结构）
 export interface SiteData {
   config: SiteConfig;
@@ -73,9 +64,4 @@ export interface SiteData {
   stats: Stats;
   liveStatus: LiveStatus;
   articles: Article[];
-}
-
-// 配置数据（config.json 的结构）
-export interface ConfigData {
-  showcase: ShowcaseItem[];
 }
