@@ -13,6 +13,8 @@
     "init:db": "node scripts/init-db.js",
     "init:db:windows": "node scripts/init-db.js",
     "init:db:prod": "node scripts/init-db.js --prod",
+    "sync:live": "node scripts/sync-live-to-d1.js",
+    "sync:live:prod": "node scripts/sync-live-to-d1.js --prod",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"

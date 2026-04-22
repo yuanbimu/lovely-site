@@ -1,0 +1,37 @@
+name: Sync Live Status to D1
+
+on:
+  schedule:
+    # 每 17 分钟执行一次
+    - cron: '*/17 * * * *'
+    # 以下固定时间点 (UTC)，对应北京时间 +8 小时
+    - cron: '0 12 * * *'  # 12:00 UTC = 20:00 CST
+    - cron: '0 13 * * *'  # 13:00 UTC = 21:00 CST
+    - cron: '0 18 * * *'  # 18:00 UTC = 02:00 CST
+    - cron: '0 4 * * *'   # 04:00 UTC = 12:00 CST
+    - cron: '0 10 * * *'  # 10:00 UTC = 18:00 CST
+    - cron: '0 23 * * *'  # 23:00 UTC = 07:00 CST
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  sync-live:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync live status to D1 (production)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          BILIBILI_UID: '3821157'
+        run: node scripts/sync-live-to-d1.js --prod

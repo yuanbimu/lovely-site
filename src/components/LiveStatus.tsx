@@ -76,14 +76,7 @@ export default function LiveStatus() {
       console.log('[LiveStatus] Result:', result);
       
       setData(result);
-      
-      // 本地/生产都以 stale 标记表示使用回退状态
-      if (result.stale) {
-        setStatus('error');
-      } else {
-        setStatus(result.isLive ? 'live' : 'offline');
-      }
-      
+      setStatus(result.isLive ? 'live' : 'offline');
       setRetryCount(0);
     } catch (error) {
       console.error('[LiveStatus] API Error:', error);
