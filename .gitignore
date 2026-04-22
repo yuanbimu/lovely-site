@@ -1,5 +1,6 @@
 # build output
 dist/
+
 # generated types
 .astro/
 
@@ -12,11 +13,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-
 # environment variables
-.env
-.env.production
-.dev.vars
 .env
 .env.production
 
@@ -25,4 +22,21 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Sisyphus AI 工作目录（本地开发记录）
+.sisyphus/
+
+# 本地工具脚本
+tools/
+
+# 测试相关
+test-screenshots.cjs
+
+# Windows 临时文件
 nul
+
+# wrangler 配置（包含敏感绑定信息）
+wrangler.toml
+
+# Cloudflare 本地开发环境变量
+.dev.vars
