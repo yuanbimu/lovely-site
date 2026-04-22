@@ -22,10 +22,10 @@ const DB_NAME = 'lovely-site-db';
 const IS_PROD = process.argv.includes('--prod');
 
 async function fetchLiveStatus() {
-  const url = `https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=${UID}`;
+  const liveUrl = `https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=${UID}`;
 
   try {
-    const res = await fetch(url, {
+    const res = await fetch(liveUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Referer': 'https://live.bilibili.com',
@@ -44,11 +44,33 @@ async function fetchLiveStatus() {
       const isLive = room.liveStatus === 1;
       const roomId = String(room.roomid || '');
 
+      // 同时获取粉丝数
+      let fansCount = 0;
+      try {
+        const cardRes = await fetch(`https://api.bilibili.com/x/web-interface/card?mid=${UID}`, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Referer': 'https://space.bilibili.com',
+            'Accept': 'application/json',
+          },
+        });
+
+        if (cardRes.ok) {
+          const cardData = await cardRes.json();
+          if (cardData.code === 0 && cardData.data) {
+            fansCount = cardData.data.follower || cardData.data.card?.fans || 0;
+          }
+        }
+      } catch (cardErr) {
+        console.error('⚠️ 获取粉丝数失败:', cardErr.message);
+      }
+
       return {
         isLive,
         title: room.title || '',
         roomId,
         url: roomId ? `https://live.bilibili.com/${roomId}` : '',
+        fans: fansCount,
       };
     }
 
@@ -77,8 +99,8 @@ async function syncToD1() {
   const checkedAt = Date.now();
 
   const sql = `
-INSERT OR REPLACE INTO live_status (id, is_live, title, room_id, url, checked_at)
-VALUES (1, ${status.isLive ? 1 : 0}, '${escapeSqlString(status.title)}', '${escapeSqlString(status.roomId)}', '${escapeSqlString(status.url)}', ${checkedAt});
+INSERT OR REPLACE INTO live_status (id, is_live, title, room_id, url, fans, checked_at)
+VALUES (1, ${status.isLive ? 1 : 0}, '${escapeSqlString(status.title)}', '${escapeSqlString(status.roomId)}', '${escapeSqlString(status.url)}', ${status.fans || 0}, ${checkedAt});
 `;
 
   const tempSqlPath = join(__dirname, 'temp-live-sync.sql');
@@ -95,6 +117,7 @@ VALUES (1, ${status.isLive ? 1 : 0}, '${escapeSqlString(status.title)}', '${esca
     console.log('\n✅ 同步成功!');
     console.log(`   状态: ${status.isLive ? '直播中' : '未开播'}`);
     console.log(`   标题: ${status.title || '-'}`);
+    console.log(`   粉丝: ${(status.fans || 0).toLocaleString('zh-CN')}`);
     console.log(`   时间: ${new Date(checkedAt).toLocaleString('zh-CN')}`);
   } catch (err) {
     console.error('\n❌ 同步失败:', err.message);

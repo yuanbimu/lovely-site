@@ -2,10 +2,8 @@
 import siteData from '../../data/site-data.json';
 import Avatar from '../Avatar';
 import LiveStatus from '../LiveStatus';
-import { formatNumber } from '../../lib/utils';
 
-const { profile, stats, config } = siteData;
-const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
+const { profile, config } = siteData;
 ---
 
 <section id="hero" class="hero-section">
@@ -16,19 +14,6 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
   <div class="hero-content">
     <div class="hero-left">
       <Avatar client:load size={280} />
-
-
-      <div class="fans-card">
-        <div class="fans-icon">
-          <svg viewBox="0 0 512 512" width="28" height="28" fill="#00aeec" aria-hidden="true">
-            <path fill="currentColor" d="M488.6 104.1c16.7 18.1 24.4 39.7 23.3 65.7v202.4c-.4 26.4-9.2 48.1-26.5 65.1c-17.2 17-39.1 25.9-65.5 26.7H92.02c-26.45-.8-48.21-9.8-65.28-27.2C9.682 419.4.767 396.5 0 368.2V169.8c.767-26 9.682-47.6 26.74-65.7C43.81 87.75 65.57 78.77 92.02 78h29.38L96.05 52.19c-5.75-5.73-8.63-13-8.63-21.79c0-8.8 2.88-16.06 8.63-21.797C101.8 2.868 109.1 0 117.9 0s16.1 2.868 21.9 8.603L213.1 78h88l74.5-69.397C381.7 2.868 389.2 0 398 0c8.8 0 16.1 2.868 21.9 8.603c5.7 5.737 8.6 12.997 8.6 21.797c0 8.79-2.9 16.06-8.6 21.79L394.6 78h29.3c26.4.77 48 9.75 64.7 26.1z"/>
-          </svg>
-        </div>
-        <div class="fans-info">
-          <span class="fans-label">B 站粉丝</span>
-          <span class="fans-count">{fansCountFormatted}</span>
-        </div>
-      </div>
 
       {config.showLiveStatus && (
         <div class="live-status-wrapper">
@@ -50,8 +35,8 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
         </a>
         {profile.socials.weibo && (
           <a href={profile.socials.weibo} target="_blank" rel="noopener noreferrer" class="social-btn weibo-btn">
-            <svg viewBox="0 0 512 512" width="20" height="20" fill="currentColor" aria-hidden="true">
-              <path d="M407 177.6c7.6-24-13.4-46.8-37.4-41.7c-22 4.8-28.8-28.1-7.1-32.8c50.1-10.9 92.3 37.1 76.5 84.8c-6.8 21.2-38.8 10.8-32-10.3z"/>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+               <path d="M10.098 20.323c-3.977.391-7.414-1.406-7.672-4.02-.259-2.609 2.759-5.047 6.74-5.441 3.979-.394 7.413 1.404 7.671 4.018.259 2.6-2.759 5.049-6.739 5.443zM9.05 17.219c-.384.616-1.208.884-1.829.602-.612-.279-.793-.991-.406-1.593.379-.595 1.176-.861 1.793-.601.622.263.82.972.442 1.592zm1.27-1.627c-.141.237-.449.353-.689.253-.236-.09-.313-.361-.177-.586.138-.227.436-.346.672-.24.239.09.315.36.18.573h.014zm.176-2.719c-1.893-.493-4.033.45-4.857 2.118-.836 1.704-.026 3.591 1.886 4.21 1.983.64 4.318-.341 5.132-2.179.8-1.793-.201-3.642-2.161-4.149zm7.563-1.224c-.346-.105-.577-.18-.399-.646.388-1.012.428-1.884.003-2.509-.793-1.164-2.96-1.101-5.448-.033 0 0-.781.343-.581-.277.383-1.217.324-2.236-.27-2.82-1.349-1.33-4.937.047-8.013 3.073-2.299 2.262-3.637 4.66-3.637 6.729 0 3.958 5.063 6.367 10.017 6.367 6.487 0 10.807-3.771 10.807-6.766 0-1.808-1.524-2.833-2.479-3.118zm2.809-5.582c-.939-1.061-2.326-1.465-3.586-1.273-.359.053-.609.386-.556.744.054.357.387.604.744.556.842-.124 1.712.158 2.298.82.586.662.76 1.564.516 2.374-.1.348.1.712.448.812.35.1.714-.1.814-.448.349-1.138.087-2.441-.678-3.585zm-1.113 3.286c-.393-.443-.974-.767-1.54-.637-.224.052-.361.278-.31.502.053.224.279.36.503.31.303-.071.639.083.87.343.231.261.311.618.232.925-.058.226.079.456.305.514.226.058.456-.078.514-.304.141-.541.016-1.146-.35-1.56l-.224-.093z"/>
             </svg>
             <span>微博</span>
           </a>
@@ -173,42 +158,6 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
     box-shadow: 0 20px 60px rgba(139, 111, 71, 0.25);
   }
 
-  .fans-card {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    padding: 16px 28px;
-    border-radius: 50px;
-    box-shadow: 0 8px 30px rgba(139, 111, 71, 0.12);
-  }
-
-  .fans-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .fans-info {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .fans-label {
-    font-size: 13px;
-    color: #8B6F47;
-  }
-
-  .fans-count {
-    font-size: 26px;
-    font-weight: 700;
-    color: #00aeec;
-  }
-
   .live-status-wrapper {
     margin-top: 15px;
     display: flex;
@@ -309,23 +258,6 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
       margin: 0 0 25px 0;
     }
 
-    .fans-card {
-      padding: 12px 20px;
-    }
-
-    .fans-icon {
-      width: 40px;
-      height: 40px;
-    }
-
-    .fans-label {
-      font-size: 12px;
-    }
-
-    .fans-count {
-      font-size: 22px;
-    }
-
     .social-buttons {
       flex-direction: column;
       align-items: center;
@@ -359,20 +291,6 @@ const fansCountFormatted = stats.fans > 0 ? formatNumber(stats.fans) : '--';
 
     .subtitle {
       font-size: 14px;
-    }
-
-    .fans-card {
-      padding: 10px 16px;
-      gap: 12px;
-    }
-
-    .fans-icon {
-      width: 36px;
-      height: 36px;
-    }
-
-    .fans-count {
-      font-size: 20px;
     }
 
     .social-btn {

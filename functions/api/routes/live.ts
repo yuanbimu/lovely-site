@@ -5,9 +5,11 @@ import { getLiveStatus } from '../../lib/db';
 
 const app = new Hono();
 
-// 获取直播状态（仅从 D1 读取，不再直接请求 Bilibili API）
-// 数据由本地定时脚本 scripts/sync-live-to-d1.js 写入 D1
+// 获取直播状态和粉丝数
+// 所有数据从 D1 读取（由本地定时脚本 scripts/sync-live-to-d1.js 写入）
 app.get('/', async (c) => {
+  const lastChecked = new Date().toISOString();
+
   try {
     const status = await getLiveStatus(c.env.DB);
 
@@ -17,6 +19,7 @@ app.get('/', async (c) => {
         title: status.title,
         url: status.url,
         roomId: status.roomId,
+        fans: status.fans,
         lastChecked: new Date(status.checkedAt).toISOString(),
       });
     }
@@ -27,7 +30,8 @@ app.get('/', async (c) => {
       title: '',
       url: '',
       roomId: '',
-      lastChecked: new Date().toISOString(),
+      fans: 0,
+      lastChecked,
     });
   } catch (err) {
     console.error('[Live API] Database error:', err);
@@ -36,7 +40,8 @@ app.get('/', async (c) => {
       title: '',
       url: '',
       roomId: '',
-      lastChecked: new Date().toISOString(),
+      fans: 0,
+      lastChecked,
     }, 500);
   }
 });

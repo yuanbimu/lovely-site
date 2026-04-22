@@ -42,6 +42,7 @@ export interface LiveStatus {
   title: string;
   url: string;
   lastChecked: string;
+  fans?: number;
 }
 
 // 文章

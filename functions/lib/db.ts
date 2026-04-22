@@ -67,15 +67,17 @@ export async function saveLiveStatus(db: D1Database, status: {
   title?: string;
   room_id?: string;
   url?: string;
+  fans?: number;
 }) {
   await db.prepare(`
-    INSERT OR REPLACE INTO live_status (id, is_live, title, room_id, url, checked_at)
-    VALUES (1, ?, ?, ?, ?, ?)
+    INSERT OR REPLACE INTO live_status (id, is_live, title, room_id, url, fans, checked_at)
+    VALUES (1, ?, ?, ?, ?, ?, ?)
   `).bind(
     status.is_live ? 1 : 0,
     status.title || null,
     status.room_id || null,
     status.url || null,
+    status.fans ?? 0,
     Date.now()
   ).run();
 }
@@ -88,16 +90,18 @@ export async function getLiveStatus(db: D1Database) {
       title: string | null;
       room_id: string | null;
       url: string | null;
+      fans: number | null;
       checked_at: number;
     }>();
-  
+
   if (!result) return null;
-  
+
   return {
     isLive: result.is_live === 1,
     title: result.title || '',
     roomId: result.room_id || '',
     url: result.url || '',
+    fans: result.fans ?? 0,
     checkedAt: result.checked_at
   };
 }

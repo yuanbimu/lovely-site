@@ -9,6 +9,7 @@ interface LiveStatusResponse {
   title: string;
   url: string;
   roomId: string;
+  fans: number;
   lastChecked: string;
   stale?: boolean;
 }
@@ -67,15 +68,51 @@ export async function GET() {
       throw new Error(`Bilibili API error: ${data.code}`);
     }
 
+    let fansCount = 0;
+
     if (data.data) {
       const { liveStatus, title, roomid } = data.data;
       const isLive = liveStatus === 1;
+
+      // 同时获取粉丝数
+      try {
+        const cardResponse = await fetchWithTimeout(
+          `https://api.bilibili.com/x/web-interface/card?mid=${BILIBILI_UID}`,
+          {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'Referer': 'https://space.bilibili.com',
+              'Accept': 'application/json',
+            },
+          },
+          REQUEST_TIMEOUT
+        );
+
+        if (cardResponse.ok) {
+          const cardData = await cardResponse.json() as {
+            code: number;
+            data?: {
+              card?: {
+                fans: number;
+              };
+              follower?: number;
+            };
+          };
+
+          if (cardData.code === 0 && cardData.data) {
+            fansCount = cardData.data.follower || cardData.data.card?.fans || 0;
+          }
+        }
+      } catch (cardError) {
+        console.error('[Live API] Failed to fetch fans count:', cardError);
+      }
 
       const result: LiveStatusResponse = {
         isLive,
         title: isLive ? (title || '直播中') : '',
         url: isLive ? `https://live.bilibili.com/${roomid}` : '',
         roomId: roomid?.toString() || '',
+        fans: fansCount,
         lastChecked,
       };
 
@@ -93,13 +130,14 @@ export async function GET() {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[Live API] Error:', errorMessage);
-    
+
     // 本地开发环境没有 D1 回退能力，失败时返回离线状态并标记为 stale
     const result: LiveStatusResponse = {
       isLive: false,
       title: '',
       url: '',
       roomId: '',
+      fans: 0,
       lastChecked,
       stale: true,
     };
