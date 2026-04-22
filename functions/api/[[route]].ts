@@ -1,36 +1,22 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { 
-  getTimelineEvents, 
-  saveTimelineEvent, 
-  deleteTimelineEvent,
-  bulkSaveTimelineEvents,
-  getUsers,
-  createUser, 
-  getUserByUsername, 
-  getUserById,
-  createSession, 
-  getSessionById, 
-  deleteSession,
-  updateUserPassword,
-  updateUserRole,
-  deleteUser,
-  getSongs,
-  saveSong,
-  deleteSong,
-  getLiveStatus,
-  saveLiveStatus,
-  getShowcases,
-  saveShowcase,
-  deleteShowcase,
-  type Env
-} from '../lib/db';
+import { type Env } from '../lib/db';
+
+// 子路由导入
+import authRoutes from './routes/auth';
+import timelineRoutes from './routes/timeline';
+import usersRoutes from './routes/users';
+import songsRoutes from './routes/songs';
+import showcasesRoutes from './routes/showcases';
+import r2Routes from './routes/r2';
+import dynamicsRoutes from './routes/dynamics';
+import liveRoutes from './routes/live';
 
 const app = new Hono<{ Bindings: Env, Variables: { user: any } }>();
 
 // === Global Middleware ===
 
-// 1. CORS
+// CORS
 app.use('/api/*', cors({
   origin: '*',
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -39,571 +25,42 @@ app.use('/api/*', cors({
   maxAge: 86400
 }));
 
-// 3. 全局錯誤處理
+// 全局錯誤處理
 app.onError((err, c) => {
   console.error(`[API ERROR] ${c.req.method} ${c.req.path}:`, err);
   console.error(`[STACK]:`, err.stack);
   return c.json({
     error: 'Internal Server Error',
     message: err.message,
-    stack: err.stack, // 開發環境先開啟 stack 回傳以便診斷
+    stack: err.stack,
     type: err.name
   }, 500);
 });
 
-// === Helpers ===
-
-function getCookieValue(cookieHeader: string | null, name: string): string | null {
-  if (!cookieHeader) return null;
-  for (const cookie of cookieHeader.split(';')) {
-    const [key, value] = cookie.trim().split('=');
-    if (key === name) return decodeURIComponent(value);
-  }
-  return null;
-}
-
-function generateId(): string {
-  return `${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-}
-
-function generateSessionToken(): string {
-  return `${Date.now()}_${Math.random().toString(36).substring(2, 15)}_${Math.random().toString(36).substring(2, 15)}`;
-}
-
-function isSecureCookieEnabled(url: string): boolean {
-  // 本地开发环境 (http://localhost 或 http://127.0.0.1) 不使用 Secure
-  try {
-    const parsed = new URL(url);
-    if (parsed.protocol === 'http:') {
-      const host = parsed.hostname;
-      if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('127.')) {
-        return false;
-      }
-    }
-  } catch {
-    // 解析失败默认保守返回 true
-    return true;
-  }
-  // HTTPS 或非本地环境使用 Secure
-  return true;
-}
-
-function isLocalDevEnv(url: string): boolean {
-  // 本地开发环境检测 - 用于 R2 URL 生成
-  try {
-    const parsed = new URL(url);
-    if (parsed.protocol === 'http:') {
-      const host = parsed.hostname;
-      if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('127.')) {
-        return true;
-      }
-    }
-  } catch {
-    // 解析失败默认返回 false (生产环境)
-    return false;
-  }
-  return false;
-}
-
-function buildR2Url(key: string, baseUrl: string): string {
-  const isLocal = isLocalDevEnv(baseUrl);
-  if (isLocal) {
-    return `http://127.0.0.1:8788/api/r2-get/${encodeURIComponent(key)}`;
-  }
-  return `https://cdn.yuanbimu.top/${key}`;
-}
-
-function buildSessionCookie(token: string, isSecure: boolean, maxAge: number): string {
-  const securePart = isSecure ? 'Secure; ' : '';
-  return `session=${token}; HttpOnly; ${securePart}SameSite=Lax; Max-Age=${maxAge}; Path=/`;
-}
-
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password + 'lovely-site-salt');
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  const hashed = await hashPassword(password);
-  return hashed === hash;
-}
-
-// === Auth Middlewares ===
-
-const requireAuth = async (c: any, next: any) => {
-  const cookieHeader = c.req.header('Cookie');
-  const sessionToken = getCookieValue(cookieHeader ?? null, 'session');
-  if (!sessionToken) {
-    return c.json({ error: '未登錄' }, 401);
-  }
-  
-  const db = c.env.DB;
-  const session = await getSessionById(db, sessionToken);
-  if (!session) {
-    const isSecure = isSecureCookieEnabled(c.req.url);
-    const cookie = buildSessionCookie('', isSecure, 0);
-    c.header('Set-Cookie', cookie, { append: true });
-    return c.json({ error: 'Session 已過期' }, 401);
-  }
-  
-  const user = await getUserById(db, session.user_id);
-  if (!user) {
-    return c.json({ error: '用戶不存在' }, 404);
-  }
-  
-  c.set('user', user);
-  await next();
-};
-
-const requireEditor = async (c: any, next: any) => {
-  const user = c.get('user');
-  if (!user || (user.role !== 'admin' && user.role !== 'editor')) {
-    return c.json({ error: '需要編輯權限' }, 403);
-  }
-  await next();
-};
-
-const requireAdmin = async (c: any, next: any) => {
-  const user = c.get('user');
-  if (!user || user.role !== 'admin') {
-    return c.json({ error: '需要管理員權限' }, 403);
-  }
-  await next();
-};
-
 // === Routes ===
 
-app.post('/api/auth/login', async (c) => {
-  try {
-    const body = await c.req.json();
-    const { username, password } = body;
-    
-    if (!username || !password) return c.json({ error: '請輸入用戶名和密碼' }, 400);
-    
-    const db = c.env.DB;
-    if (!db) {
-       console.error("[Auth] Database binding (c.env.DB) is missing!");
-       return c.json({ error: "Database binding missing" }, 500);
-    }
-    
-    const user = await getUserByUsername(db, username);
-    if (!user) {
-       return c.json({ error: '用戶名或密碼錯誤' }, 401);
-    }
-    
-    const isValid = await verifyPassword(password, user.password_hash);
-    if (!isValid) {
-       return c.json({ error: '用戶名或密碼錯誤' }, 401);
-    }
-    
-    const sessionToken = generateSessionToken();
-    const expiresAt = Date.now() + (7 * 24 * 60 * 60 * 1000);
-    await createSession(db, { id: sessionToken, user_id: user.id, expires_at: expiresAt });
-    
-    const isSecure = isSecureCookieEnabled(c.req.url);
-    const cookie = buildSessionCookie(sessionToken, isSecure, 7 * 24 * 60 * 60);
-    c.header('Set-Cookie', cookie, { append: true });
-    return c.json({ success: true, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
-  } catch (err) {
-    console.error(`[Auth] Login Route Error:`, err);
-    throw err;
-  }
-});
+// 认证路由 /api/auth/*
+app.route('/api/auth', authRoutes);
 
-app.get('/api/auth/me', requireAuth, async (c) => {
-  const user = c.get('user');
-  return c.json({ success: true, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
-});
+// 时间线路由 /api/timeline/*
+app.route('/api/timeline', timelineRoutes);
 
-app.post('/api/auth/logout', async (c) => {
-  const cookieHeader = c.req.header('Cookie');
-  const sessionToken = getCookieValue(cookieHeader ?? null, 'session');
-  if (sessionToken) await deleteSession(c.env.DB, sessionToken);
-  const isSecure = isSecureCookieEnabled(c.req.url);
-  const cookie = buildSessionCookie('', isSecure, 0);
-  c.header('Set-Cookie', cookie, { append: true });
-  return c.json({ success: true });
-});
+// 用户路由 /api/users/*
+app.route('/api/users', usersRoutes);
 
-app.get('/api/timeline', async (c) => {
-  const events = await getTimelineEvents(c.env.DB);
-  return c.json({ data: events, total: events.length });
-});
+// 歌曲路由 /api/songs/*
+app.route('/api/songs', songsRoutes);
 
-app.post('/api/timeline', requireAuth, requireEditor, async (c) => {
-  const body = await c.req.json();
-  const eventData = { id: body.id || `event_${Date.now()}`, ...body };
-  await saveTimelineEvent(c.env.DB, eventData);
-  return c.json({ success: true, data: eventData });
-});
+// 橱窗路由 /api/showcases/*
+app.route('/api/showcases', showcasesRoutes);
 
-app.delete('/api/timeline/:id', requireAuth, requireEditor, async (c) => {
-  await deleteTimelineEvent(c.env.DB, c.req.param('id'));
-  return c.json({ success: true });
-});
+// R2 文件路由 - 挂载到 /api，因为子路由定义了完整路径 /r2-files, /r2-get 等
+app.route('/api', r2Routes);
 
-app.get('/api/users', requireAuth, requireAdmin, async (c) => {
-  const users = await getUsers(c.env.DB);
-  return c.json({ success: true, data: users });
-});
+// 动态路由 /api/dynamics/*
+app.route('/api/dynamics', dynamicsRoutes);
 
-app.post('/api/users', requireAuth, requireAdmin, async (c) => {
-  try {
-    const body = await c.req.json();
-    const { username, email, password, role } = body;
-
-    if (!username || !email || !password) {
-      return c.json({ error: '请填写用户名、邮箱和密码' }, 400);
-    }
-
-    if (password.length < 6) {
-      return c.json({ error: '密码至少需要6个字符' }, 400);
-    }
-
-    const db = c.env.DB;
-
-    // 检查用户名是否已存在
-    const existingUser = await getUserByUsername(db, username);
-    if (existingUser) {
-      return c.json({ error: '用户名已存在' }, 409);
-    }
-
-    const userId = `user_${Date.now()}`;
-    const passwordHash = await hashPassword(password);
-
-    await createUser(db, {
-      id: userId,
-      username,
-      email,
-      password_hash: passwordHash,
-      role: role || 'editor'
-    });
-
-    return c.json({ success: true, data: { id: userId, username, email, role: role || 'editor' } });
-  } catch (err) {
-    console.error('[Users] Create error:', err);
-    return c.json({ error: '创建用户失败' }, 500);
-  }
-});
-
-app.put('/api/users/:id/role', requireAuth, requireAdmin, async (c) => {
-  try {
-    const userId = c.req.param('id');
-    const body = await c.req.json();
-    const { role } = body;
-
-    if (!role || !['admin', 'editor', 'viewer'].includes(role)) {
-      return c.json({ error: '无效的角色' }, 400);
-    }
-
-    await updateUserRole(c.env.DB, userId, role);
-    return c.json({ success: true });
-  } catch (err) {
-    console.error('[Users] Update role error:', err);
-    return c.json({ error: '更新角色失败' }, 500);
-  }
-});
-
-app.delete('/api/users/:id', requireAuth, requireAdmin, async (c) => {
-  try {
-    const userId = c.req.param('id');
-    await deleteUser(c.env.DB, userId);
-    return c.json({ success: true });
-  } catch (err) {
-    console.error('[Users] Delete error:', err);
-    return c.json({ error: '删除用户失败' }, 500);
-  }
-});
-
-app.get('/api/songs', async (c) => {
-  const songs = await getSongs(c.env.DB);
-  return c.json({ success: true, data: songs });
-});
-
-app.post('/api/songs', requireAuth, requireEditor, async (c) => {
-  try {
-    const body = await c.req.json();
-    const songData = {
-      id: body.id || `song_${Date.now()}`,
-      title: body.title,
-      artist: body.artist || '东爱璃 Lovely',
-      cover_url: body.cover_url,
-      url: body.url,
-      release_date: body.release_date
-    };
-    await saveSong(c.env.DB, songData);
-    return c.json({ success: true, data: songData });
-  } catch (err) {
-    console.error('[Songs] Save error:', err);
-    return c.json({ error: '保存失败' }, 500);
-  }
-});
-
-app.delete('/api/songs/:id', requireAuth, requireEditor, async (c) => {
-  await deleteSong(c.env.DB, c.req.param('id'));
-  return c.json({ success: true });
-});
-
-// Showcase API
-app.get('/api/showcases', async (c) => {
-  const showcases = await getShowcases(c.env.DB);
-  
-  // Migration: Fill empty folder fields with their ID on first run
-  for (const showcase of showcases) {
-    if (!showcase.folder && showcase.id) {
-      await updateShowcaseFolder(c.env.DB, showcase.id, showcase.id);
-      showcase.folder = showcase.id;
-    }
-  }
-  
-  return c.json({ success: true, data: showcases });
-});
-
-// Get max model number from existing showcases
-async function getMaxModelNumber(db: D1Database): Promise<number> {
-  const showcases = await getShowcases(db);
-  let maxNum = 0;
-  for (const s of showcases) {
-    const match = s.id?.match(/^model-(\d+)$/);
-    if (match) {
-      const num = parseInt(match[1], 10);
-      if (num > maxNum) maxNum = num;
-    }
-    const folderMatch = s.folder?.match(/^model-(\d+)$/);
-    if (folderMatch) {
-      const num = parseInt(folderMatch[1], 10);
-      if (num > maxNum) maxNum = num;
-    }
-  }
-  return maxNum;
-}
-
-// Update showcase folder
-async function updateShowcaseFolder(db: D1Database, id: string, folder: string) {
-  const now = Date.now();
-  await db.prepare(`
-    UPDATE showcases SET folder = ?, updated_at = ? WHERE id = ?
-  `).bind(folder, now, id).run();
-}
-
-app.post('/api/showcases', requireAuth, requireEditor, async (c) => {
-  try {
-    const body = await c.req.json();
-    
-    // Auto-generate folder if not provided
-    let folder = body.folder;
-    let id = body.id;
-    
-    if (!folder && !id) {
-      // Both missing - auto-generate model-{N}
-      const maxNum = await getMaxModelNumber(c.env.DB);
-      const newNum = maxNum + 1;
-      id = `model-${newNum}`;
-      folder = id;
-    } else if (!folder && id) {
-      // folder missing but id provided - use id as folder
-      folder = id;
-    } else if (folder && !id) {
-      // id missing but folder provided - use folder as id
-      id = folder;
-    }
-    
-    const showcaseData = {
-      id,
-      name: body.name,
-      description: body.description,
-      folder,
-      image_url: body.image_url,
-      sort_order: body.sort_order || 0
-    };
-    await saveShowcase(c.env.DB, showcaseData);
-    
-    // 创建 R2 占位对象以支持目录识别
-    const folderKey = `showcase/${folder}/.folder`;
-    await c.env.IMAGES.put(folderKey, new TextEncoder().encode(''), {
-      httpMetadata: {
-        contentType: 'application/octet-stream'
-      }
-    });
-    
-    return c.json({ success: true, data: showcaseData });
-  } catch (err) {
-    console.error('[Showcase] Save error:', err);
-    return c.json({ error: '保存失败' }, 500);
-  }
-});
-
-app.delete('/api/showcases/:id', requireAuth, requireEditor, async (c) => {
-  await deleteShowcase(c.env.DB, c.req.param('id'));
-  return c.json({ success: true });
-});
-
-// R2 文件列表 API - 公开读取（写操作保留认证）
-app.get('/api/r2-files', async (c) => {
-  try {
-    const prefix = c.req.query('prefix') || '';
-    const recursive = c.req.query('recursive') === 'true';
-    
-    // 非递归模式使用 delimiter 返回目录结构
-    const list = recursive 
-      ? await c.env.IMAGES.list({ prefix })
-      : await c.env.IMAGES.list({ prefix, delimiter: '/' });
-    
-    // 文件夾（目錄）- 仅在非递归模式下有值
-    const folders = recursive 
-      ? [] 
-      : (list.delimitedPrefixes || []).map(p => ({
-          type: 'folder',
-          name: p.replace(prefix, '').replace('/', ''),
-          key: p
-        }));
-    
-    // 文件 - 根据环境返回 URL
-    const files = list.objects.map(obj => ({
-      type: 'file',
-      key: obj.key,
-      url: buildR2Url(obj.key, c.req.url)
-    }));
-    
-    return c.json({ success: true, data: { folders, files } });
-  } catch (err) {
-    console.error('[R2] List error:', err);
-    return c.json({ error: '獲取文件列表失敗' }, 500);
-  }
-});
-
-// R2 文件獲取 API - 本地開發環境代理
-app.get('/api/r2-get/:key', async (c) => {
-  try {
-    const key = decodeURIComponent(c.req.param('key'));
-    const object = await c.env.IMAGES.get(key);
-    
-    if (!object) {
-      return c.json({ error: '文件不存在' }, 404);
-    }
-    
-    return new Response(object.body, {
-      headers: {
-        'Content-Type': object.httpMetadata?.contentType || 'application/octet-stream',
-        'Cache-Control': 'public, max-age=31536000'
-      }
-    });
-  } catch (err) {
-    console.error('[R2] Get error:', err);
-    return c.json({ error: '獲取文件失敗' }, 500);
-  }
-});
-
-// R2 文件刪除 API
-app.delete('/api/r2-files/:key', requireAuth, requireEditor, async (c) => {
-  try {
-    const key = c.req.param('key');
-    
-    if (!key) {
-      return c.json({ error: '缺少文件 key' }, 400);
-    }
-
-    await c.env.IMAGES.delete(key);
-    
-    return c.json({ success: true });
-  } catch (err) {
-    console.error('[R2] Delete error:', err);
-    return c.json({ error: '刪除失敗' }, 500);
-  }
-});
-
-// R2 上傳 API
-app.post('/api/r2-upload', requireAuth, requireEditor, async (c) => {
-  try {
-    const formData = await c.req.parseBody();
-    const file = formData['file'] as File;
-    
-    if (!file) {
-      return c.json({ error: '請選擇文件' }, 400);
-    }
-
-    const filename = formData['filename'] as string || file.name;
-    const folder = formData['folder'] as string || '';
-    const key = folder ? `${folder}/${filename}` : filename;
-    
-    const arrayBuffer = await file.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
-    
-    await c.env.IMAGES.put(key, uint8Array, {
-      httpMetadata: {
-        contentType: file.type || 'application/octet-stream'
-      }
-    });
-
-    return c.json({ 
-      success: true, 
-      data: { 
-        key, 
-        url: buildR2Url(key, c.req.url)
-      } 
-    });
-  } catch (err) {
-    console.error('[R2] Upload error:', err);
-    return c.json({ error: '上傳失敗' }, 500);
-  }
-});
-
-app.get('/api/dynamics', async (c) => {
-  return c.json({ error: '动态功能暂时下线，后续将以新方案重新接入' }, 410);
-});
-
-app.get('/api/live', async (c) => {
-  try {
-    const cachedStatus = await getLiveStatus(c.env.DB);
-    const res = await fetch(`https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid=3821157`);
-    const data = await res.json() as any;
-    if (data.code === 0 && data.data) {
-      const { liveStatus, title, roomid } = data.data;
-      const status = {
-        is_live: liveStatus === 1,
-        title: title || '',
-        room_id: roomid ? String(roomid) : '',
-        url: roomid ? `https://live.bilibili.com/${roomid}` : ''
-      };
-      await saveLiveStatus(c.env.DB, status);
-      return c.json({ 
-        isLive: status.is_live,
-        title: status.title,
-        url: status.url,
-        roomId: status.room_id,
-        lastChecked: new Date().toISOString()
-      });
-    }
-
-    if (cachedStatus) {
-      return c.json({
-        isLive: cachedStatus.isLive,
-        title: cachedStatus.title,
-        url: cachedStatus.url,
-        roomId: cachedStatus.roomId,
-        lastChecked: new Date(cachedStatus.checkedAt).toISOString(),
-        stale: true
-      });
-    }
-
-    return c.json({ isLive: false, title: '', url: '', roomId: '', lastChecked: new Date().toISOString() });
-  } catch {
-    const cachedStatus = await getLiveStatus(c.env.DB);
-    if (cachedStatus) {
-      return c.json({
-        isLive: cachedStatus.isLive,
-        title: cachedStatus.title,
-        url: cachedStatus.url,
-        roomId: cachedStatus.roomId,
-        lastChecked: new Date(cachedStatus.checkedAt).toISOString(),
-        stale: true
-      });
-    }
-    return c.json({ isLive: false, title: '', url: '', roomId: '', lastChecked: new Date().toISOString() });
-  }
-});
+// 直播路由 /api/live/*
+app.route('/api/live', liveRoutes);
 
 export const onRequest = (context: { request: Request; env: Env; executionCtx: ExecutionContext }) => app.fetch(context.request, context.env, context.executionCtx);
