@@ -488,7 +488,7 @@ export default function AdminDashboard() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('folder', editingShowcase.folder);
+      formData.append('folder', toR2Path(editingShowcase.folder));
       
       const res = await fetch('/api/r2-upload', {
         method: 'POST',
