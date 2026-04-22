@@ -1,0 +1,121 @@
+{
+  "active_plan": "C:\\Users\\Cashier\\Desktop\\reLovelyProject\\lovely-site\\.sisyphus\\plans\\showcase-image-fix.md",
+  "started_at": "2026-04-21T03:21:54.438Z",
+  "session_ids": [
+    "ses_251f0f6d3ffeOl8S81dQvx1nBB",
+    "ses_251f06addffe6dnRuzQLRR0BG6",
+    "ses_251f06ac8ffel4cn1bbcnW7mcR",
+    "ses_2518f547bffeV5i30ezCikB43E",
+    "ses_2518df696ffeaPj408hcKaaQ9i",
+    "ses_2518df5feffe4zO6VoCxTPbzr4",
+    "ses_2518654bcffe2NkW40j4BSzB77",
+    "ses_251865400ffeph6hSMe1T2lpkR",
+    "ses_2515fd91effe2V9crTY4K1Gynq",
+    "ses_2515f37bbffeA7n2g2lgPriFZR",
+    "ses_2515f3705ffecHfsaIAbkaD8td",
+    "ses_2513ff559ffeC8CWOx52ArVeMO",
+    "ses_25130a5b3ffeKw320y4UICVFId",
+    "ses_2512f817fffe0RskUDNNizF6iR",
+    "ses_2512f80b2ffe7A92rbVbZcHPeT",
+    "ses_2512f80a7ffeHS1wsxPQUIsjQT",
+    "ses_24d300b56ffeOwNPC7Cftc1p9P",
+    "ses_24d2f1efeffeKLMivVoDin6K0P",
+    "ses_24d2f1e8affepug5MZz4MvqZrq",
+    "ses_24d2f1e77ffeBuJjOvt4m6mxky",
+    "ses_24cc635ebffeANlIxPTcetnhfo",
+    "ses_24cc4c4dcffezv5SffqaU5DnOZ",
+    "ses_24cc4c4c5ffeTkzwm0mCKyDQLF"
+  ],
+  "session_origins": {
+    "ses_251f0f6d3ffeOl8S81dQvx1nBB": "direct",
+    "ses_251f06addffe6dnRuzQLRR0BG6": "appended",
+    "ses_251f06ac8ffel4cn1bbcnW7mcR": "appended",
+    "ses_2518f547bffeV5i30ezCikB43E": "direct",
+    "ses_2518df696ffeaPj408hcKaaQ9i": "appended",
+    "ses_2518df5feffe4zO6VoCxTPbzr4": "appended",
+    "ses_2518654bcffe2NkW40j4BSzB77": "appended",
+    "ses_251865400ffeph6hSMe1T2lpkR": "appended",
+    "ses_2515fd91effe2V9crTY4K1Gynq": "direct",
+    "ses_2515f37bbffeA7n2g2lgPriFZR": "appended",
+    "ses_2515f3705ffecHfsaIAbkaD8td": "appended",
+    "ses_2513ff559ffeC8CWOx52ArVeMO": "appended",
+    "ses_25130a5b3ffeKw320y4UICVFId": "direct",
+    "ses_2512f817fffe0RskUDNNizF6iR": "appended",
+    "ses_2512f80b2ffe7A92rbVbZcHPeT": "appended",
+    "ses_2512f80a7ffeHS1wsxPQUIsjQT": "appended",
+    "ses_24d300b56ffeOwNPC7Cftc1p9P": "direct",
+    "ses_24d2f1efeffeKLMivVoDin6K0P": "appended",
+    "ses_24d2f1e8affepug5MZz4MvqZrq": "appended",
+    "ses_24d2f1e77ffeBuJjOvt4m6mxky": "appended",
+    "ses_24cc635ebffeANlIxPTcetnhfo": "direct",
+    "ses_24cc4c4dcffezv5SffqaU5DnOZ": "appended",
+    "ses_24cc4c4c5ffeTkzwm0mCKyDQLF": "appended"
+  },
+  "plan_name": "showcase-image-fix",
+  "agent": "atlas",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "修复 /api/r2-files 端点添加 recursive 参数",
+      "session_id": "ses_2518654bcffe2NkW40j4BSzB77",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-04-21T05:23:12.535Z"
+    },
+    "todo:2": {
+      "task_key": "todo:2",
+      "task_label": "2",
+      "task_title": "探查 R2 当前文件分布",
+      "session_id": "ses_251756946ffef19qPUzoCrstK8",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-04-21T05:43:16.540Z"
+    },
+    "todo:3": {
+      "task_key": "todo:3",
+      "task_label": "3",
+      "task_title": "修复 AdminDashboard 图片选择器按目录获取文件",
+      "session_id": "ses_250bd2534ffeRO1EI5AQl5p3d6",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-04-21T09:28:07.950Z"
+    },
+    "todo:4": {
+      "task_key": "todo:4",
+      "task_label": "4",
+      "task_title": "修复 ShowcaseList 图片获取和轮播",
+      "session_id": "ses_24d24321dffeTnvozkJDuD9fI1",
+      "agent": "oracle",
+      "category": "",
+      "updated_at": "2026-04-22T01:45:34.225Z"
+    },
+    "todo:6": {
+      "task_key": "todo:6",
+      "task_label": "6",
+      "task_title": "迁移 R2 文件到 model-N 目录",
+      "session_id": "ses_24cfb7c5dffegye5Nj81TnYMcn",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-04-22T02:42:35.471Z"
+    },
+    "todo:7": {
+      "task_key": "todo:7",
+      "task_label": "7",
+      "task_title": "端到端集成验证 + 清理",
+      "session_id": "ses_24cec6887ffeJzmI1vkYAtFQXU",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-04-22T03:00:29.328Z"
+    },
+    "final-wave:f1": {
+      "task_key": "final-wave:f1",
+      "task_label": "F1",
+      "task_title": "**Plan Compliance Audit** — `oracle`",
+      "session_id": "ses_24c7a3554ffe0YV3mDByEbVDGh",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-04-22T04:54:20.641Z"
+    }
+  }
+}

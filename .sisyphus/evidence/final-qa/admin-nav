@@ -1,0 +1,51 @@
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]: 🎀 东爱璃 Lovely
+      - generic [ref=e8]: 管理後台
+    - navigation [ref=e9]:
+      - button "📊 概覽" [ref=e10] [cursor=pointer]:
+        - generic [ref=e11]: 📊
+        - text: 概覽
+      - button "📅 時間線管理" [ref=e12] [cursor=pointer]:
+        - generic [ref=e13]: 📅
+        - text: 時間線管理
+      - button "🎵 歌單管理" [ref=e14] [cursor=pointer]:
+        - generic [ref=e15]: 🎵
+        - text: 歌單管理
+      - button "🖼️ 櫥窗管理" [ref=e16] [cursor=pointer]:
+        - generic [ref=e17]: 🖼️
+        - text: 櫥窗管理
+      - button "👥 用戶管理" [ref=e18] [cursor=pointer]:
+        - generic [ref=e19]: 👥
+        - text: 用戶管理
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]: admin
+        - generic [ref=e23]: admin
+      - button "登出" [ref=e24] [cursor=pointer]
+  - main [ref=e25]:
+    - generic [ref=e26]:
+      - heading "儀表板" [level=1] [ref=e27]
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - generic [ref=e30]: 📅
+          - generic [ref=e31]: "4"
+          - generic [ref=e32]: 時間線事件
+        - generic [ref=e33]:
+          - generic [ref=e34]: 👥
+          - generic [ref=e35]: "2"
+          - generic [ref=e36]: 管理用戶
+        - generic [ref=e37]:
+          - generic [ref=e38]: 🎵
+          - generic [ref=e39]: "0"
+          - generic [ref=e40]: 歌單數量
+      - generic [ref=e41]:
+        - heading "快速操作" [level=2] [ref=e42]
+        - generic [ref=e43]:
+          - button "➕ 添加時間線事件" [ref=e44] [cursor=pointer]:
+            - generic [ref=e45]: ➕
+            - text: 添加時間線事件
+          - button "👤 添加管理員" [ref=e46] [cursor=pointer]:
+            - generic [ref=e47]: 👤
+            - text: 添加管理員

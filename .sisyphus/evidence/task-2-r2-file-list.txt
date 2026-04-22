@@ -1,0 +1,221 @@
+# Task 2: R2 探查报告
+
+**任务**: 探查 R2 当前文件分布  
+**日期**: 2026-04-21  
+**状态**: 部分完成（阻塞）
+
+---
+
+## 1. R2 Bucket 信息
+
+- **绑定名称**: `IMAGES`
+- **Bucket 名称**: `lovelymain`（来自 wrangler.toml）
+- **账户 ID**: `adf0a8d2240708e4a3c5f0ebcb6b9be8`
+- **CDN 域名**: `cdn.yuanbimu.top`
+
+---
+
+## 2. 探查方法与结果
+
+### 2.1 尝试的探查方法
+
+| 方法 | 工具/命令 | 结果 |
+|------|----------|------|
+| wrangler r2 object list | `wrangler r2 object list lovelymain --prefix showcase/` | ❌ 失败 - 命令不存在 |
+| wrangler R2 list | `wrangler r2 object list` | ❌ 失败 - 只有 get/put/delete |
+| Cloudflare API | curl API | ❌ 失败 - 无 API Token |
+| 本地 .wrangler/state | 查看本地模拟存储 | ✅ 有限数据 |
+
+### 2.2 wrangler CLI 版本验证（2026-04-21 更新）
+
+| 位置 | 版本 | 备注 |
+|------|------|------|
+| 全局 wrangler | v4.72.0 | `wrangler --version` |
+| 项目 wrangler | v4.76.0 | `npm list wrangler` |
+
+### 2.3 命令验证（2026-04-21 实际执行）
+
+执行 `npx wrangler r2 object --help` 结果：
+
+```
+COMMANDS
+  wrangler r2 object get <objectPath>     Fetch an object from an R2 bucket
+  wrangler r2 object put <objectPath>     Create an object in an R2 bucket
+  wrangler r2 object delete <objectPath>  Delete an object in an R2 bucket
+```
+
+**结论**: 确实没有 `list` 子命令，无法使用 CLI 直接列出对象。
+
+### 2.4 阻塞状态确认
+
+| 阻塞项 | 状态 | 证据 |
+|--------|------|------|
+| wrangler 版本 | ❌ 无法通过 CLI 列出 | 命令帮助输出证明无 list 子命令 |
+| Cloudflare API Token | ❌ 未配置 | .env 文件中无 CLOUDFLARE_API_TOKEN |
+| R2 API 凭证 | ❌ 未配置 | .env 文件中无 R2_ACCESS_KEY_ID 等 |
+
+### 2.5 本地开发环境数据
+
+通过查看 `.wrangler/state/v3/r2/` 目录：
+
+```
+.wrangler/state/v3/r2/
+├── miniflare-R2BucketObject/   # 模拟 bucket 存储
+│   └── blobs/
+└── model-1/                    # 本地创建的目录模拟
+    └── blobs/
+```
+
+本地只有一个 blob 文件（测试上传）。
+
+---
+
+## 3. 现有 API 响应（参考）
+
+从之前证据文件 `evidence-r2-snapshot-api.md`：
+
+```json
+{
+  "success": true,
+  "data": {
+    "folders": [
+      {"type": "folder", "name": "data", "key": "data/"},
+      {"type": "folder", "name": "images", "key": "images/"},
+      {"type": "folder", "name": "model-1", "key": "model-1/"},
+      {"type": "folder", "name": "showcase", "key": "showcase/"}
+    ],
+    "files": []
+  }
+}
+```
+
+**注意**: 这个 API 响应使用的是 `delimiter: '/'`，所以只返回目录（文件夹），不返回文件。
+
+---
+
+## 4. 已知的 R2 目录结构（推测）
+
+基于代码分析：
+
+| 目录 | 用途 | 文件类型 |
+|------|------|----------|
+| `showcase/` | 根目录 | 应该迁移走的图片 |
+| `showcase/model-N/` | 橱窗图片目录 | N = 1, 2, 3... |
+| `data/` | 数据文件 | JSON 等 |
+| `images/` | 动态图片 | 动态配图 |
+
+---
+
+## 6. 阻塞原因（2026-04-21 再次确认）
+
+| 阻塞项 | 状态 | 证据 |
+|--------|------|------|
+| wrangler 版本 | ❌ 无法通过 CLI 列出 | `npx wrangler r2 object --help` 输出证明无 list 子命令 |
+| Cloudflare API Token | ❌ 未配置 | `.env` 文件中无 `CLOUDFLARE_API_TOKEN` |
+| R2 API 凭证 | ❌ 未配置 | `.env` 文件中无 `R2_ACCESS_KEY_ID` 等 |
+
+---
+
+## 7. 实际可用的探查方式
+
+### 方式 A：使用项目 API（需要部署后登录）
+
+**端点**: `GET /api/r2-files?recursive=true&prefix=showcase/`
+
+**认证要求**:
+- 需要 `requireAuth` 中间件（登录）
+- 需要 `requireEditor` 角色
+
+**使用步骤**:
+1. 部署站点到 Cloudflare Pages
+2. 使用 admin 账户登录
+3. 访问上述 API 端点
+4. 分析返回的文件列表，生成迁移映射
+
+### 方式 B：配置 Cloudflare API Token（需要手动配置）
+
+1. 在 Cloudflare Dashboard 创建 API Token（需要 User > Edit 权限）
+2. 在本地 `.env` 添加：
+   ```
+   CLOUDFLARE_API_TOKEN=your_token_here
+   ```
+3. 使用 curl 调用 REST API：
+   ```bash
+   curl -X GET "https://api.cloudflare.com/client/v4/r2/buckets/lovelymain/objects?prefix=showcase/" \
+     -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+     -H "Content-Type: application/json"
+   ```
+
+---
+
+## 8. 结论
+
+**状态**: 部分完成 - 存在阻塞
+
+**已验证范围**:
+- ✅ wrangler.toml 配置正确（bucket: lovelymain, binding: IMAGES）
+- ✅ wrangler CLI 版本和命令支持情况
+- ✅ 本地 .env 配置（确认无 API Token）
+- ✅ /api/r2-files API 端点存在（需要登录）
+
+**无法验证**（被阻塞）:
+- ❌ 实际 R2 对象列表
+- ❌ showcase/ 根目录文件
+- ❌ showcase/model-N/ 目录结构
+
+**建议后续步骤**:
+1. **优先方案**: 部署后用 admin 登录，通过 API 探查
+2. **备选方案**: 配置 Cloudflare API Token 后使用 REST API
+
+---
+
+## 6. 建议的解决方案
+
+### 方案 A: 升级 wrangler（推荐）
+
+```bash
+npm install -D wrangler@latest
+```
+
+然后使用：
+```bash
+npx wrangler r2 object list lovelymain --prefix showcase/ --remote
+```
+
+### 方案 B: 使用 API Token
+
+在 Cloudflare Dashboard 创建 API Token，然后在本地配置：
+
+```
+CLOUDFLARE_API_TOKEN=your_token
+```
+
+### 方案 C: 临时迁移端点
+
+在 Task 1 中先完成 API 修改，让前端可以通过登录后访问 `/api/r2-files?recursive=true` 来查看。
+
+---
+
+## 7. 迁移映射建议（待确认）
+
+在获取完整文件列表后，需要：
+
+| 源路径 | 目标路径 | 条件 |
+|--------|----------|------|
+| `showcase/xxx.jpg` | `showcase/model-N/xxx.jpg` | 根据橱窗 folder 字段匹配 |
+| `showcase/model-1/*` | (保持不变) | 子目录已有正确结构 |
+
+---
+
+## 8. 证据文件
+
+- **本报告**: `.sisyphus/evidence/task-2-r2-file-list.txt` (本文件)
+- **映射建议**: `.sisyphus/evidence/task-2-migration-map.txt` (待补充)
+
+---
+
+## 9. 下一步
+
+1. **Task 2 阻塞**: 需要等待 R2 访问方式解决
+2. **建议并行执行 Task 1**: 修复 API 添加 recursive 参数，之后可以用 API 方式探查
+3. **Task 6 依赖**: 迁移任务需要先完成 Task 2 的探查

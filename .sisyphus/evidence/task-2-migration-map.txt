@@ -1,0 +1,80 @@
+# Task 2: 迁移映射建议
+
+**状态**: 待确认 - 需要获取实际 R2 文件列表后更新
+
+---
+
+## 当前状态
+
+由于无法直接列出 R2 对象，迁移映射需要等待 Task 1 (API 修复) 完成后，通过登录后访问 API 获取。
+
+---
+
+## 预期的迁移规则
+
+### 规则 1: showcase/ 根目录文件
+- **源**: `showcase/xxx.jpg` (直接在根目录)
+- **目标**: `showcase/model-N/xxx.jpg`
+- **匹配逻辑**: 根据 D1 数据库中橱窗的 `folder` 字段或 `id` 字段匹配
+
+### 规则 2: showcase/model-N/ 子目录文件
+- **源**: `showcase/model-N/xxx.jpg`
+- **目标**: (保持不变)
+- **说明**: 这些文件已经在正确位置，无需移动
+
+### 规则 3: 孤立文件（无匹配橱窗）
+- **源**: `showcase/xxx.jpg`
+- **目标**: 保留在原位或手动处理
+- **说明**: 需要确认是否有对应的橱窗记录
+
+---
+
+## 待填充的迁移表
+
+获取实际文件列表后，此表格将更新为：
+
+| 序号 | 源 key | 目标 key | 对应橱窗 | 状态 |
+|------|--------|----------|----------|------|
+| 1 | | | | 待确认 |
+| 2 | | | | 待确认 |
+| ... | | | | 待确认 |
+
+---
+
+## 执行方式
+
+### 方式 A: 使用 API（推荐）
+
+1. 完成 Task 1 后，登录 admin
+2. 访问 `GET /api/r2-files?recursive=true&prefix=showcase/`
+3. 分析响应，生成映射表
+4. 使用 wrangler 命令或临时 API 端点执行迁移
+
+### 方式 B: 使用 wrangler CLI（需要升级）
+
+```bash
+# 升级 wrangler
+npm install -D wrangler@latest
+
+# 列出文件
+npx wrangler r2 object list lovelymain --prefix showcase/ --remote
+
+# 迁移（逐个）
+npx wrangler r2 object get lovelymain/showcase/xxx.jpg --file /tmp/xxx.jpg
+npx wrangler r2 object put lovelymain/showcase/model-1/xxx.jpg --file /tmp/xxx.jpg
+npx wrangler r2 object delete lovelymain/showcase/xxx.jpg
+```
+
+---
+
+## 风险提示
+
+1. **文件重名**: 如果 model-N 目录已有同名文件，需要处理覆盖
+2. **CDN 缓存**: 迁移后需要确认 CDN 缓存刷新
+3. **原子性**: 建议先复制再删除，避免迁移中断导致文件丢失
+
+---
+
+## 更新日志
+
+- 2026-04-21: 初始版本 - 待获取实际文件列表

@@ -1,0 +1,121 @@
+- generic [ref=e4]:
+  - complementary [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]: 🎀 东爱璃 Lovely
+      - generic [ref=e8]: 管理後台
+    - navigation [ref=e9]:
+      - button "📊 概覽" [ref=e10] [cursor=pointer]:
+        - generic [ref=e11]: 📊
+        - text: 概覽
+      - button "📅 時間線管理" [ref=e12] [cursor=pointer]:
+        - generic [ref=e13]: 📅
+        - text: 時間線管理
+      - button "🎵 歌單管理" [ref=e14] [cursor=pointer]:
+        - generic [ref=e15]: 🎵
+        - text: 歌單管理
+      - button "🖼️ 櫥窗管理" [ref=e16] [cursor=pointer]:
+        - generic [ref=e17]: 🖼️
+        - text: 櫥窗管理
+      - button "👥 用戶管理" [ref=e18] [cursor=pointer]:
+        - generic [ref=e19]: 👥
+        - text: 用戶管理
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]: admin
+        - generic [ref=e23]: admin
+      - button "登出" [ref=e24] [cursor=pointer]
+  - main [ref=e25]:
+    - generic [ref=e48]:
+      - heading "櫥窗管理" [level=1] [ref=e49]
+      - generic [ref=e110]:
+        - heading "編輯櫥窗" [level=3] [ref=e111]
+        - generic [ref=e112]:
+          - generic [ref=e113]: 展示序号
+          - spinbutton [ref=e114]: "1"
+        - generic [ref=e115]:
+          - generic [ref=e116]: 橱窗标题
+          - textbox "请输入橱窗名称（示例：待编写）" [ref=e117]: ���a???���@
+        - generic [ref=e118]:
+          - generic [ref=e119]: 目录
+          - textbox "输入 R2 文件夹名称（如 model-1）" [ref=e120]: model-1
+        - textbox "描述（可选）" [ref=e121]: "???��??"
+        - generic [ref=e122]:
+          - generic [ref=e123]: 📷 橱窗图片
+          - generic [ref=e124]:
+            - img "showcase" [ref=e171]
+            - button "選擇圖片" [ref=e126] [cursor=pointer]
+        - generic [ref=e127]:
+          - generic [ref=e128]: 目錄圖片 (2)
+          - generic [ref=e129]:
+            - generic [ref=e130]:
+              - img "showcase/model-1/a.jpg" [ref=e131]
+              - button "×" [ref=e132] [cursor=pointer]
+            - generic [ref=e133]:
+              - img "showcase/model-1/b.jpg" [ref=e134]
+              - button "×" [ref=e135] [cursor=pointer]
+        - generic [ref=e136]:
+          - generic [ref=e137]: 上傳圖片到此目錄
+          - button "Choose File" [ref=e138]
+        - generic [ref=e139]:
+          - button "保存" [ref=e140] [cursor=pointer]
+          - button "取消" [ref=e141] [cursor=pointer]
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - heading "櫥窗列表 (5)" [level=3] [ref=e52]
+          - button "+ 新增" [ref=e53] [cursor=pointer]
+        - table [ref=e54]:
+          - rowgroup [ref=e55]:
+            - row "圖片 名稱 / 描述 排序 操作" [ref=e56]:
+              - columnheader "圖片" [ref=e57]
+              - columnheader "名稱 / 描述" [ref=e58]
+              - columnheader "排序" [ref=e59]
+              - columnheader "操作" [ref=e60]
+          - rowgroup [ref=e61]:
+            - row "🖼️ ���a???���@ ???��?? 1 編輯 删除" [ref=e62]:
+              - cell "🖼️" [ref=e63]:
+                - generic [ref=e64]: 🖼️
+              - cell "���a???���@ ???��??" [ref=e65]:
+                - strong [ref=e66]: ���a???���@
+                - generic [ref=e67]: "???��??"
+              - cell "1" [ref=e68]
+              - cell "編輯 删除" [ref=e69]:
+                - button "編輯" [ref=e70] [cursor=pointer]
+                - button "删除" [ref=e71] [cursor=pointer]
+            - row "🖼️ ���a???���G ??�O�e���????? 2 編輯 删除" [ref=e72]:
+              - cell "🖼️" [ref=e73]:
+                - generic [ref=e74]: 🖼️
+              - cell "���a???���G ??�O�e���?????" [ref=e75]:
+                - strong [ref=e76]: ���a???���G
+                - generic [ref=e77]: "??�O�e���?????"
+              - cell "2" [ref=e78]
+              - cell "編輯 删除" [ref=e79]:
+                - button "編輯" [ref=e80] [cursor=pointer]
+                - button "删除" [ref=e81] [cursor=pointer]
+            - row "🖼️ ���a�ť�??�� �ť�?�e��?? 3 編輯 删除" [ref=e82]:
+              - cell "🖼️" [ref=e83]:
+                - generic [ref=e84]: 🖼️
+              - cell "���a�ť�??�� �ť�?�e��??" [ref=e85]:
+                - strong [ref=e86]: ���a�ť�??��
+                - generic [ref=e87]: �ť�?�e��??
+              - cell "3" [ref=e88]
+              - cell "編輯 删除" [ref=e89]:
+                - button "編輯" [ref=e90] [cursor=pointer]
+                - button "删除" [ref=e91] [cursor=pointer]
+            - row "🖼️ Task5?????? 99 編輯 删除" [ref=e92]:
+              - cell "🖼️" [ref=e93]:
+                - generic [ref=e94]: 🖼️
+              - cell "Task5??????" [ref=e95]:
+                - strong [ref=e96]: Task5??????
+              - cell "99" [ref=e97]
+              - cell "編輯 删除" [ref=e98]:
+                - button "編輯" [ref=e99] [cursor=pointer]
+                - button "删除" [ref=e100] [cursor=pointer]
+            - row "🖼️ E2E测试橱窗 100 編輯 删除" [ref=e101]:
+              - cell "🖼️" [ref=e102]:
+                - generic [ref=e103]: 🖼️
+              - cell "E2E测试橱窗" [ref=e104]:
+                - strong [ref=e105]: E2E测试橱窗
+              - cell "100" [ref=e106]
+              - cell "編輯 删除" [ref=e107]:
+                - button "編輯" [ref=e108] [cursor=pointer]
+                - button "删除" [ref=e109] [cursor=pointer]
