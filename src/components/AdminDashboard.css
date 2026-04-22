@@ -364,16 +364,19 @@
 }
 
 .edit-section input,
-.edit-section textarea {
+.edit-section textarea,
+.edit-section select {
   width: 100%;
   padding: 0.875rem;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 0.9375rem;
+  box-sizing: border-box;
 }
 
 .edit-section input:focus,
-.edit-section textarea:focus {
+.edit-section textarea:focus,
+.edit-section select:focus {
   outline: none;
   border-color: #8B6F47;
 }
