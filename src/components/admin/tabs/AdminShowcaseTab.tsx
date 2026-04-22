@@ -81,14 +81,19 @@ export default function AdminShowcaseTab({
             </div>
           )}
           
-          {/* 描述字段 - 放在最后 */}
-          <input
-            type="text"
-            value={editingShowcase.description || ''}
-            onChange={e => onUpdateEditingShowcase({...editingShowcase, description: e.target.value})}
-            placeholder="描述（可选）"
-            style={{ width: '100%', marginBottom: '1rem', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
-          />
+          {/* 描述字段 */}
+          <div style={{ borderBottom: '1px dashed #ddd', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.25rem', color: '#666', fontSize: '0.875rem' }}>
+              描述
+            </label>
+            <input
+              type="text"
+              value={editingShowcase.description || ''}
+              onChange={e => onUpdateEditingShowcase({...editingShowcase, description: e.target.value})}
+              placeholder="请输入描述（可选）"
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
+            />
+          </div>
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666', fontSize: '1rem', fontWeight: 'bold' }}>📷 橱窗图片</label>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
