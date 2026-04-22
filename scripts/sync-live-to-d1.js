@@ -99,8 +99,8 @@ async function syncToD1() {
   const checkedAt = Date.now();
 
   const sql = `
-INSERT OR REPLACE INTO live_status (id, is_live, title, room_id, url, fans, checked_at)
-VALUES (1, ${status.isLive ? 1 : 0}, '${escapeSqlString(status.title)}', '${escapeSqlString(status.roomId)}', '${escapeSqlString(status.url)}', ${status.fans || 0}, ${checkedAt});
+INSERT INTO live_status (is_live, title, room_id, url, fans, checked_at)
+VALUES (${status.isLive ? 1 : 0}, '${escapeSqlString(status.title)}', '${escapeSqlString(status.roomId)}', '${escapeSqlString(status.url)}', ${status.fans || 0}, ${checkedAt});
 `;
 
   const tempSqlPath = join(__dirname, 'temp-live-sync.sql');

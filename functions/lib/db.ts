@@ -70,8 +70,8 @@ export async function saveLiveStatus(db: D1Database, status: {
   fans?: number;
 }) {
   await db.prepare(`
-    INSERT OR REPLACE INTO live_status (id, is_live, title, room_id, url, fans, checked_at)
-    VALUES (1, ?, ?, ?, ?, ?, ?)
+    INSERT INTO live_status (is_live, title, room_id, url, fans, checked_at)
+    VALUES (?, ?, ?, ?, ?, ?)
   `).bind(
     status.is_live ? 1 : 0,
     status.title || null,
@@ -84,7 +84,7 @@ export async function saveLiveStatus(db: D1Database, status: {
 
 export async function getLiveStatus(db: D1Database) {
   const result = await db
-    .prepare('SELECT * FROM live_status WHERE id = 1')
+    .prepare('SELECT * FROM live_status ORDER BY checked_at DESC LIMIT 1')
     .first<{
       is_live: number;
       title: string | null;
