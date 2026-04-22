@@ -1,2 +1,0 @@
-[     962ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lovely.yuanbimu.top/api/avatar:0
-[    1221ms] [LOG] [LiveStatus] Result: {isLive: false, title: 东爱璃Lovely的投稿视频, url: https://live.bilibili.com/21692711, lastChecked: 2026-04-09T03:11:36.696Z} @ https://lovely.yuanbimu.top/_astro/LiveStatus.CKIZRHRY.js:0
