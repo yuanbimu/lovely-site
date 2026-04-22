@@ -30,13 +30,7 @@ const app = new Hono<{ Bindings: Env, Variables: { user: any } }>();
 
 // === Global Middleware ===
 
-// 1. 全局請求日誌
-app.use('*', async (c, next) => {
-  console.log(`[API Request] ${c.req.method} ${c.req.path}`);
-  await next();
-});
-
-// 2. CORS
+// 1. CORS
 app.use('/api/*', cors({
   origin: '*',
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -76,6 +70,54 @@ function generateSessionToken(): string {
   return `${Date.now()}_${Math.random().toString(36).substring(2, 15)}_${Math.random().toString(36).substring(2, 15)}`;
 }
 
+function isSecureCookieEnabled(url: string): boolean {
+  // 本地开发环境 (http://localhost 或 http://127.0.0.1) 不使用 Secure
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'http:') {
+      const host = parsed.hostname;
+      if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('127.')) {
+        return false;
+      }
+    }
+  } catch {
+    // 解析失败默认保守返回 true
+    return true;
+  }
+  // HTTPS 或非本地环境使用 Secure
+  return true;
+}
+
+function isLocalDevEnv(url: string): boolean {
+  // 本地开发环境检测 - 用于 R2 URL 生成
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'http:') {
+      const host = parsed.hostname;
+      if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('127.')) {
+        return true;
+      }
+    }
+  } catch {
+    // 解析失败默认返回 false (生产环境)
+    return false;
+  }
+  return false;
+}
+
+function buildR2Url(key: string, baseUrl: string): string {
+  const isLocal = isLocalDevEnv(baseUrl);
+  if (isLocal) {
+    return `http://127.0.0.1:8788/api/r2-get/${encodeURIComponent(key)}`;
+  }
+  return `https://cdn.yuanbimu.top/${key}`;
+}
+
+function buildSessionCookie(token: string, isSecure: boolean, maxAge: number): string {
+  const securePart = isSecure ? 'Secure; ' : '';
+  return `session=${token}; HttpOnly; ${securePart}SameSite=Lax; Max-Age=${maxAge}; Path=/`;
+}
+
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(password + 'lovely-site-salt');
@@ -95,21 +137,20 @@ const requireAuth = async (c: any, next: any) => {
   const cookieHeader = c.req.header('Cookie');
   const sessionToken = getCookieValue(cookieHeader ?? null, 'session');
   if (!sessionToken) {
-    console.log('[Auth Middleware] No session token found');
     return c.json({ error: '未登錄' }, 401);
   }
   
   const db = c.env.DB;
   const session = await getSessionById(db, sessionToken);
   if (!session) {
-    console.log(`[Auth Middleware] Invalid session: ${sessionToken}`);
-    c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/', { append: true });
+    const isSecure = isSecureCookieEnabled(c.req.url);
+    const cookie = buildSessionCookie('', isSecure, 0);
+    c.header('Set-Cookie', cookie, { append: true });
     return c.json({ error: 'Session 已過期' }, 401);
   }
   
   const user = await getUserById(db, session.user_id);
   if (!user) {
-    console.log(`[Auth Middleware] User not found: ${session.user_id}`);
     return c.json({ error: '用戶不存在' }, 404);
   }
   
@@ -139,7 +180,6 @@ app.post('/api/auth/login', async (c) => {
   try {
     const body = await c.req.json();
     const { username, password } = body;
-    console.log(`[Auth] Login attempt: username=${username}`);
     
     if (!username || !password) return c.json({ error: '請輸入用戶名和密碼' }, 400);
     
@@ -151,13 +191,11 @@ app.post('/api/auth/login', async (c) => {
     
     const user = await getUserByUsername(db, username);
     if (!user) {
-       console.log(`[Auth] User not found in DB: ${username}`);
        return c.json({ error: '用戶名或密碼錯誤' }, 401);
     }
     
     const isValid = await verifyPassword(password, user.password_hash);
     if (!isValid) {
-       console.log(`[Auth] Password mismatch for user: ${username}`);
        return c.json({ error: '用戶名或密碼錯誤' }, 401);
     }
     
@@ -165,8 +203,9 @@ app.post('/api/auth/login', async (c) => {
     const expiresAt = Date.now() + (7 * 24 * 60 * 60 * 1000);
     await createSession(db, { id: sessionToken, user_id: user.id, expires_at: expiresAt });
     
-    c.header('Set-Cookie', `session=${sessionToken}; HttpOnly; Secure; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}; Path=/`, { append: true });
-    console.log(`[Auth] Login SUCCESS: ${username}`);
+    const isSecure = isSecureCookieEnabled(c.req.url);
+    const cookie = buildSessionCookie(sessionToken, isSecure, 7 * 24 * 60 * 60);
+    c.header('Set-Cookie', cookie, { append: true });
     return c.json({ success: true, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
   } catch (err) {
     console.error(`[Auth] Login Route Error:`, err);
@@ -183,7 +222,9 @@ app.post('/api/auth/logout', async (c) => {
   const cookieHeader = c.req.header('Cookie');
   const sessionToken = getCookieValue(cookieHeader ?? null, 'session');
   if (sessionToken) await deleteSession(c.env.DB, sessionToken);
-  c.header('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Path=/', { append: true });
+  const isSecure = isSecureCookieEnabled(c.req.url);
+  const cookie = buildSessionCookie('', isSecure, 0);
+  c.header('Set-Cookie', cookie, { append: true });
   return c.json({ success: true });
 });
 
@@ -311,6 +352,15 @@ app.post('/api/showcases', requireAuth, requireEditor, async (c) => {
       sort_order: body.sort_order || 0
     };
     await saveShowcase(c.env.DB, showcaseData);
+    
+    // 创建 R2 占位对象以支持目录识别
+    const folderKey = `showcase/${folder}/.folder`;
+    await c.env.IMAGES.put(folderKey, new TextEncoder().encode(''), {
+      httpMetadata: {
+        contentType: 'application/octet-stream'
+      }
+    });
+    
     return c.json({ success: true, data: showcaseData });
   } catch (err) {
     console.error('[Showcase] Save error:', err);
@@ -323,30 +373,59 @@ app.delete('/api/showcases/:id', requireAuth, requireEditor, async (c) => {
   return c.json({ success: true });
 });
 
-// R2 文件列表 API - 返回文件夾和文件分開的數據
-app.get('/api/r2-files', requireAuth, requireEditor, async (c) => {
+// R2 文件列表 API - 公开读取（写操作保留认证）
+app.get('/api/r2-files', async (c) => {
   try {
     const prefix = c.req.query('prefix') || '';
-    const list = await c.env.IMAGES.list({ prefix, delimiter: '/' });
+    const recursive = c.req.query('recursive') === 'true';
     
-    // 文件夾（目錄）
-    const folders = (list.delimitedPrefixes || []).map(p => ({
-      type: 'folder',
-      name: p.replace(prefix, '').replace('/', ''),
-      key: p
-    }));
+    // 非递归模式使用 delimiter 返回目录结构
+    const list = recursive 
+      ? await c.env.IMAGES.list({ prefix })
+      : await c.env.IMAGES.list({ prefix, delimiter: '/' });
     
-    // 文件
+    // 文件夾（目錄）- 仅在非递归模式下有值
+    const folders = recursive 
+      ? [] 
+      : (list.delimitedPrefixes || []).map(p => ({
+          type: 'folder',
+          name: p.replace(prefix, '').replace('/', ''),
+          key: p
+        }));
+    
+    // 文件 - 根据环境返回 URL
     const files = list.objects.map(obj => ({
       type: 'file',
       key: obj.key,
-      url: `https://cdn.yuanbimu.top/${obj.key}`
+      url: buildR2Url(obj.key, c.req.url)
     }));
     
     return c.json({ success: true, data: { folders, files } });
   } catch (err) {
     console.error('[R2] List error:', err);
     return c.json({ error: '獲取文件列表失敗' }, 500);
+  }
+});
+
+// R2 文件獲取 API - 本地開發環境代理
+app.get('/api/r2-get/:key', async (c) => {
+  try {
+    const key = decodeURIComponent(c.req.param('key'));
+    const object = await c.env.IMAGES.get(key);
+    
+    if (!object) {
+      return c.json({ error: '文件不存在' }, 404);
+    }
+    
+    return new Response(object.body, {
+      headers: {
+        'Content-Type': object.httpMetadata?.contentType || 'application/octet-stream',
+        'Cache-Control': 'public, max-age=31536000'
+      }
+    });
+  } catch (err) {
+    console.error('[R2] Get error:', err);
+    return c.json({ error: '獲取文件失敗' }, 500);
   }
 });
 
@@ -395,7 +474,7 @@ app.post('/api/r2-upload', requireAuth, requireEditor, async (c) => {
       success: true, 
       data: { 
         key, 
-        url: `https://cdn.yuanbimu.top/${key}` 
+        url: buildR2Url(key, c.req.url)
       } 
     });
   } catch (err) {

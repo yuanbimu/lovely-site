@@ -16,15 +16,32 @@ export default function ShowcaseList() {
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
   const hoveredIdRef = useRef<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // 使用 ref 追踪最新状态，避免 effect 闭包问题
+  const folderImagesRef = useRef<Record<string, string[]>>({});
+  const showcasesRef = useRef<Showcase[]>([]);
+
+  // 同步状态到 ref
+  useEffect(() => {
+    folderImagesRef.current = folderImages;
+  }, [folderImages]);
+
+  useEffect(() => {
+    showcasesRef.current = showcases;
+  }, [showcases]);
 
   // 自动切换图片 (每3秒)
   useEffect(() => {
     intervalRef.current = setInterval(() => {
+      // 使用 ref 获取最新状态
+      const currentFolderImages = folderImagesRef.current;
+      const currentShowcases = showcasesRef.current;
+      
       // 只有不在悬停且有多个图片时才自动切换
       setCurrentImageIndex(prev => {
         const newIndex: Record<string, number> = { ...prev };
-        showcases.forEach(s => {
-          const total = getTotalImages(s);
+        currentShowcases.forEach(s => {
+          const images = currentFolderImages[s.folder || ''];
+          const total = images?.length || (s.image_url ? 1 : 0);
           if (total > 1 && hoveredIdRef.current !== s.id) {
             const currentIdx = prev[s.id] || 0;
             newIndex[s.id] = (currentIdx + 1) % total;
@@ -39,7 +56,7 @@ export default function ShowcaseList() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [showcases]);
+  }, []);
 
   // 处理悬停状态 (用 ref 避免重置计时器)
   const handleMouseEnter = (id: string) => {
@@ -62,21 +79,32 @@ export default function ShowcaseList() {
           // 获取每个有 folder 的橱窗的图片列表
           const foldersWithShowcases = data.data.filter((s: Showcase) => s.folder);
           if (foldersWithShowcases.length > 0) {
-            // 获取 R2 文件列表
+            // 使用 recursive=true 获取所有层级的文件
             try {
-              const r2Res = await fetch('/api/r2-files');
+              const r2Res = await fetch('/api/r2-files?recursive=true');
               const r2Data = await r2Res.json();
               if (r2Data.success && r2Data.data) {
                 const imagesByFolder: Record<string, string[]> = {};
-                r2Data.data.files.forEach((file: { key: string, url: string }) => {
-                  const parts = file.key.split('/');
-                  if (parts.length >= 2) {
-                    const folder = parts[0];
-                    if (!imagesByFolder[folder]) imagesByFolder[folder] = [];
-                    if (file.key.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-                      imagesByFolder[folder].push(file.url);
-                    }
+                r2Data.data.files.forEach((file: { key: string; url: string }) => {
+                  // 跳过隐藏/占位文件和非图片文件
+                  const key = file.key;
+                  const fileName = key.split('/').pop() || '';
+                  if (fileName.startsWith('.') || !key.match(/\.(jpg|jpeg|png|gif|webp)$/i)) return;
+                  
+                  // 提取 folder 键值
+                  const parts = key.split('/');
+                  let folderKey = '';
+                  if (parts[0] === 'showcase' && parts[1]) {
+                    // showcase/model-N/xxx.jpg -> model-N
+                    folderKey = parts[1];
+                  } else if (parts[0] && !parts[0].startsWith('.') && parts[0] !== 'showcase') {
+                    // 兼容旧路径 model-N/xxx.jpg -> model-N
+                    folderKey = parts[0];
                   }
+                  if (!folderKey || folderKey.startsWith('.')) return;
+                  
+                  if (!imagesByFolder[folderKey]) imagesByFolder[folderKey] = [];
+                  imagesByFolder[folderKey].push(file.url);
                 });
                 setFolderImages(imagesByFolder);
               }
@@ -95,18 +123,22 @@ export default function ShowcaseList() {
   }, []);
 
   const getCurrentImage = (showcase: Showcase): string => {
-    if (showcase.image_url) return showcase.image_url;
+    // 优先使用 folder 图片（支持轮播）
     if (showcase.folder && folderImages[showcase.folder]?.length > 0) {
       const idx = currentImageIndex[showcase.id] || 0;
       return folderImages[showcase.folder][idx];
     }
+    // 回退到 image_url
+    if (showcase.image_url) return showcase.image_url;
     return '';
   };
 
   const getTotalImages = (showcase: Showcase): number => {
+    // 优先返回 folder 图片数量
     if (showcase.folder && folderImages[showcase.folder]) {
       return folderImages[showcase.folder].length;
     }
+    // 回退
     return showcase.image_url ? 1 : 0;
   };
 

@@ -41,6 +41,14 @@ interface Showcase {
 const AUTH_API = '/api/auth';
 const TIMELINE_API = '/api/timeline';
 
+// 路径映射：数据库字段 model-N <-> R2 路径 showcase/model-N
+function toR2Path(folder: string): string {
+  return folder ? `showcase/${folder}` : '';
+}
+function toDisplayPath(folder: string): string {
+  return folder ? `showcase/${folder}` : '';
+}
+
 export default function AdminDashboard() {
   // 認證狀態
   const [user, setUser] = useState<User | null>(null);
@@ -80,14 +88,35 @@ const [r2Files, setR2Files] = useState<{type: string, name?: string, key: string
 const [r2Folders, setR2Folders] = useState<{name: string, key: string}[]>([]);
 const [imagePickerType, setImagePickerType] = useState<'cover' | 'image'>('image');
 const [showUploader, setShowUploader] = useState(false);
-const [uploadFolder, setUploadFolder] = useState('showcase');
+const [uploadFolder, setUploadFolder] = useState('');
 const [uploading, setUploading] = useState(false);
 
-// 过滤当前目录的文件（排除根目录的文件）
+// 过滤当前目录的文件（排除根目录的文件和 .folder 隐藏占位）
 const currentFolderFiles = r2Files.filter(f => {
   if (!uploadFolder) return false; // 不显示根目录文件
+  // 排除 .folder 隐藏占位文件
+  if (f.key.endsWith('.folder')) return false;
   return f.key.startsWith(uploadFolder + '/');
 });
+
+// 按目录获取文件列表（传入完整 R2 路径，如 showcase/model-1）
+async function fetchFolderFiles(folder: string) {
+  if (!folder) {
+    setR2Files([]);
+    return;
+  }
+  // 检查是否已经是完整 R2 路径（以 showcase/ 开头）
+  const prefix = folder.startsWith('showcase/') ? folder : toR2Path(folder);
+  try {
+    const res = await fetch(`/api/r2-files?prefix=${encodeURIComponent(prefix)}/`, { credentials: 'include' });
+    const data = await res.json();
+    if (data.success && data.data) {
+      setR2Files(data.data.files || []);
+    }
+  } catch (err) {
+    console.error('Failed to fetch folder files:', err);
+  }
+}
   
   // 用戶管理
   const [users, setUsers] = useState<User[]>([]);
@@ -329,26 +358,31 @@ const currentFolderFiles = r2Files.filter(f => {
     }
   }
 
-  // Load images from R2 folder for editing showcase
-  async function loadFolderImages(folder: string) {
-    if (!folder) {
-      setFolderImages([]);
-      return;
-    }
-    try {
-      const res = await fetch(`/api/r2-files?prefix=${encodeURIComponent(folder)}`, { credentials: 'include' });
-      const data = await res.json();
-      if (data.success && data.data) {
-        // Filter to only image files in the folder
-        const images = (data.data.files || []).filter((f: { key: string, url: string }) => 
-          f.key.match(/\.(jpg|jpeg|png|gif|webp)$/i)
-        ).map((f: { key: string, url: string }) => ({ key: f.key, url: f.url }));
-        setFolderImages(images);
-      }
-    } catch {
-      showMessage('error', '加載圖片失敗');
-    }
+// Load images from R2 folder for editing showcase
+async function loadFolderImages(folder: string) {
+  if (!folder) {
+    setFolderImages([]);
+    return;
   }
+  // folder 可能是 model-N 或 showcase/model-1，检查后构建 prefix
+  const r2Folder = folder.startsWith('showcase/') ? folder : toR2Path(folder);
+  try {
+    const prefix = r2Folder + '/';
+    const res = await fetch(`/api/r2-files?prefix=${encodeURIComponent(prefix)}`, { credentials: 'include' });
+    const data = await res.json();
+    if (data.success && data.data) {
+      // Filter to only image files in the folder, exclude .folder placeholder
+      const images = (data.data.files || [])
+        .filter((f: { key: string, url: string }) => 
+          f.key.match(/\.(jpg|jpeg|png|gif|webp)$/i) && !f.key.endsWith('.folder')
+        )
+        .map((f: { key: string, url: string }) => ({ key: f.key, url: f.url }));
+      setFolderImages(images);
+    }
+  } catch {
+    showMessage('error', '加載圖片失敗');
+  }
+}
 
   // Delete image from R2
   async function deleteR2Image(key: string) {
@@ -416,55 +450,74 @@ const currentFolderFiles = r2Files.filter(f => {
     }
   }
 
-  async function openImagePicker(type: 'cover' | 'image', folder?: string) {
+async function openImagePicker(type: 'cover' | 'image', folder?: string) {
     setImagePickerType(type);
     
-    // 櫥窗圖片：驗證 folder
+    // 橱窗图片：验证 folder
     if (type === 'image') {
-      // 新增櫥窗時：允許上傳（API 會自動生成 model-{N} 目錄）
-      // 編輯櫥窗時：需要已有 folder
+      // 新增橱窗时：允许上传（API 会自动生成 model-{N} 目录）
+      // 编辑橱窗时：需要已有 folder
       if (editingShowcase?.id && !editingShowcase?.folder) {
-        showMessage('error', '請先在櫥窗編輯表單中填寫「目錄名稱」');
+        showMessage('error', '请先在橱窗编辑表单中填写「目录名称」');
         return;
       }
-      // 強制使用 editingShowcase.folder 作為目標目錄
+      // 强制使用 editingShowcase.folder 作为目标目录
       folder = editingShowcase?.folder;
     }
     
-    // 封面圖片：保持原有邏輯
+    // 封面图片：保持原有逻辑
     const targetFolder = folder || '';
+    // 转换为 R2 路径
+    const r2Path = toR2Path(targetFolder);
     
     try {
-      const res = await fetch('/api/r2-files', { credentials: 'include' });
+      // 获取目录列表（不带 prefix，获取 showcase/ 下的目录）
+      const res = await fetch('/api/r2-files?prefix=showcase/', { credentials: 'include' });
       const data = await res.json();
       if (data.success && data.data) {
         let folders = data.data.folders || [];
         
+        // 目录名称标准化为 showcase/model-N 格式
+        folders = folders.map((f: { name: string, key: string }) => ({
+          name: toR2Path(f.name),
+          key: f.key
+        }));
+        
         // 如果目标目录不在列表中，动态添加
-        if (targetFolder && !folders.find((f: { name: string }) => f.name === targetFolder)) {
-          folders = [...folders, { name: targetFolder, key: targetFolder + '/' }];
+        if (r2Path && !folders.find((f: { name: string }) => f.name === r2Path)) {
+          folders = [...folders, { name: r2Path, key: r2Path + '/' }];
         }
         
         setR2Folders(folders);
-        setR2Files(data.data.files || []);
         
         // 自动设置目录（优先使用传入的 folder）
-        if (targetFolder) {
-          setUploadFolder(targetFolder);
+        if (r2Path) {
+          // 使用完整 R2 路径作为 uploadFolder
+          setUploadFolder(r2Path);
+          // 按 prefix 获取该目录的文件
+          const prefix = r2Path + '/';
+          const filesRes = await fetch(`/api/r2-files?prefix=${encodeURIComponent(prefix)}`, { credentials: 'include' });
+          const filesData = await filesRes.json();
+          setR2Files(filesData.success && filesData.data ? filesData.data.files || [] : []);
         } else if (folders.length > 0) {
-          setUploadFolder(folders[0].name); // 默认选第一个目录
+          setUploadFolder(folders[0].name);
+          // 按 prefix 获取该目录的文件
+          const prefix = folders[0].name + '/';
+          const filesRes = await fetch(`/api/r2-files?prefix=${encodeURIComponent(prefix)}`, { credentials: 'include' });
+          const filesData = await filesRes.json();
+          setR2Files(filesData.success && filesData.data ? filesData.data.files || [] : []);
         } else {
           // 无目录时显示空状态，不创建硬编码目录
           setR2Folders([]);
           setR2Files([]);
           setUploadFolder('');
-          showMessage('info', '暫無目錄，請先保存櫥窗或上傳圖片到指定目錄');
+          showMessage('info', '暂无目录，请先保存橱窗或上传图片到指定目录');
         }
         
         setShowImagePicker(true);
       }
     } catch {
-      showMessage('error', '獲取文件列表失敗');
+      showMessage('error', '获取文件列表失败');
     }
   }
 
@@ -486,9 +539,9 @@ const currentFolderFiles = r2Files.filter(f => {
       return;
     }
     
-    // 強制使用 editingShowcase.folder 上傳
+    // 強制使用 editingShowcase.folder 上傳（映射为 R2 路径）
     const targetFolder = imagePickerType === 'image' && editingShowcase?.folder 
-      ? editingShowcase.folder 
+      ? toR2Path(editingShowcase.folder)
       : uploadFolder;
     
     setUploading(true);
@@ -506,7 +559,7 @@ const currentFolderFiles = r2Files.filter(f => {
       const data = await res.json();
       if (data.success) {
         showMessage('success', '上傳成功！');
-        // 刷新文件列表 - 传递 prefix 参数确保只获取当前目录的文件
+        // 刷新文件列表 - 使用当前 uploadFolder（R2 路径）
         const prefix = uploadFolder ? `${uploadFolder}/` : '';
         const listRes = await fetch(`/api/r2-files?prefix=${encodeURIComponent(prefix)}`, { credentials: 'include' });
         const listData = await listRes.json();
@@ -1247,7 +1300,10 @@ const currentFolderFiles = r2Files.filter(f => {
                     {r2Folders.map(folder => (
                       <button
                         key={folder.name}
-                        onClick={() => setUploadFolder(folder.name)}
+                        onClick={() => {
+                          setUploadFolder(folder.name);
+                          fetchFolderFiles(folder.name);
+                        }}
                         style={{
                           padding: '6px 12px',
                           borderRadius: '16px',
