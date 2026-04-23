@@ -56,7 +56,7 @@ function checkURL2(request, init) {
 __name(checkURL2, "checkURL");
 var urls2;
 var init_checked_fetch = __esm({
-  "../.wrangler/tmp/bundle-6BmHRB/checked-fetch.js"() {
+  "../.wrangler/tmp/bundle-dPnhSS/checked-fetch.js"() {
     "use strict";
     urls2 = /* @__PURE__ */ new Set();
     __name2(checkURL2, "checkURL");
@@ -2965,7 +2965,7 @@ var init_timeline = __esm({
     });
     app2.post("/", requireAuth, requireEditor, async (c) => {
       const body = await c.req.json();
-      const eventData = { id: body.id || `event_${Date.now()}`, ...body };
+      const eventData = { ...body, id: body.id || `event_${Date.now()}` };
       await saveTimelineEvent(c.env.DB, eventData);
       return c.json({ success: true, data: eventData });
     });

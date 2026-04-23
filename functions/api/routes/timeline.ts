@@ -15,7 +15,7 @@ app.get('/', async (c) => {
 // 创建或更新时间线事件
 app.post('/', requireAuth, requireEditor, async (c) => {
   const body = await c.req.json();
-  const eventData = { id: body.id || `event_${Date.now()}`, ...body };
+  const eventData = { ...body, id: body.id || `event_${Date.now()}` };
   await saveTimelineEvent(c.env.DB, eventData);
   return c.json({ success: true, data: eventData });
 });
