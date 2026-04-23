@@ -5,6 +5,7 @@ const TAG_MAP: Record<string, { color: string; icon: string }> = {
   '首播': { color: 'purple', icon: '🎤' },
   '歌回': { color: 'green', icon: '🎵' },
   '遊戲': { color: 'teal', icon: '🎮' },
+  '视频投稿': { color: 'cyan', icon: '📹' },
   '3D披露': { color: 'violet', icon: '👤' },
   '新衣裝': { color: 'orange', icon: '👗' },
   '紀念回': { color: 'red', icon: '🏆' },

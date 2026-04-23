@@ -49,6 +49,7 @@ export default function TimelineList() {
       '首播': 'debut',
       '歌回': 'song',
       '遊戲': 'game',
+      '视频投稿': 'video',
       '3D披露': '_3d',
       '新衣裝': 'costume',
       '紀念回': 'memorial',
@@ -205,6 +206,7 @@ export default function TimelineList() {
         .timeline-tag.collab { background: rgba(52, 152, 219, 0.12); color: #3498db; border-color: rgba(52, 152, 219, 0.2); }
         .timeline-tag.costume { background: rgba(230, 126, 34, 0.12); color: #e67e22; border-color: rgba(230, 126, 34, 0.2); }
         .timeline-tag.game { background: rgba(26, 188, 156, 0.12); color: #1abc9c; border-color: rgba(26, 188, 156, 0.2); }
+        .timeline-tag.video { background: rgba(6, 182, 212, 0.12); color: #06b6d4; border-color: rgba(6, 182, 212, 0.2); }
         .timeline-tag._3d { background: rgba(142, 68, 173, 0.12); color: #8e44ad; border-color: rgba(142, 68, 173, 0.2); }
         .timeline-tag.memorial { background: rgba(192, 57, 43, 0.12); color: #c0392b; border-color: rgba(192, 57, 43, 0.2); }
         .timeline-tag.birthday { background: rgba(241, 196, 15, 0.12); color: #d4ac0d; border-color: rgba(241, 196, 15, 0.2); }
