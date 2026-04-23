@@ -4,8 +4,9 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "dev:cf": "wrangler pages dev --d1 DB=lovely-site-db --r2 IMAGES=lovelymain --proxy 4321",
-    "dev:all": "concurrently \"npm run dev\" \"npm run dev:cf\"",
+    "dev:wrangler": "wrangler pages dev --proxy 4321",
+    "dev:cf": "concurrently --kill-others --names \"astro,wrangler\" --prefix-colors \"cyan,blue\" \"npm run dev\" \"npm run dev:wrangler\"",
+    "dev:all": "npm run dev:cf",
     "setup": "node scripts/setup-wrangler.js",
     "setup:windows": "node scripts/setup-wrangler.js",
     "setup:complete": "node scripts/setup-wrangler.js",
@@ -13,6 +14,7 @@
     "init:db": "node scripts/init-db.js",
     "init:db:windows": "node scripts/init-db.js",
     "init:db:prod": "node scripts/init-db.js --prod",
+    "pull:db": "node scripts/pull-d1.js",
     "sync:live": "node scripts/sync-live-to-d1.js",
     "sync:live:prod": "node scripts/sync-live-to-d1.js --prod",
     "build": "astro build",
@@ -29,6 +31,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260301.1",
     "better-sqlite3": "^12.6.2",
+    "concurrently": "^9.2.1",
     "playwright": "^1.59.1",
     "wrangler": "^4.76.0"
   }
