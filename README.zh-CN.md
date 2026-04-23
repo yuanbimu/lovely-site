@@ -1,243 +1,105 @@
 # 東愛璃Lovely - 非官方应援站
 
 [![Astro](https://img.shields.io/badge/Astro-5.17.1-BC52EE?style=flat-square&logo=astro)](https://astro.build)
-[![React](https://img.shields.io/badge/React-18.0+-61DAFB?style=flat-square&logo=react)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0+-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
 [![Deploy](https://img.shields.io/badge/Deploy-Cloudflare_Pages-F38020?style=flat-square&logo=cloudflare)](https://pages.cloudflare.com)
 
 [English Documentation](./README.md) | [线上站点](https://lovely.yuanbimu.top)
 
-东爱璀Lovely 的非官方应援站，一个用爱发电的 VTuber 展示网站。
+这是一个面向东爱璀 Lovely 的非官方应援站，采用 Astro 静态生成、React Islands 和 Cloudflare Pages 构建。
 
-## 🎯 功能特色
+## 当前能力
 
-- 🖼️ **主页展示** - 头像、简介、社交链接
-- 📊 **实时统计** - Bilibili 粉丝数实时显示
-- 📹 **直播状态** - 实时直播检测（*即将上线*）
-- 🖼️ **橱窗展示** - 32 套不同的形象/模型展示
-- 📱 **响应式设计** - 适配所有设备
-- ⚡ **极致性能** - 静态站点加边缘部署
+- 使用 Astro 生成静态页面，包括首页、关于、橱窗、歌曲、时间线、友链和文章页面
+- 使用 React 组件承载交互逻辑，例如直播状态、头像加载和动态列表
+- 使用 Cloudflare Pages Functions + Hono 提供运行时 API
+- 使用 D1 存储直播状态和后台管理相关数据，使用 R2 作为图片存储绑定
+- 提供面向移动端和桌面端的响应式样式系统
 
-## 🚀 技术栈
+## 技术栈
 
-### 前端
-- **框架**: [Astro](https://astro.build) - 静态站点生成器
-- **UI 框架**: [React](https://react.dev) - 交互组件（岛屿架构）
-- **语言**: [TypeScript](https://www.typescriptlang.org)
-- **样式**: 
-  - [Tailwind CSS](https://tailwindcss.com) - Utility-first CSS
-  - 自定义 CSS 设计系统（基于 OKLCH 配色）
-- **状态管理**: React 原生 hooks（Zustand 已就绪）
+- Astro 5
+- React 19
+- TypeScript 严格模式
+- Hono
+- Cloudflare Pages / D1 / R2
 
-### 后端与数据
-- **边缘函数**: [Hono](https://hono.dev) 部署在 Cloudflare Pages
-- **数据库**: JSON 文件（静态数据）+ IndexedDB（客户端，即将支持）
-- **API 接入**: Bilibili API 整合
+## 项目结构
 
-### 运维与部署
-- **托管**: [Cloudflare Pages](https://pages.cloudflare.com)
-- **CDN**: Cloudflare R2（图片存储）
-- **CI/CD**: GitHub Actions（每日数据更新）
-- **包管理器**: npm（兼容 Bun）
-
-## 📁 项目结构
-
-```
+```text
 lovely-site/
-├── functions/                    # Cloudflare Pages Functions
-│   └── api/
-│       └── live.ts              # 直播状态 API 端点
-├── public/                     # 静态资源
-│   ├── images/
-│   └── favicon.ico
-├── scripts/                    # 构建与数据自动化
-│   ├── fetch-bilibili-data.js  # 获取 Bilibili 用户数据
-│   ├── check-live.py           # 检测直播状态
-│   └── ...
+├── functions/                 # Cloudflare Pages Functions 入口与路由聚合
+├── scripts/                   # 初始化、同步、数据库辅助脚本
 ├── src/
-│   ├── components/             # 可复用组件
-│   │   ├── home/
-│   │   ├── ui/
-│   │   └── LiveStatus.tsx    # ⭐ 实时直播状态组件
-│   ├── data/                   # JSON 数据文件
-│   │   ├── config.json
-│   │   ├── dynamics.json
-│   │   └── site-data.json
-│   ├── layouts/                # 页面布局
-│   ├── pages/                  # 路由页面
-│   │   ├── index.astro
-│   │   ├── showcase.astro
-│   │   └── ...
-│   ├── styles/                 # CSS 样式
-│   │   ├── design-system.css
-│   │   └── global.css
-│   └── types/                  # TypeScript 定义
-│       └── index.ts
-├── astro.config.mjs
-├── package.json
-├── tsconfig.json
-└── README.md
+│   ├── components/            # Astro + React 组件
+│   ├── config/                # 站点配置
+│   ├── data/                  # 构建期使用的静态 JSON 数据
+│   ├── pages/                 # Astro 页面与 API 端点
+│   │   ├── admin/
+│   │   └── api/
+│   ├── styles/                # 设计系统与全局样式
+│   └── types/                 # 共用 TypeScript 类型
+├── docs/                      # 活跃文档与归档文档
+├── wrangler.toml
+└── package.json
 ```
 
-## 🎁 快速开始
+## 快速开始
 
-### 环境要求
-- Node.js 18+ (或 Bun 1.0+)
-- npm / yarn / pnpm / bun
+### 前置要求
 
-### 安装
+- Node.js 18+
+- npm
+- 如果需要使用 `dev:cf`、D1 或 R2，请准备 Cloudflare 账号权限
+
+### 安装依赖
 
 ```bash
-# 克隆仓库
-git clone https://github.com/yourname/lovely-site.git
-cd lovely-site
-
-# 安装依赖
 npm install
-# 或: bun install
-
-# 启动开发服务器
-npm run dev
-# 或: bun run dev
-
-# 打开 http://localhost:4321
 ```
 
-### 可用命令
-
-| 命令 | 操作 |
-| :------ | :----- |
-| `npm install` | 安装依赖 |
-| `npm run dev` | 启动开发服务器 `localhost:4321` |
-| `npm run fetch-data` | 获取最新 Bilibili 数据 |
-| `npm run build` | 构建生产版本 |
-| `npm run preview` | 预览生产构建 |
-
-## 📝 配置
-
-### 环境变量
-
-创建 `.env` 文件用于本地开发：
-
-```env
-# Bilibili API 凭证（公开数据可选）
-BILI_JCT=your_jct_cookie
-BUVID3=your_buvid3_cookie
-BUVID4=your_buvid4_cookie
-SESSDATA=your_sessdata_cookie
-
-# Bilibili UID（默认: 3821157）
-BILIBILI_UID=3821157
-
-# CDN 配置
-CDN_DOMAIN=cdn.yuanbimu.top
-```
-
-### 站点数据
-
-编辑 `src/data/site-data.json` 来自定义：
-- 个人信息
-- 社交链接
-- 统计显示设置
-
-## 🔧 开发路线图
-
-### ✅ 已完成
-- [x] 基础站点结构
-- [x] 个人主页和社交链接
-- [x] 橱窗展示（32 套形象）
-- [x] Bilibili 数据接入
-- [x] 响应式设计
-- [x] 自定义设计系统
-
-### 🚛 进行中
-- [ ] 实时直播状态检测
-  - [ ] 边缘函数 API (`/api/live`)
-  - [ ] React 组件 (`LiveStatus.tsx`)
-  - [ ] 每 15 分钟自动刷新
-  - [ ] 文档: [docs/live-status-plan.md](./docs/live-status-plan.md)
-
-### 📜 计划中
-- [ ] 离线支持 (IndexedDB)
-- [ ] 收藏功能
-- [ ] 搜索功能
-- [ ] 暗色模式切换
-- [ ] 数据分析仪表盘
-- [ ] 多语言支持
-
-### 💭 未来想法
-- [ ] 用户评论系统 (Cloudflare D1)
-- [ ] 直播推送通知
-- [ ] 历史直播统计
-- [ ] 交互式时间线
-
-## 📚 文档
-
-- [直播状态开发计划](./docs/live-status-plan.md) - 详细技术方案
-- [贡献指南](./CONTRIBUTING.md) - 如何贡献（*即将推出*）
-- [更新日志](./CHANGELOG.md) - 版本历史（*即将推出*）
-
-## 💾 数据来源
-
-- **Bilibili API**: [api.bilibili.com](https://api.bilibili.com)
-  - 用户信息
-  - 直播状态
-  - 粉丝数量
-  - 动态/投稿
-
-## 🌐 部署
-
-### Cloudflare Pages
-
-本项目配置为在 Cloudflare Pages 自动部署：
-
-1. 将 GitHub 仓库连接到 Cloudflare Pages
-2. 构建命令: `npm run build`
-3. 构建输出: `dist`
-4. 环境变量: 在 Cloudflare 仪表板添加秘密
-
-### 手动部署
+### 本地开发
 
 ```bash
-# 构建项目
-npm run build
+# Astro 开发服务器
+npm run dev
 
-# 将 dist/ 文件夹部署到任何静态托管
-# （Cloudflare Pages、Vercel、Netlify 等）
+# 带 Cloudflare Pages Functions / D1 / R2 绑定的本地环境
+npm run dev:cf
 ```
 
-## 🤝 贡献
+### 常用命令
 
-欢迎贡献！请阅读我们的[贡献指南](./CONTRIBUTING.md)了解详情。
+| 命令 | 用途 |
+| --- | --- |
+| `npm run dev` | 启动 Astro 本地开发服务器 |
+| `npm run dev:cf` | 启动 Cloudflare Pages 本地环境 |
+| `npm run setup` | 执行 Wrangler 相关本地配置 |
+| `npm run login` | Wrangler 登录 |
+| `npm run init:db` | 初始化本地数据库 |
+| `npm run sync:live` | 同步直播状态到本地 D1 |
+| `npm run build` | 构建生产产物 |
+| `npm run preview` | 预览构建结果 |
 
-### 贡献者快速开始
+## 数据与部署说明
 
-1. Fork 仓库
-2. 创建你的功能分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m '添加一些神奇功能'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 创建 Pull Request
+- `src/data/*.json` 用于构建期静态内容
+- D1 用于运行时数据，例如直播状态和后台内容
+- R2 用于图片存储绑定
+- 构建输出目录为 `dist`
+- Cloudflare Pages 配置位于 `wrangler.toml`
+- `sync-dynamics.yml` 仍存在，但定时自动同步当前因 B 站风控已禁用
+- `sync-live.yml` 用于定时同步直播状态
 
-## 📝 许可证
+## 文档入口
 
-本项目开源，基于 [MIT 许可证](./LICENSE)。
+- `AGENTS.md`：项目规则与 AI 开发约束
+- `CONTRIBUTING.md`：贡献流程与仓库约定
+- `QUICK_START.md`：最小本地启动路径
+- `docs/database-schema.md`：基于代码整理的数据库结构参考
+- `docs/archive/`：已归档的历史存根文档，不应作为当前实现依据
 
-## 💝 致谢
+## 参与开发
 
-- **东爱璀Lovely** - 这个站点的主角，超棒的 VTuber
-- **PSPLive** - 所属事务所
-- **Bilibili** - 提供开放 API
-- **Cloudflare** - 慷慨的免费托管层级
-
-## 📱 联系方式
-
-- **站点**: [lovely.yuanbimu.top](https://lovely.yuanbimu.top)
-- **Bilibili**: [space.bilibili.com/3821157](https://space.bilibili.com/3821157)
-- **微博**: [weibo.com/u/7802960328](https://weibo.com/u/7802960328)
-
----
-
-⭐ **如果觉得有帮助，请给这个仓库点星！**
-
-Made with ❤️ by fans, for fans.
+提交修改前请先阅读 [CONTRIBUTING.md](./CONTRIBUTING.md)。

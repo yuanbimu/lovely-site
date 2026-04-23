@@ -1,50 +1,46 @@
-# 🚀 快速配置 - 3 步完成
+# 快速开始
 
-## 前提条件
+本文件只保留当前仓库真实可执行的最小启动路径。
 
-✅ 已获取 Cloudflare API Token  
-访问：https://dash.cloudflare.com/profile/api-tokens
-
----
-
-## 快速开始
-
-### 1️⃣ 配置 Token
+## 1. 安装依赖
 
 ```bash
-cd C:\Users\Cashier\Desktop\reLovelyProject\lovely-site
-scripts\complete-setup.bat 你的 Token
+npm install
 ```
 
-### 2️⃣ 重启终端
+## 2. 可选：登录与初始化 Cloudflare 本地环境
 
-关闭所有窗口，重新打开。
-
-### 3️⃣ 启动开发
+如果你需要运行带 D1 / R2 绑定的本地环境，请先完成：
 
 ```bash
-cd C:\Users\Cashier\Desktop\reLovelyProject\lovely-site
+npm run login
+npm run setup
+npm run init:db
+```
+
+## 3. 启动开发
+
+```bash
+# 仅启动 Astro
+npm run dev
+
+# 启动 Cloudflare Pages 本地环境
 npm run dev:cf
 ```
 
----
+## 常用访问地址
 
-## 访问地址
-
-- **Timeline**: http://localhost:4321/timeline
-- **管理后台**: http://localhost:4321/admin/timeline
-
----
+- 首页：`http://localhost:4321/`
+- 时间线：`http://localhost:4321/timeline`
+- 管理后台：`http://localhost:4321/admin`
 
 ## 成功标志
 
-✅ `wrangler whoami` 显示账号信息  
-✅ `wrangler d1 list` 显示数据库  
-✅ Timeline 页面正常显示  
-✅ 管理后台可以登录
+- `npm run dev` 可以正常打开站点
+- `npm run dev:cf` 可以正常启动本地 Pages 环境
+- 页面能正常访问，且时间线与后台入口存在
 
----
+## 补充说明
 
-## 遇到问题？
-
-查看 `docs/COMPLETE_SETUP_GUIDE.md` 获取详细故障排查指南。
+- 更完整的项目规则请看 `AGENTS.md`
+- 数据库结构参考见 `docs/database-schema.md`
