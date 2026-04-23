@@ -14,6 +14,7 @@ export interface TimelineEvent {
   content?: string;
   color?: string;
   icon?: string;
+  tag?: string;
   sort_order?: number;
 }
 

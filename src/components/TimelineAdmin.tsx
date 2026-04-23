@@ -8,7 +8,33 @@ interface TimelineEvent {
   content?: string;
   color?: string;
   icon?: string;
+  tag?: string;
   sort_order?: number;
+}
+
+// 標籤系統：標籤名 -> { color, icon }
+const TAG_MAP: Record<string, { color: string; icon: string }> = {
+  '首播': { color: 'purple', icon: '🎤' },
+  '歌回': { color: 'green', icon: '🎵' },
+  '遊戲': { color: 'teal', icon: '🎮' },
+  '3D披露': { color: 'violet', icon: '👤' },
+  '新衣裝': { color: 'orange', icon: '👗' },
+  '紀念回': { color: 'red', icon: '🏆' },
+  '聯動': { color: 'blue', icon: '🤝' },
+  '重要': { color: 'red', icon: '⭐' },
+  '生日': { color: 'yellow', icon: '🎂' },
+  '周年': { color: 'amber', icon: '🎉' },
+  '活動': { color: 'slate', icon: '📅' },
+  '日常': { color: 'gray', icon: '📝' },
+};
+
+const TAG_NAMES = Object.keys(TAG_MAP);
+
+function resolveTag(tagName?: string): { color: string; icon: string } {
+  if (tagName && TAG_MAP[tagName]) {
+    return TAG_MAP[tagName];
+  }
+  return { color: 'blue', icon: '⭐' };
 }
 
 interface User {
@@ -209,10 +235,15 @@ export default function TimelineAdmin() {
       const lines = importText.trim().split('\n');
       const events = lines.map(line => {
         const parts = line.split('|');
+        const tagName = parts[3]?.trim() || '';
+        const resolved = resolveTag(tagName);
         return {
           date: parts[0]?.trim() || '',
           title: parts[1]?.trim() || '',
-          content: parts[2]?.trim() || ''
+          content: parts[2]?.trim() || '',
+          tag: tagName,
+          color: resolved.color,
+          icon: resolved.icon
         };
       }).filter(e => e.date && e.title);
 
@@ -349,7 +380,7 @@ export default function TimelineAdmin() {
         <textarea
           value={importText}
           onChange={(e) => setImportText(e.target.value)}
-          placeholder="格式：日期|標題|內容（每行一個事件）&#10;例如：&#10;2024-01-01|新年快樂|祝大家新年快樂！&#10;2024-03-15|重要事件|這是一個重要事件"
+          placeholder="格式：日期|標題|內容|標籤（每行一個事件）&#10;例如：&#10;2024-01-01|新年快樂|祝大家新年快樂！|重要&#10;2024-03-15|首次歌回|唱了多首經典歌曲|首播&#10;標籤可選：首播、歌回、遊戲、3D披露、新衣裝、紀念回、聯動、重要、生日、周年、活動、日常"
           rows={4}
         />
         <button 
@@ -393,6 +424,49 @@ export default function TimelineAdmin() {
               rows={3}
             />
           </div>
+          <div className="form-group">
+            <label>標籤</label>
+            <select
+              value={editingEvent.tag || ''}
+              onChange={(e) => {
+                const tagName = e.target.value;
+                const resolved = resolveTag(tagName);
+                setEditingEvent({
+                  ...editingEvent,
+                  tag: tagName,
+                  color: resolved.color,
+                  icon: resolved.icon
+                });
+              }}
+            >
+              <option value="">請選擇標籤</option>
+              {TAG_NAMES.map(tag => (
+                <option key={tag} value={tag}>
+                  {TAG_MAP[tag].icon} {tag}
+                </option>
+              ))}
+            </select>
+            <div className="tag-presets">
+              {TAG_NAMES.map(tag => (
+                <button
+                  key={tag}
+                  type="button"
+                  className={`tag-preset ${editingEvent.tag === tag ? 'active' : ''}`}
+                  onClick={() => {
+                    const resolved = resolveTag(tag);
+                    setEditingEvent({
+                      ...editingEvent,
+                      tag,
+                      color: resolved.color,
+                      icon: resolved.icon
+                    });
+                  }}
+                >
+                  {TAG_MAP[tag].icon} {tag}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="form-actions">
             <button 
               onClick={() => saveEvent(editingEvent)} 
@@ -416,7 +490,7 @@ export default function TimelineAdmin() {
         <div className="list-header">
           <h3>事件列表 ({events.length})</h3>
           <button 
-            onClick={() => setEditingEvent({ id: '', date: '', title: '', content: '' })}
+            onClick={() => setEditingEvent({ id: '', date: '', title: '', content: '', tag: '', color: 'blue', icon: '⭐' })}
             className="btn btn-primary btn-sm"
           >
             + 新建事件
@@ -434,6 +508,7 @@ export default function TimelineAdmin() {
                 <th>日期</th>
                 <th>標題</th>
                 <th>內容</th>
+                <th>標籤</th>
                 <th>操作</th>
               </tr>
             </thead>
@@ -443,6 +518,13 @@ export default function TimelineAdmin() {
                   <td>{event.date}</td>
                   <td>{event.title}</td>
                   <td>{event.content?.substring(0, 50)}...</td>
+                  <td>
+                    {event.tag ? (
+                      <span className="tag-badge">
+                        {resolveTag(event.tag).icon} {event.tag}
+                      </span>
+                    ) : '-'}
+                  </td>
                   <td>
                     <button 
                       onClick={() => setEditingEvent(event)}

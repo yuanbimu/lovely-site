@@ -6,6 +6,7 @@ interface TimelineEvent {
   content?: string;
   color?: string;
   icon?: string;
+  tag?: string;
 }
 
 export default function TimelineList() {
@@ -43,27 +44,48 @@ export default function TimelineList() {
     fetchEvents();
   }, []);
 
+  function getTagClass(tag: string): string {
+    const map: Record<string, string> = {
+      '首播': 'debut',
+      '歌回': 'song',
+      '遊戲': 'game',
+      '3D披露': '_3d',
+      '新衣裝': 'costume',
+      '紀念回': 'memorial',
+      '聯動': 'collab',
+      '重要': 'important',
+      '生日': 'birthday',
+      '周年': 'anniversary',
+      '活動': 'event',
+      '日常': 'daily'
+    };
+    return map[tag] || '';
+  }
+
   function getDefaultEvents(): TimelineEvent[] {
     return [
       {
         date: "2020-04-26",
         title: "在 B 站发表第一条动态",
         content: "",
-        color: "blue",
-        icon: "⭐"
+        tag: "日常",
+        color: "gray",
+        icon: "📝"
       },
       {
         date: "2020-04-28",
         title: "投稿第一个视频，展示了自己的立绘",
         content: "",
-        color: "blue",
-        icon: "▶️"
+        tag: "首播",
+        color: "purple",
+        icon: "🎤"
       },
       {
         date: "2020-04-29",
         title: "投稿自我介绍视频",
         content: "在视频末尾，误认已经切断直播而用本音发出「早知道这样我还不如回老家种地呢」的名言。种田系偶像的起源",
-        color: "green",
+        tag: "首播",
+        color: "purple",
         icon: "🎤"
       }
     ];
@@ -161,6 +183,33 @@ export default function TimelineList() {
         .timeline-dot.blue { border-color: #4A90D9; }
         .timeline-dot.green { border-color: #4CAF50; }
         .timeline-icon { font-size: 1.2rem; }
+        .timeline-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 10px;
+        }
+        .timeline-tag {
+          font-size: 0.75rem;
+          padding: 3px 10px;
+          border-radius: 12px;
+          background: rgba(74, 144, 217, 0.12);
+          color: #4A90D9;
+          font-weight: 500;
+          border: 1px solid rgba(74, 144, 217, 0.2);
+        }
+        .timeline-tag.important { background: rgba(231, 76, 60, 0.12); color: #e74c3c; border-color: rgba(231, 76, 60, 0.2); }
+        .timeline-tag.debut { background: rgba(155, 89, 182, 0.12); color: #9b59b6; border-color: rgba(155, 89, 182, 0.2); }
+        .timeline-tag.anniversary { background: rgba(243, 156, 18, 0.12); color: #f39c12; border-color: rgba(243, 156, 18, 0.2); }
+        .timeline-tag.song { background: rgba(46, 204, 113, 0.12); color: #2ecc71; border-color: rgba(46, 204, 113, 0.2); }
+        .timeline-tag.collab { background: rgba(52, 152, 219, 0.12); color: #3498db; border-color: rgba(52, 152, 219, 0.2); }
+        .timeline-tag.costume { background: rgba(230, 126, 34, 0.12); color: #e67e22; border-color: rgba(230, 126, 34, 0.2); }
+        .timeline-tag.game { background: rgba(26, 188, 156, 0.12); color: #1abc9c; border-color: rgba(26, 188, 156, 0.2); }
+        .timeline-tag._3d { background: rgba(142, 68, 173, 0.12); color: #8e44ad; border-color: rgba(142, 68, 173, 0.2); }
+        .timeline-tag.memorial { background: rgba(192, 57, 43, 0.12); color: #c0392b; border-color: rgba(192, 57, 43, 0.2); }
+        .timeline-tag.birthday { background: rgba(241, 196, 15, 0.12); color: #d4ac0d; border-color: rgba(241, 196, 15, 0.2); }
+        .timeline-tag.event { background: rgba(52, 73, 94, 0.12); color: #34495e; border-color: rgba(52, 73, 94, 0.2); }
+        .timeline-tag.daily { background: rgba(149, 165, 166, 0.12); color: #7f8c8d; border-color: rgba(149, 165, 166, 0.2); }
         
         @media (max-width: 768px) {
           .timeline::before { left: 30px; }
@@ -209,6 +258,11 @@ export default function TimelineList() {
             <div className="timeline-date">{event.date}</div>
             <h3 className="timeline-title">{event.title}</h3>
             {event.content && <p className="timeline-desc">{event.content}</p>}
+            {event.tag && (
+              <div className="timeline-tags">
+                <span className={`timeline-tag ${getTagClass(event.tag)}`}>{event.icon || '⭐'} {event.tag}</span>
+              </div>
+            )}
           </div>
           <div className={`timeline-dot ${event.color || 'blue'}`}>
             <span className="timeline-icon">{event.icon || '⭐'}</span>

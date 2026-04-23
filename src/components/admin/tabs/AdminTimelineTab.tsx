@@ -1,5 +1,30 @@
 import type { TimelineEvent } from '../types';
 
+// 標籤系統：標籤名 -> { color, icon }
+const TAG_MAP: Record<string, { color: string; icon: string }> = {
+  '首播': { color: 'purple', icon: '🎤' },
+  '歌回': { color: 'green', icon: '🎵' },
+  '遊戲': { color: 'teal', icon: '🎮' },
+  '3D披露': { color: 'violet', icon: '👤' },
+  '新衣裝': { color: 'orange', icon: '👗' },
+  '紀念回': { color: 'red', icon: '🏆' },
+  '聯動': { color: 'blue', icon: '🤝' },
+  '重要': { color: 'red', icon: '⭐' },
+  '生日': { color: 'yellow', icon: '🎂' },
+  '周年': { color: 'amber', icon: '🎉' },
+  '活動': { color: 'slate', icon: '📅' },
+  '日常': { color: 'gray', icon: '📝' },
+};
+
+const TAG_NAMES = Object.keys(TAG_MAP);
+
+function resolveTag(tagName?: string): { color: string; icon: string } {
+  if (tagName && TAG_MAP[tagName]) {
+    return TAG_MAP[tagName];
+  }
+  return { color: 'blue', icon: '⭐' };
+}
+
 interface AdminTimelineTabProps {
   events: TimelineEvent[];
   editingEvent: TimelineEvent | null;
@@ -26,7 +51,7 @@ export default function AdminTimelineTab({
   return (
     <div className="tab-content">
       <h1>時間線管理</h1>
-      
+
       {/* 編輯表單 */}
       {editingEvent && (
         <div className="section edit-section">
@@ -50,28 +75,83 @@ export default function AdminTimelineTab({
             placeholder="內容（可選）"
             rows={3}
           />
+          <div className="form-group" style={{ marginTop: '12px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#6B5637' }}>標籤</label>
+            <select
+              value={editingEvent.tag || ''}
+              onChange={e => {
+                const tagName = e.target.value;
+                const resolved = resolveTag(tagName);
+                onUpdateEditingEvent({
+                  ...editingEvent,
+                  tag: tagName,
+                  color: resolved.color,
+                  icon: resolved.icon
+                });
+              }}
+              style={{ padding: '10px 14px', borderRadius: '8px', border: '2px solid #E8D4C0', fontSize: '14px', marginBottom: '10px', width: '100%', maxWidth: '300px' }}
+            >
+              <option value="">請選擇標籤</option>
+              {TAG_NAMES.map(tag => (
+                <option key={tag} value={tag}>
+                  {TAG_MAP[tag].icon} {tag}
+                </option>
+              ))}
+            </select>
+            <div className="tag-presets" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {TAG_NAMES.map(tag => (
+                <button
+                  key={tag}
+                  type="button"
+                  className={`tag-preset ${editingEvent.tag === tag ? 'active' : ''}`}
+                  onClick={() => {
+                    const resolved = resolveTag(tag);
+                    onUpdateEditingEvent({
+                      ...editingEvent,
+                      tag,
+                      color: resolved.color,
+                      icon: resolved.icon
+                    });
+                  }}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '20px',
+                    border: '1px solid #E8D4C0',
+                    background: editingEvent.tag === tag ? 'linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%)' : 'white',
+                    color: editingEvent.tag === tag ? 'white' : '#8B6F47',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {TAG_MAP[tag].icon} {tag}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="form-actions">
             <button onClick={() => onSaveEvent(editingEvent)}>保存</button>
             <button className="btn-secondary" onClick={() => onEditEvent(null)}>取消</button>
           </div>
         </div>
       )}
-      
+
       {/* 事件列表 */}
       <div className="section">
         <div className="section-header">
           <h3>事件列表 ({events.length})</h3>
-          <button onClick={() => onEditEvent({ id: '', date: '', title: '', content: '' })}>
+          <button onClick={() => onEditEvent({ id: '', date: '', title: '', content: '', tag: '', color: 'blue', icon: '⭐' })}>
             + 新建
           </button>
         </div>
-        
+
         <table className="data-table">
           <thead>
             <tr>
               <th>日期</th>
               <th>標題</th>
               <th>內容</th>
+              <th>標籤</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -81,6 +161,23 @@ export default function AdminTimelineTab({
                 <td>{event.date}</td>
                 <td>{event.title}</td>
                 <td>{event.content?.substring(0, 50)}...</td>
+                <td>
+                  {event.tag ? (
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '4px 10px',
+                      borderRadius: '12px',
+                      background: 'rgba(157, 132, 183, 0.1)',
+                      color: '#6a4c93',
+                      fontSize: '13px',
+                      fontWeight: 500
+                    }}>
+                      {resolveTag(event.tag).icon} {event.tag}
+                    </span>
+                  ) : '-'}
+                </td>
                 <td className="actions">
                   <button onClick={() => onEditEvent(event)}>編輯</button>
                   <button className="btn-danger" onClick={() => onDeleteEvent(event.id)}>删除</button>
@@ -97,7 +194,7 @@ export default function AdminTimelineTab({
         <textarea
           value={importText}
           onChange={e => onImportTextChange(e.target.value)}
-          placeholder="格式: 日期|標題|內容&#10;示例: 2024-01-01|新年|新年快乐"
+          placeholder="格式: 日期|標題|內容|標籤&#10;示例: 2024-01-01|新年|新年快乐|重要&#10;標籤可選：首播、歌回、遊戲、3D披露、新衣裝、紀念回、聯動、重要、生日、周年、活動、日常"
           rows={5}
         />
         <div className="form-actions">

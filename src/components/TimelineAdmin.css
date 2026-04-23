@@ -389,6 +389,47 @@
   background: #D0D0D0;
 }
 
+.tag-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tag-preset {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #E8D4C0;
+  background: white;
+  color: #8B6F47;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tag-preset:hover {
+  border-color: #9d84b7;
+  color: #9d84b7;
+}
+
+.tag-preset.active {
+  background: linear-gradient(135deg, #9d84b7 0%, #6a4c93 100%);
+  color: white;
+  border-color: #9d84b7;
+}
+
+.tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(157, 132, 183, 0.1);
+  color: #6a4c93;
+  font-size: 13px;
+  font-weight: 500;
+}
+
 /* 响应式 */
 @media (max-width: 600px) {
   .admin-header {

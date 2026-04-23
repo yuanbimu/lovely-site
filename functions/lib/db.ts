@@ -118,19 +118,44 @@ export interface TimelineEventData {
   sort_order?: number;
 }
 
+// 標籤系統：標籤名 -> { color, icon }
+export const TIMELINE_TAG_MAP: Record<string, { color: string; icon: string }> = {
+  '首播': { color: 'purple', icon: '🎤' },
+  '歌回': { color: 'green', icon: '🎵' },
+  '遊戲': { color: 'teal', icon: '🎮' },
+  '3D披露': { color: 'violet', icon: '👤' },
+  '新衣裝': { color: 'orange', icon: '👗' },
+  '紀念回': { color: 'red', icon: '🏆' },
+  '聯動': { color: 'blue', icon: '🤝' },
+  '重要': { color: 'red', icon: '⭐' },
+  '生日': { color: 'yellow', icon: '🎂' },
+  '周年': { color: 'amber', icon: '🎉' },
+  '活動': { color: 'slate', icon: '📅' },
+  '日常': { color: 'gray', icon: '📝' },
+};
+
+export const TIMELINE_TAG_NAMES = Object.keys(TIMELINE_TAG_MAP);
+
+export function resolveTag(tagName?: string): { color: string; icon: string } {
+  if (tagName && TIMELINE_TAG_MAP[tagName]) {
+    return TIMELINE_TAG_MAP[tagName];
+  }
+  return { color: 'blue', icon: '⭐' };
+}
+
 export async function saveTimelineEvent(db: D1Database, event: TimelineEventData) {
   await db.prepare(`
     INSERT OR REPLACE INTO timeline_events 
     (id, date, title, content, color, icon, sort_order, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
-    event.id,
-    event.date,
-    event.title,
-    event.content || null,
-    event.color || 'blue',
-    event.icon || 'mdi-star',
-    event.sort_order || 0,
+    event.id ?? `event_${Date.now()}`,
+    event.date ?? '',
+    event.title ?? '',
+    event.content ?? null,
+    event.color ?? 'blue',
+    event.icon ?? 'mdi-star',
+    event.sort_order ?? 0,
     Date.now(),
     Date.now()
   ).run();
@@ -148,23 +173,23 @@ export async function deleteTimelineEvent(db: D1Database, id: string) {
 }
 
 export async function bulkSaveTimelineEvents(db: D1Database, events: TimelineEventData[]) {
-  // 使用事务批量导入
-  const statements = events.map(event => db.prepare(`
+  const now = Date.now();
+  const statements = events.map((event, index) => db.prepare(`
     INSERT OR REPLACE INTO timeline_events 
     (id, date, title, content, color, icon, sort_order, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
-    event.id,
-    event.date,
-    event.title,
-    event.content || null,
-    event.color || 'blue',
-    event.icon || 'mdi-star',
-    event.sort_order || 0,
-    Date.now(),
-    Date.now()
+    event.id ?? `event_${now}_${index}`,
+    event.date ?? '',
+    event.title ?? '',
+    event.content ?? null,
+    event.color ?? 'blue',
+    event.icon ?? 'mdi-star',
+    event.sort_order ?? 0,
+    now,
+    now
   ));
-  
+
   await db.batch(statements);
 }
 // ========== User Authentication ==========

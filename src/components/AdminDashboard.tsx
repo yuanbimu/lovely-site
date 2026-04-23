@@ -447,14 +447,19 @@ export default function AdminDashboard() {
 
   async function handleImport() {
     if (!importText.trim()) return;
-    
+
     const lines = importText.trim().split('\n');
     const eventsToImport = lines.map(line => {
       const parts = line.split('|');
+      const tagName = parts[3]?.trim() || '';
+      const resolved = resolveTag(tagName);
       return {
         date: parts[0]?.trim() || '',
         title: parts[1]?.trim() || '',
-        content: parts[2]?.trim() || ''
+        content: parts[2]?.trim() || '',
+        tag: tagName,
+        color: resolved.color,
+        icon: resolved.icon
       };
     }).filter(e => e.date && e.title);
 
@@ -465,7 +470,7 @@ export default function AdminDashboard() {
         credentials: 'include',
         body: JSON.stringify({ events: eventsToImport })
       });
-      
+
       if (res.ok) {
         setImportText('');
         loadTimelineData();
@@ -474,6 +479,29 @@ export default function AdminDashboard() {
     } catch {
       showMessage('error', '導入失敗');
     }
+  }
+
+  // 標籤系統：標籤名 -> { color, icon }
+  const TAG_MAP: Record<string, { color: string; icon: string }> = {
+    '首播': { color: 'purple', icon: '🎤' },
+    '歌回': { color: 'green', icon: '🎵' },
+    '遊戲': { color: 'teal', icon: '🎮' },
+    '3D披露': { color: 'violet', icon: '👤' },
+    '新衣裝': { color: 'orange', icon: '👗' },
+    '紀念回': { color: 'red', icon: '🏆' },
+    '聯動': { color: 'blue', icon: '🤝' },
+    '重要': { color: 'red', icon: '⭐' },
+    '生日': { color: 'yellow', icon: '🎂' },
+    '周年': { color: 'amber', icon: '🎉' },
+    '活動': { color: 'slate', icon: '📅' },
+    '日常': { color: 'gray', icon: '📝' },
+  };
+
+  function resolveTag(tagName?: string): { color: string; icon: string } {
+    if (tagName && TAG_MAP[tagName]) {
+      return TAG_MAP[tagName];
+    }
+    return { color: 'blue', icon: '⭐' };
   }
 
   function showMessage(type: 'success' | 'error', text: string) {

@@ -53,11 +53,13 @@
 | `date` | `TEXT` | 日期字符串 |
 | `title` | `TEXT` | 标题 |
 | `content` | `TEXT` | 内容，可为空 |
-| `color` | `TEXT` | 颜色标识，默认 `blue` |
-| `icon` | `TEXT` | 图标标识，默认 `mdi-star` |
+| `color` | `TEXT` | 颜色标识，由标签系统自动分配 |
+| `icon` | `TEXT` | 图标标识，由标签系统自动分配 |
 | `sort_order` | `INTEGER` | 排序值，默认 `0` |
 | `created_at` | `INTEGER` | 创建时间戳 |
 | `updated_at` | `INTEGER` | 更新时间戳 |
+
+> 标签系统：前端用户只需选择标签名（如「首播」），系统通过 `TIMELINE_TAG_MAP` 自动映射为对应的 `color` + `icon`，存入数据库。
 
 代码依据：`functions/lib/db.ts:107`, `functions/lib/db.ts:118`, `functions/lib/db.ts:149`
 
