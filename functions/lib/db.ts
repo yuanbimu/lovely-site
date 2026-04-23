@@ -115,6 +115,7 @@ export interface TimelineEventData {
   content?: string;
   color?: string;
   icon?: string;
+  tag?: string;
   sort_order?: number;
 }
 
@@ -146,8 +147,8 @@ export function resolveTag(tagName?: string): { color: string; icon: string } {
 export async function saveTimelineEvent(db: D1Database, event: TimelineEventData) {
   await db.prepare(`
     INSERT OR REPLACE INTO timeline_events 
-    (id, date, title, content, color, icon, sort_order, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (id, date, title, content, color, icon, tag, sort_order, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     event.id ?? `event_${Date.now()}`,
     event.date ?? '',
@@ -155,6 +156,7 @@ export async function saveTimelineEvent(db: D1Database, event: TimelineEventData
     event.content ?? null,
     event.color ?? 'blue',
     event.icon ?? 'mdi-star',
+    event.tag ?? null,
     event.sort_order ?? 0,
     Date.now(),
     Date.now()
@@ -176,8 +178,8 @@ export async function bulkSaveTimelineEvents(db: D1Database, events: TimelineEve
   const now = Date.now();
   const statements = events.map((event, index) => db.prepare(`
     INSERT OR REPLACE INTO timeline_events 
-    (id, date, title, content, color, icon, sort_order, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (id, date, title, content, color, icon, tag, sort_order, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     event.id ?? `event_${now}_${index}`,
     event.date ?? '',
@@ -185,6 +187,7 @@ export async function bulkSaveTimelineEvents(db: D1Database, events: TimelineEve
     event.content ?? null,
     event.color ?? 'blue',
     event.icon ?? 'mdi-star',
+    event.tag ?? null,
     event.sort_order ?? 0,
     now,
     now
