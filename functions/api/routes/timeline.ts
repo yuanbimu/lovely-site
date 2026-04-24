@@ -1,14 +1,32 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { Hono } from 'hono';
-import { getTimelineEvents, saveTimelineEvent, deleteTimelineEvent, bulkSaveTimelineEvents } from '../../lib/db';
+import { getTimelineEvents, getTimelineCount, saveTimelineEvent, deleteTimelineEvent, bulkSaveTimelineEvents } from '../../lib/db';
 import { requireAuth, requireEditor } from '../middleware/auth';
 
 const app = new Hono();
 
-// 获取所有时间线事件
+// 获取时间线事件（支持分页；不传 limit 则返回全部。支持 year 和 tag 组合筛选）
 app.get('/', async (c) => {
-  const events = await getTimelineEvents(c.env.DB);
+  const year = c.req.query('year') || undefined;
+  const tag = c.req.query('tag') || undefined;
+  const limitQuery = c.req.query('limit');
+  const pageQuery = c.req.query('page');
+
+  if (limitQuery) {
+    const page = parseInt(pageQuery || '1', 10);
+    const limit = parseInt(limitQuery, 10);
+    const offset = (page - 1) * limit;
+
+    const [events, total] = await Promise.all([
+      getTimelineEvents(c.env.DB, { year, tag, limit, offset }),
+      getTimelineCount(c.env.DB, { year, tag })
+    ]);
+
+    return c.json({ data: events, total, page, limit });
+  }
+
+  const events = await getTimelineEvents(c.env.DB, { year, tag });
   return c.json({ data: events, total: events.length });
 });
 

@@ -30,25 +30,36 @@ interface AdminTimelineTabProps {
   events: TimelineEvent[];
   editingEvent: TimelineEvent | null;
   importText: string;
+  total: number;
+  page: number;
+  limit: number;
   onEditEvent: (event: TimelineEvent | null) => void;
   onSaveEvent: (event: TimelineEvent) => void;
   onDeleteEvent: (id: string) => void;
   onImport: () => void;
   onImportTextChange: (value: string) => void;
   onUpdateEditingEvent: (event: TimelineEvent) => void;
+  onPageChange: (page: number) => void;
+  onLimitChange: (limit: number) => void;
 }
 
 export default function AdminTimelineTab({
   events,
   editingEvent,
   importText,
+  total,
+  page,
+  limit,
   onEditEvent,
   onSaveEvent,
   onDeleteEvent,
   onImport,
   onImportTextChange,
-  onUpdateEditingEvent
+  onUpdateEditingEvent,
+  onPageChange,
+  onLimitChange
 }: AdminTimelineTabProps) {
+  const totalPages = Math.max(1, Math.ceil(total / limit));
   return (
     <div className="tab-content">
       <h1>時間線管理</h1>
@@ -187,6 +198,76 @@ export default function AdminTimelineTab({
             ))}
           </tbody>
         </table>
+
+        {/* 分页控件 */}
+        <div className="pagination" style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginTop: '16px',
+          padding: '12px 0',
+          borderTop: '1px solid #E8D4C0',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#8B6F47' }}>
+            <span>每页</span>
+            <select
+              value={limit}
+              onChange={e => onLimitChange(Number(e.target.value))}
+              style={{
+                padding: '6px 10px',
+                borderRadius: '6px',
+                border: '1px solid #E8D4C0',
+                fontSize: '14px',
+                background: 'white',
+                color: '#6B5637'
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span>条，共 {total} 条</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button
+              onClick={() => onPageChange(page - 1)}
+              disabled={page <= 1}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '6px',
+                border: '1px solid #E8D4C0',
+                background: page <= 1 ? '#F5F0EB' : 'white',
+                color: page <= 1 ? '#B0A090' : '#6B5637',
+                cursor: page <= 1 ? 'not-allowed' : 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              上一页
+            </button>
+            <span style={{ fontSize: '14px', color: '#6B5637', padding: '0 8px' }}>
+              {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => onPageChange(page + 1)}
+              disabled={page >= totalPages}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '6px',
+                border: '1px solid #E8D4C0',
+                background: page >= totalPages ? '#F5F0EB' : 'white',
+                color: page >= totalPages ? '#B0A090' : '#6B5637',
+                cursor: page >= totalPages ? 'not-allowed' : 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              下一页
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* 批量导入 */}

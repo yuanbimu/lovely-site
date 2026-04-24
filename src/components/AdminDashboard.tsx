@@ -48,6 +48,9 @@ export default function AdminDashboard() {
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [editingEvent, setEditingEvent] = useState<TimelineEvent | null>(null);
   const [importText, setImportText] = useState('');
+  const [timelinePage, setTimelinePage] = useState(1);
+  const [timelineLimit, setTimelineLimit] = useState(20);
+  const [timelineTotal, setTimelineTotal] = useState(0);
 
   // 歌單數據
   const [songs, setSongs] = useState<Song[]>([]);
@@ -134,17 +137,17 @@ export default function AdminDashboard() {
   async function loadDashboardData() {
     try {
       const [timelineRes, usersRes, songsRes] = await Promise.all([
-        fetch(TIMELINE_API, { credentials: 'include' }),
+        fetch(`${TIMELINE_API}?page=1&limit=1`, { credentials: 'include' }),
         user?.role === 'admin' ? fetch('/api/users', { credentials: 'include' }) : Promise.resolve({ ok: false, json: () => Promise.resolve({}) } as Response),
         fetch('/api/songs', { credentials: 'include' })
       ]);
-      
+
       const timelineData = await timelineRes.json();
       const usersData = usersRes.ok ? await usersRes.json() : { data: [] };
       const songsData = await songsRes.json();
 
       setStats({
-        timelineCount: timelineData.data?.length || 0,
+        timelineCount: timelineData.total || 0,
         userCount: usersData.data?.length || 0,
         songCount: songsData.data?.length || 0,
         lastUpdate: new Date().toISOString()
@@ -154,11 +157,14 @@ export default function AdminDashboard() {
     }
   }
 
-  async function loadTimelineData() {
+  async function loadTimelineData(page = timelinePage, limit = timelineLimit) {
     try {
-      const res = await fetch(TIMELINE_API, { credentials: 'include' });
+      const res = await fetch(`${TIMELINE_API}?page=${page}&limit=${limit}`, { credentials: 'include' });
       const data = await res.json();
       setEvents(data.data || []);
+      setTimelineTotal(data.total || 0);
+      setTimelinePage(data.page || page);
+      setTimelineLimit(data.limit || limit);
     } catch {
       showMessage('error', '加載時間線失敗');
     }
@@ -596,12 +602,17 @@ export default function AdminDashboard() {
             events={events}
             editingEvent={editingEvent}
             importText={importText}
+            total={timelineTotal}
+            page={timelinePage}
+            limit={timelineLimit}
             onEditEvent={setEditingEvent}
             onSaveEvent={saveEvent}
             onDeleteEvent={deleteEvent}
             onImport={handleImport}
             onImportTextChange={setImportText}
             onUpdateEditingEvent={setEditingEvent}
+            onPageChange={(p) => loadTimelineData(p, timelineLimit)}
+            onLimitChange={(l) => loadTimelineData(1, l)}
           />
         )}
 

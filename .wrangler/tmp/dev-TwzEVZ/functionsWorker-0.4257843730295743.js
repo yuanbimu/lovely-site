@@ -56,7 +56,7 @@ function checkURL2(request, init) {
 __name(checkURL2, "checkURL");
 var urls2;
 var init_checked_fetch = __esm({
-  "../.wrangler/tmp/bundle-vVdhF3/checked-fetch.js"() {
+  "../.wrangler/tmp/bundle-nyeRT1/checked-fetch.js"() {
     "use strict";
     urls2 = /* @__PURE__ */ new Set();
     __name2(checkURL2, "checkURL");
@@ -2492,6 +2492,7 @@ __export(db_exports, {
   getSessionById: /* @__PURE__ */ __name(() => getSessionById, "getSessionById"),
   getShowcases: /* @__PURE__ */ __name(() => getShowcases, "getShowcases"),
   getSongs: /* @__PURE__ */ __name(() => getSongs, "getSongs"),
+  getTimelineCount: /* @__PURE__ */ __name(() => getTimelineCount, "getTimelineCount"),
   getTimelineEvents: /* @__PURE__ */ __name(() => getTimelineEvents, "getTimelineEvents"),
   getUserById: /* @__PURE__ */ __name(() => getUserById, "getUserById"),
   getUserByUsername: /* @__PURE__ */ __name(() => getUserByUsername, "getUserByUsername"),
@@ -2598,11 +2599,53 @@ async function saveTimelineEvent(db, event) {
   ).run();
 }
 __name(saveTimelineEvent, "saveTimelineEvent");
-async function getTimelineEvents(db) {
-  const result = await db.prepare("SELECT * FROM timeline_events ORDER BY date DESC, sort_order ASC").all();
+async function getTimelineEvents(db, options) {
+  const conditions = [];
+  const bindings = [];
+  if (options?.year) {
+    conditions.push("date LIKE ?");
+    bindings.push(`${options.year}-%`);
+  }
+  if (options?.tag) {
+    conditions.push("tag = ?");
+    bindings.push(options.tag);
+  }
+  let query = "SELECT * FROM timeline_events";
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
+  query += " ORDER BY date DESC, sort_order ASC";
+  if (options?.limit !== void 0) {
+    query += " LIMIT ?";
+    bindings.push(options.limit);
+  }
+  if (options?.offset !== void 0) {
+    query += " OFFSET ?";
+    bindings.push(options.offset);
+  }
+  const result = await db.prepare(query).bind(...bindings).all();
   return result.results || [];
 }
 __name(getTimelineEvents, "getTimelineEvents");
+async function getTimelineCount(db, filters) {
+  const conditions = [];
+  const bindings = [];
+  if (filters?.year) {
+    conditions.push("date LIKE ?");
+    bindings.push(`${filters.year}-%`);
+  }
+  if (filters?.tag) {
+    conditions.push("tag = ?");
+    bindings.push(filters.tag);
+  }
+  let query = "SELECT COUNT(*) as count FROM timeline_events";
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
+  const result = await db.prepare(query).bind(...bindings).first();
+  return result?.count ?? 0;
+}
+__name(getTimelineCount, "getTimelineCount");
 async function deleteTimelineEvent(db, id) {
   await db.prepare("DELETE FROM timeline_events WHERE id = ?").bind(id).run();
 }
@@ -2784,6 +2827,7 @@ var init_db = __esm({
     __name2(resolveTag, "resolveTag");
     __name2(saveTimelineEvent, "saveTimelineEvent");
     __name2(getTimelineEvents, "getTimelineEvents");
+    __name2(getTimelineCount, "getTimelineCount");
     __name2(deleteTimelineEvent, "deleteTimelineEvent");
     __name2(bulkSaveTimelineEvents, "bulkSaveTimelineEvents");
     __name2(createUser, "createUser");
@@ -2992,7 +3036,21 @@ var init_timeline = __esm({
     init_auth();
     app2 = new Hono2();
     app2.get("/", async (c) => {
-      const events = await getTimelineEvents(c.env.DB);
+      const year = c.req.query("year") || void 0;
+      const tag = c.req.query("tag") || void 0;
+      const limitQuery = c.req.query("limit");
+      const pageQuery = c.req.query("page");
+      if (limitQuery) {
+        const page = parseInt(pageQuery || "1", 10);
+        const limit = parseInt(limitQuery, 10);
+        const offset = (page - 1) * limit;
+        const [events2, total] = await Promise.all([
+          getTimelineEvents(c.env.DB, { year, tag, limit, offset }),
+          getTimelineCount(c.env.DB, { year, tag })
+        ]);
+        return c.json({ data: events2, total, page, limit });
+      }
+      const events = await getTimelineEvents(c.env.DB, { year, tag });
       return c.json({ data: events, total: events.length });
     });
     app2.post("/", requireAuth, requireEditor, async (c) => {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface TimelineEvent {
   date: string;
@@ -13,36 +13,48 @@ export default function TimelineList() {
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [selectedYear, setSelectedYear] = useState('');
+  const [selectedTag, setSelectedTag] = useState('');
+  const [availableYears, setAvailableYears] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const isFirstLoad = useRef(true);
 
   useEffect(() => {
-    async function fetchEvents() {
+    async function load() {
+      setLoading(true);
       try {
-        const response = await fetch('/api/timeline');
+        const params = new URLSearchParams();
+        if (selectedYear) params.set('year', selectedYear);
+        if (selectedTag) params.set('tag', selectedTag);
+        const url = params.toString() ? `/api/timeline?${params.toString()}` : '/api/timeline';
+        const response = await fetch(url);
         if (response.ok) {
           const result = await response.json();
           const fetchedEvents = result.data || [];
-          
-          if (fetchedEvents.length === 0) {
-            // 如果 API 返回空，使用默认数据
-            setEvents(getDefaultEvents());
-          } else {
-            setEvents(fetchedEvents);
+          setEvents(fetchedEvents);
+
+          if (isFirstLoad.current && fetchedEvents.length > 0) {
+            const years = Array.from(new Set(fetchedEvents.map((e: TimelineEvent) => e.date.split('-')[0]))).sort().reverse();
+            const tags = Array.from(new Set(fetchedEvents.map((e: TimelineEvent) => e.tag).filter(Boolean))).sort();
+            setAvailableYears(years as string[]);
+            setAvailableTags(tags as string[]);
           }
         } else {
           setError(true);
-          setEvents(getDefaultEvents());
+          if (isFirstLoad.current) setEvents(getDefaultEvents());
         }
       } catch (err) {
         console.error('[Timeline] Failed to fetch events:', err);
         setError(true);
-        setEvents(getDefaultEvents());
+        if (isFirstLoad.current) setEvents(getDefaultEvents());
       } finally {
         setLoading(false);
+        isFirstLoad.current = false;
       }
     }
 
-    fetchEvents();
-  }, []);
+    load();
+  }, [selectedYear, selectedTag]);
 
   function getTagClass(tag: string): string {
     const map: Record<string, string> = {
@@ -253,7 +265,80 @@ export default function TimelineList() {
           animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .timeline-filters {
+          display: flex;
+          gap: 16px;
+          align-items: flex-end;
+          margin-bottom: 40px;
+          flex-wrap: wrap;
+        }
+        .filter-group {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .filter-group label {
+          font-size: 0.85rem;
+          color: #8B7355;
+          font-weight: 500;
+        }
+        .filter-group select {
+          padding: 8px 12px;
+          border-radius: 8px;
+          border: 1px solid rgba(107, 86, 55, 0.2);
+          background: white;
+          color: #6B5637;
+          font-size: 0.95rem;
+          cursor: pointer;
+          min-width: 120px;
+        }
+        .filter-reset {
+          padding: 8px 16px;
+          border-radius: 8px;
+          border: 1px solid rgba(107, 86, 55, 0.2);
+          background: white;
+          color: #6B5637;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .filter-reset:hover {
+          background: rgba(107, 86, 55, 0.05);
+        }
+        @media (max-width: 768px) {
+          .timeline-filters {
+            gap: 12px;
+          }
+        }
       `}</style>
+
+      {/* 筛选栏 */}
+      <div className="timeline-filters">
+        <div className="filter-group">
+          <label>年份</label>
+          <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)}>
+            <option value="">全部</option>
+            {availableYears.map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        </div>
+        <div className="filter-group">
+          <label>标签</label>
+          <select value={selectedTag} onChange={e => setSelectedTag(e.target.value)}>
+            <option value="">全部</option>
+            {availableTags.map(t => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        </div>
+        {(selectedYear || selectedTag) && (
+          <button className="filter-reset" onClick={() => { setSelectedYear(''); setSelectedTag(''); }}>
+            重置
+          </button>
+        )}
+      </div>
+
       {events.map((event, index) => (
         <div key={index} className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}>
           <div className="timeline-content">

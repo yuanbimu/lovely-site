@@ -3,6 +3,22 @@ import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
 import Footer from '../components/Footer.astro';
 import ContributorsWall from '../components/ContributorsWall';
+import siteData from '../data/site-data.json';
+
+const { profile, about } = siteData;
+
+// 把模板变量替换掉
+function fillTemplate(text: string): string {
+  return text
+    .replace(/\{name\}/g, profile.name)
+    .replace(/\{nickname\}/g, profile.nickname);
+}
+
+const socialLinks = [
+  { url: profile.socials.bilibili, label: 'Bilibili 主页', cls: 'bilibili' },
+  { url: profile.socials.live, label: '直播间', cls: 'live' },
+  { url: profile.socials.weibo, label: '微博', cls: 'weibo' },
+].filter(link => link.url);
 ---
 
 <Layout title="关于本站 - 东爱璃Lovely">
@@ -18,77 +34,45 @@ import ContributorsWall from '../components/ContributorsWall';
 
     <section class="content-section">
       <div class="container">
-        <div class="content-card">
-          <h2>🌸 这是什么站？</h2>
-          <p>
-            这是<strong>东爱璃Lovely</strong>的非官方应援站，由热爱她的粉丝们自发搭建。
-            我们希望为所有喜欢东爱璃的观众提供一个温馨的线上空间，
-            在这里你可以了解她的最新动态、观看直播提醒、欣赏她的各种造型。
-          </p>
-          <p>
-            <strong>东爱璃Lovely</strong>，来自 PSPLive 的虚拟主播，昵称「狍子」。
-          </p>
-          <blockquote class="official-intro">
-            「我是来自PSPLive的虚拟主播 可爱的 杂谈整活唱跳主持都会一点的～东北小狍子（不是偶像）的东爱璃Lovely！！！」
-          </blockquote>
-          <p>
-            她总是元气满满，用可爱的形象和有趣的直播内容深受观众喜爱，感谢每一位粉丝的支持！
-        </div>
-
-        <div class="content-card">
-          <h2>❤️ 为什么建这个站？</h2>
-          <p>
-            因为喜欢啊！作为东爱璃的粉丝，我们希望能够为她的粉丝社区贡献一份力量。
-            这个站是我们表达支持的方式，也希望能够帮助更多人了解和喜欢上她。
-          </p>
-          <p>
-            我们会持续更新这个站，添加更多有趣的功能和内容。
-            如果你有任何建议或想法，欢迎联系我们！
-          </p>
-        </div>
+        {about.sections.map((section) => (
+          <div class="content-card">
+            <h2>{section.icon} {section.title}</h2>
+            <p set:html={fillTemplate(section.content)} />
+            {section.title.includes('什么') && (
+              <blockquote class="official-intro">
+                {profile.description}
+              </blockquote>
+            )}
+          </div>
+        ))}
 
         <div class="content-card">
           <h2>🛠️ 技术栈</h2>
           <ul class="tech-list">
             <li><strong>前端框架：</strong>Astro 5 + React 19</li>
-            <li><strong>样式：</strong>Tailwind CSS + 自定义设计系统</li>
+            <li><strong>样式：</strong>自定义设计系统</li>
             <li><strong>部署：</strong>Cloudflare Pages</li>
             <li><strong>数据来源：</strong>Bilibili API</li>
           </ul>
-          <p class="tech-note">
-            本站是开源项目，欢迎有能力的粉丝一起参与建设！
-          </p>
+          <p class="tech-note">本站是开源项目，欢迎有能力的粉丝一起参与建设！</p>
         </div>
 
         <div class="content-card highlight">
           <h2>✨ 功能特色</h2>
           <div class="features-grid">
-            <div class="feature-item">
-              <span class="feature-icon">📺</span>
-              <h3>直播提醒</h3>
-              <p>实时检测直播状态，第一时间知道开播</p>
-            </div>
-            <div class="feature-item">
-              <span class="feature-icon">📸</span>
-              <h3>造型展示</h3>
-              <p>收录 32+ 种造型，欣赏狍子的各种样子</p>
-            </div>
-            <div class="feature-item">
-              <span class="feature-icon">📊</span>
-              <h3>数据统计</h3>
-              <p>粉丝数等数据实时更新</p>
-            </div>
-            <div class="feature-item">
-              <span class="feature-icon">📱</span>
-              <h3>响应式设计</h3>
-              <p>完美适配各种设备，随时随地访问</p>
-            </div>
+            {about.features.map((feature) => (
+              <div class="feature-item">
+                <span class="feature-icon">{feature.icon}</span>
+                <h3>{feature.title}</h3>
+                <p>{fillTemplate(feature.desc)}</p>
+              </div>
+            ))}
           </div>
         </div>
 
         <!-- 贡献者墙 -->
         <div class="content-card">
-          <h2>💝 特别致谢</h2>
+          <h2>💝 鸣谢</h2>
           <ContributorsWall client:load />
         </div>
 
@@ -96,27 +80,18 @@ import ContributorsWall from '../components/ContributorsWall';
           <div class="disclaimer-icon">⚠️</div>
           <div class="disclaimer-content">
             <h3>免责声明</h3>
-            <p>
-              本站为粉丝自发建设的非官方站点，与 <strong>东爱璃 Lovely</strong> 本人及 PSPLive 无直接关联。
-              所有内容仅供参考，官方信息请以 Bilibili 主页为准。
-            </p>
+            <p set:html={fillTemplate(about.disclaimer)} />
           </div>
         </div>
-
-
 
         <div class="links-section">
           <h3>🔗 相关链接</h3>
           <div class="links-grid">
-            <a href="https://space.bilibili.com/3821157" target="_blank" rel="noopener" class="link-btn bilibili">
-              <span>Bilibili 主页</span>
-            </a>
-            <a href="https://live.bilibili.com/21692711" target="_blank" rel="noopener" class="link-btn live">
-              <span>直播间</span>
-            </a>
-            <a href="https://weibo.com/u/7802960328" target="_blank" rel="noopener" class="link-btn weibo">
-              <span>微博</span>
-            </a>
+            {socialLinks.map((link) => (
+              <a href={link.url} target="_blank" rel="noopener" class={`link-btn ${link.cls}`}>
+                <span>{link.label}</span>
+              </a>
+            ))}
           </div>
         </div>
       </div>
@@ -269,23 +244,6 @@ import ContributorsWall from '../components/ContributorsWall';
     line-height: 1.5 !important;
   }
 
-  .thanks-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .thanks-list li {
-    padding: 10px 0;
-    font-size: 15px;
-    color: #5C4A30;
-    border-bottom: 1px solid rgba(139, 111, 71, 0.1);
-  }
-
-  .thanks-list li:last-child {
-    border-bottom: none;
-  }
-
   .disclaimer {
     background: linear-gradient(135deg, rgba(255, 200, 100, 0.12) 0%, rgba(255, 180, 50, 0.08) 100%);
     border: 1px solid rgba(255, 180, 50, 0.25);
@@ -322,7 +280,7 @@ import ContributorsWall from '../components/ContributorsWall';
     line-height: 1.8;
   }
 
-  .disclaimer-content strong {
+  .disclaimer-content :global(strong) {
     font-weight: 600;
     color: #8B6F47;
   }

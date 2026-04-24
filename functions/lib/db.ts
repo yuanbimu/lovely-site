@@ -164,11 +164,67 @@ export async function saveTimelineEvent(db: D1Database, event: TimelineEventData
   ).run();
 }
 
-export async function getTimelineEvents(db: D1Database) {
-  const result = await db
-    .prepare('SELECT * FROM timeline_events ORDER BY date DESC, sort_order ASC')
-    .all();
+export async function getTimelineEvents(
+  db: D1Database,
+  options?: { year?: string; tag?: string; limit?: number; offset?: number }
+) {
+  const conditions: string[] = [];
+  const bindings: (string | number)[] = [];
+
+  if (options?.year) {
+    conditions.push('date LIKE ?');
+    bindings.push(`${options.year}-%`);
+  }
+  if (options?.tag) {
+    conditions.push('tag = ?');
+    bindings.push(options.tag);
+  }
+
+  let query = 'SELECT * FROM timeline_events';
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
+  }
+  query += ' ORDER BY date DESC, sort_order ASC';
+
+  if (options?.limit !== undefined) {
+    query += ' LIMIT ?';
+    bindings.push(options.limit);
+  }
+  if (options?.offset !== undefined) {
+    query += ' OFFSET ?';
+    bindings.push(options.offset);
+  }
+
+  const result = await db.prepare(query).bind(...bindings).all();
   return result.results || [];
+}
+
+export async function getTimelineCount(
+  db: D1Database,
+  filters?: { year?: string; tag?: string }
+): Promise<number> {
+  const conditions: string[] = [];
+  const bindings: (string | number)[] = [];
+
+  if (filters?.year) {
+    conditions.push('date LIKE ?');
+    bindings.push(`${filters.year}-%`);
+  }
+  if (filters?.tag) {
+    conditions.push('tag = ?');
+    bindings.push(filters.tag);
+  }
+
+  let query = 'SELECT COUNT(*) as count FROM timeline_events';
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
+  }
+
+  const result = await db
+    .prepare(query)
+    .bind(...bindings)
+    .first<{ count: number }>();
+  return result?.count ?? 0;
 }
 
 export async function deleteTimelineEvent(db: D1Database, id: string) {

@@ -5,14 +5,15 @@ export interface Profile {
   name: string;
   nickname: string;
   avatar: string;
-  avatarApi: string;
   uid: string;
   bio: string;
   description: string;
   socials: {
     bilibili: string;
+    live: string;
     weibo?: string;
   };
+  aboutText: string[];
 }
 
 // 站点配置

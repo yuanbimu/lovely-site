@@ -16,9 +16,9 @@ const contributors: Contributor[] = [
 ];
 
 const specialThanks = [
-  { name: '东爱璃Lovely', desc: '狍子的快乐能量是本站存在的理由' },
-  { name: 'PSPLive', desc: '优秀的虚拟主播社团' },
-  { name: '所有狍子粉丝', desc: '你们的支持让这个项目有意义' }
+  { name: '东爱璃Lovely', desc: '没有狍子就没有这个站，就这么简单' },
+  { name: 'PSPLive', desc: '靠谱的社团，狍子待着我们也放心' },
+  { name: '所有秧歌星', desc: '每一个看直播、发弹幕、做二创的你，撑起了这个小站的意义' }
 ];
 
 export default function ContributorsWall() {

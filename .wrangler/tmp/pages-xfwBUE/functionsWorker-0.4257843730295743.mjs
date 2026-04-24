@@ -9,7 +9,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// ../.wrangler/tmp/bundle-vVdhF3/checked-fetch.js
+// ../.wrangler/tmp/bundle-nyeRT1/checked-fetch.js
 function checkURL(request, init) {
   const url = request instanceof URL ? request : new URL(
     (typeof request === "string" ? new Request(request, init) : request).url
@@ -27,7 +27,7 @@ function checkURL(request, init) {
 }
 var urls;
 var init_checked_fetch = __esm({
-  "../.wrangler/tmp/bundle-vVdhF3/checked-fetch.js"() {
+  "../.wrangler/tmp/bundle-nyeRT1/checked-fetch.js"() {
     "use strict";
     urls = /* @__PURE__ */ new Set();
     __name(checkURL, "checkURL");
@@ -2435,6 +2435,7 @@ __export(db_exports, {
   getSessionById: () => getSessionById,
   getShowcases: () => getShowcases,
   getSongs: () => getSongs,
+  getTimelineCount: () => getTimelineCount,
   getTimelineEvents: () => getTimelineEvents,
   getUserById: () => getUserById,
   getUserByUsername: () => getUserByUsername,
@@ -2533,9 +2534,50 @@ async function saveTimelineEvent(db, event) {
     Date.now()
   ).run();
 }
-async function getTimelineEvents(db) {
-  const result = await db.prepare("SELECT * FROM timeline_events ORDER BY date DESC, sort_order ASC").all();
+async function getTimelineEvents(db, options) {
+  const conditions = [];
+  const bindings = [];
+  if (options?.year) {
+    conditions.push("date LIKE ?");
+    bindings.push(`${options.year}-%`);
+  }
+  if (options?.tag) {
+    conditions.push("tag = ?");
+    bindings.push(options.tag);
+  }
+  let query = "SELECT * FROM timeline_events";
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
+  query += " ORDER BY date DESC, sort_order ASC";
+  if (options?.limit !== void 0) {
+    query += " LIMIT ?";
+    bindings.push(options.limit);
+  }
+  if (options?.offset !== void 0) {
+    query += " OFFSET ?";
+    bindings.push(options.offset);
+  }
+  const result = await db.prepare(query).bind(...bindings).all();
   return result.results || [];
+}
+async function getTimelineCount(db, filters) {
+  const conditions = [];
+  const bindings = [];
+  if (filters?.year) {
+    conditions.push("date LIKE ?");
+    bindings.push(`${filters.year}-%`);
+  }
+  if (filters?.tag) {
+    conditions.push("tag = ?");
+    bindings.push(filters.tag);
+  }
+  let query = "SELECT COUNT(*) as count FROM timeline_events";
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
+  const result = await db.prepare(query).bind(...bindings).first();
+  return result?.count ?? 0;
 }
 async function deleteTimelineEvent(db, id) {
   await db.prepare("DELETE FROM timeline_events WHERE id = ?").bind(id).run();
@@ -2698,6 +2740,7 @@ var init_db = __esm({
     __name(resolveTag, "resolveTag");
     __name(saveTimelineEvent, "saveTimelineEvent");
     __name(getTimelineEvents, "getTimelineEvents");
+    __name(getTimelineCount, "getTimelineCount");
     __name(deleteTimelineEvent, "deleteTimelineEvent");
     __name(bulkSaveTimelineEvents, "bulkSaveTimelineEvents");
     __name(createUser, "createUser");
@@ -2906,7 +2949,21 @@ var init_timeline = __esm({
     init_auth();
     app2 = new Hono2();
     app2.get("/", async (c) => {
-      const events = await getTimelineEvents(c.env.DB);
+      const year = c.req.query("year") || void 0;
+      const tag = c.req.query("tag") || void 0;
+      const limitQuery = c.req.query("limit");
+      const pageQuery = c.req.query("page");
+      if (limitQuery) {
+        const page = parseInt(pageQuery || "1", 10);
+        const limit = parseInt(limitQuery, 10);
+        const offset = (page - 1) * limit;
+        const [events2, total] = await Promise.all([
+          getTimelineEvents(c.env.DB, { year, tag, limit, offset }),
+          getTimelineCount(c.env.DB, { year, tag })
+        ]);
+        return c.json({ data: events2, total, page, limit });
+      }
+      const events = await getTimelineEvents(c.env.DB, { year, tag });
       return c.json({ data: events, total: events.length });
     });
     app2.post("/", requireAuth, requireEditor, async (c) => {
@@ -3393,11 +3450,11 @@ var init_functionsRoutes_0_9050978634056555 = __esm({
   }
 });
 
-// ../.wrangler/tmp/bundle-vVdhF3/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-nyeRT1/middleware-loader.entry.ts
 init_functionsRoutes_0_9050978634056555();
 init_checked_fetch();
 
-// ../.wrangler/tmp/bundle-vVdhF3/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-nyeRT1/middleware-insertion-facade.js
 init_functionsRoutes_0_9050978634056555();
 init_checked_fetch();
 
@@ -3898,7 +3955,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-vVdhF3/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-nyeRT1/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -3932,7 +3989,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-vVdhF3/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-nyeRT1/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;
