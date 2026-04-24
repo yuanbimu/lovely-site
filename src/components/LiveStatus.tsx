@@ -48,14 +48,6 @@ function formatExactTime(dateString: string | undefined): string {
   });
 }
 
-// Format number (e.g., 318777 -> "31.9万" or 1234 -> "1,234")
-function formatNumber(num: number): string {
-  if (num >= 10000) {
-    return (num / 10000).toFixed(1) + '万';
-  }
-  return num.toLocaleString('zh-CN');
-}
-
 export default function LiveStatus() {
   const [status, setStatus] = useState<StatusState>('loading');
   const [data, setData] = useState<LiveStatusData | null>(null);
@@ -70,7 +62,6 @@ export default function LiveStatus() {
     }
     
     try {
-      // Add cache-busting parameter for manual refresh to bypass browser cache
       const cacheBuster = isManual ? `?t=${Date.now()}` : '';
       const response = await fetch(`/api/live${cacheBuster}`, {
         headers: {
@@ -117,7 +108,6 @@ export default function LiveStatus() {
   useEffect(() => {
     fetchLiveStatus();
     
-    // Auto refresh every 15 minutes
     const interval = setInterval(() => {
       setRetryCount(0);
       fetchLiveStatus();
@@ -132,20 +122,12 @@ export default function LiveStatus() {
     fetchLiveStatus(false, true);
   };
 
-  const fansCountFormatted = data && data.fans > 0 ? formatNumber(data.fans) : '--';
-
   // Loading state
   if (status === 'loading') {
     return (
-      <div className="status-wrapper">
-        <div className="fans-display loading">
-          <span className="fans-label">B 站粉丝</span>
-          <span className="fans-count">--</span>
-        </div>
-        <div className="live-status loading">
-          <span className="loading-spinner"></span>
-          <span>检测中...</span>
-        </div>
+      <div className="live-status loading">
+        <span className="loading-spinner"></span>
+        <span>检测中...</span>
       </div>
     );
   }
@@ -153,85 +135,67 @@ export default function LiveStatus() {
   // Live state
   if (status === 'live' && data) {
     return (
-      <div className="status-wrapper">
-        <div className="fans-display">
-          <span className="fans-label">B 站粉丝</span>
-          <span className="fans-count">{fansCountFormatted}</span>
-        </div>
-        <a
-          href={data.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="live-status live"
-          title={`点击进入直播间: ${data.title}`}
-        >
-          <span className="live-dot"></span>
-          <span className="live-text">正在直播</span>
-          <span className="live-title">{data.title}</span>
-          <span className="live-arrow">→</span>
-        </a>
-      </div>
+      <a
+        href={data.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="live-status live"
+        title={`点击进入直播间: ${data.title}`}
+      >
+        <span className="live-dot"></span>
+        <span className="live-text">正在直播</span>
+        <span className="live-title">{data.title}</span>
+        <span className="live-arrow">→</span>
+      </a>
     );
   }
 
   // Offline state
   if (status === 'offline' && data) {
     return (
-      <div className="status-wrapper">
-        <div className="fans-display">
-          <span className="fans-label">B 站粉丝</span>
-          <span className="fans-count">{fansCountFormatted}</span>
-        </div>
-        <div className="live-status offline-container">
-          <div className="offline-main">
-            <span className="offline-dot"></span>
-            <span className="offline-text">未开播</span>
-            <button
-              className={`refresh-btn ${isManualRefresh ? 'spinning' : ''}`}
-              onClick={handleRetry}
-              title="刷新状态"
-              aria-label="刷新直播状态"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
-              </svg>
-            </button>
-          </div>
-          <span className="last-checked" title={`最后检查: ${formatExactTime(data.lastChecked)}`}>
-            更新于 {formatRelativeTime(data.lastChecked)}
-          </span>
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  return (
-    <div className="status-wrapper">
-      <div className="fans-display">
-        <span className="fans-label">B 站粉丝</span>
-        <span className="fans-count">{fansCountFormatted}</span>
-      </div>
-      <div className="live-status error-container">
-        <div className="error-main">
-          <span className="error-icon">⚠️</span>
-          <span className="error-text">检测失败</span>
+      <div className="live-status offline-container">
+        <div className="offline-main">
+          <span className="offline-dot"></span>
+          <span className="offline-text">未开播</span>
           <button
-            className={`retry-btn-small ${isManualRefresh ? 'spinning' : ''}`}
+            className={`refresh-btn ${isManualRefresh ? 'spinning' : ''}`}
             onClick={handleRetry}
-            title="点击重试"
+            title="刷新状态"
+            aria-label="刷新直播状态"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
             </svg>
           </button>
         </div>
-        {data && (
-          <span className="last-checked" title={`最后尝试: ${formatExactTime(data.lastChecked)}`}>
-            {formatRelativeTime(data.lastChecked)}
-          </span>
-        )}
+        <span className="last-checked" title={`最后检查: ${formatExactTime(data.lastChecked)}`}>
+          更新于 {formatRelativeTime(data.lastChecked)}
+        </span>
       </div>
+    );
+  }
+
+  // Error state
+  return (
+    <div className="live-status error-container">
+      <div className="error-main">
+        <span className="error-icon">⚠️</span>
+        <span className="error-text">检测失败</span>
+        <button
+          className={`retry-btn-small ${isManualRefresh ? 'spinning' : ''}`}
+          onClick={handleRetry}
+          title="点击重试"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+          </svg>
+        </button>
+      </div>
+      {data && (
+        <span className="last-checked" title={`最后尝试: ${formatExactTime(data.lastChecked)}`}>
+          {formatRelativeTime(data.lastChecked)}
+        </span>
+      )}
     </div>
   );
 }

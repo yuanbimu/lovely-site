@@ -9,16 +9,17 @@ interface Contributor {
 
 const contributors: Contributor[] = [
   {
-    name: '站点开发者',
+    name: 'yuanbimu',
     role: '全栈开发',
-    link: 'https://github.com/yourname'
+    link: 'https://github.com/yuanbimu'
   }
 ];
 
 const specialThanks = [
   { name: '东爱璃Lovely', desc: '没有狍子就没有这个站，就这么简单' },
   { name: 'PSPLive', desc: '靠谱的社团，狍子待着我们也放心' },
-  { name: '所有秧歌星', desc: '每一个看直播、发弹幕、做二创的你，撑起了这个小站的意义' }
+  { name: '所有秧歌星', desc: '每一个看直播、发弹幕、做二创的你，撑起了这个小站的意义' },
+  { name: '萌娘百科', desc: '提供了详尽的人物资料与背景参考，整理工作辛苦了' }
 ];
 
 export default function ContributorsWall() {

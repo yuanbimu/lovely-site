@@ -24,6 +24,11 @@ const { profile, config } = siteData;
 
     <div class="hero-right">
       <h1 class="site-title">{profile.name}</h1>
+      <div class="fans-counter" id="fans-counter">
+        <span class="fans-label">与</span>
+        <span class="fans-number" id="fans-number">--</span>
+        <span class="fans-label">只秧歌星相遇</span>
+      </div>
       <p class="subtitle">{profile.bio}</p>
 
       <div class="social-buttons">
@@ -45,6 +50,23 @@ const { profile, config } = siteData;
     </div>
   </div>
 </section>
+
+<script is:inline>
+  (function() {
+    const el = document.getElementById('fans-number');
+    if (!el) return;
+    fetch('/api/live')
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.fans > 0) {
+          el.textContent = data.fans.toLocaleString('zh-CN');
+        } else {
+          el.textContent = '--';
+        }
+      })
+      .catch(() => { el.textContent = '--'; });
+  })();
+</script>
 
 <style>
   .hero-section {
@@ -174,9 +196,24 @@ const { profile, config } = siteData;
     font-size: clamp(2rem, 5vw, 56px);
     font-weight: 700;
     color: #6B5637;
-    margin: 0 0 15px 0;
+    margin: 0 0 10px 0;
     letter-spacing: 3px;
     line-height: 1.2;
+  }
+
+  .fans-counter {
+    display: block;
+    margin: 0 0 16px 0;
+    font-size: clamp(1rem, 2vw, 18px);
+    color: #8B6F47;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+
+  .fans-counter .fans-number {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #6B5637;
   }
 
   .subtitle {
@@ -253,6 +290,11 @@ const { profile, config } = siteData;
       letter-spacing: 2px;
     }
 
+    .fans-counter {
+      font-size: 16px;
+      margin: 0 0 14px 0;
+    }
+
     .subtitle {
       font-size: 15px;
       margin: 0 0 25px 0;
@@ -287,6 +329,10 @@ const { profile, config } = siteData;
 
     .site-title {
       font-size: 28px;
+    }
+
+    .fans-counter {
+      font-size: 15px;
     }
 
     .subtitle {

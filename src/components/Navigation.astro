@@ -44,8 +44,57 @@ const navItems = [
   (function() {
     const btn = document.getElementById('hamburgerBtn');
     const menu = document.getElementById('mobileMenu');
+    const nav = document.querySelector('.glass-nav');
     
     if (!btn || !menu) return;
+    
+    // === 当前页面高亮 ===
+    function initActiveLink() {
+      const path = window.location.pathname;
+      const normalizedPath = path.endsWith('/') && path.length > 1 ? path.slice(0, -1) : path;
+      
+      // 桌面端链接
+      document.querySelectorAll('.nav-link').forEach(function(link) {
+        const href = link.getAttribute('href');
+        const normalizedHref = href.endsWith('/') && href.length > 1 ? href.slice(0, -1) : href;
+        if (normalizedHref === normalizedPath || (href === '/' && path === '/')) {
+          link.classList.add('active');
+        }
+      });
+      
+      // 移动端链接
+      document.querySelectorAll('.mobile-nav-link').forEach(function(link) {
+        const href = link.getAttribute('href');
+        const normalizedHref = href.endsWith('/') && href.length > 1 ? href.slice(0, -1) : href;
+        if (normalizedHref === normalizedPath || (href === '/' && path === '/')) {
+          link.classList.add('active');
+        }
+      });
+    }
+    
+    // === 滚动监听 ===
+    function initScrollEffect() {
+      let lastScroll = 0;
+      const scrollThreshold = 20;
+      
+      function handleScroll() {
+        const currentScroll = window.scrollY;
+        
+        if (currentScroll > scrollThreshold) {
+          nav.classList.add('scrolled');
+        } else {
+          nav.classList.remove('scrolled');
+        }
+        
+        lastScroll = currentScroll;
+      }
+      
+      // 初始检查
+      handleScroll();
+      
+      // 使用 passive listener 优化性能
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    }
     
     function toggleMenu() {
       menu.classList.toggle('active');
@@ -77,6 +126,10 @@ const navItems = [
         closeMenu();
       }
     });
+    
+    // 初始化
+    initActiveLink();
+    initScrollEffect();
   })();
 </script>
 
@@ -86,11 +139,19 @@ const navItems = [
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: var(--z-sticky);
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(196, 167, 71, 0.2);
+    transition: background var(--duration-normal) ease, box-shadow var(--duration-normal) ease;
+  }
+
+  /* 滚动后状态 */
+  .glass-nav.scrolled {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: var(--shadow-md);
+    border-bottom-color: rgba(196, 167, 71, 0.3);
   }
 
   .nav-content {
@@ -113,8 +174,8 @@ const navItems = [
   .logo-img {
     height: 50px;
     width: auto;
-    border-radius: 8px;
-    transition: transform 0.3s ease;
+    border-radius: var(--radius-sm);
+    transition: transform var(--duration-normal) ease;
   }
 
   .logo-img:hover {
@@ -124,25 +185,59 @@ const navItems = [
   .nav-links {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-xs);
     flex: 1;
     justify-content: flex-end;
   }
 
   .nav-link {
+    position: relative;
     padding: 8px 16px;
-    color: #6B5637;
+    color: var(--brown-600);
     text-decoration: none;
-    border-radius: 20px;
+    border-radius: var(--radius-full);
     font-weight: 500;
     font-size: 14px;
-    transition: all 0.3s ease;
+    transition: color var(--duration-fast) ease, background var(--duration-fast) ease;
     white-space: nowrap;
   }
 
+  /* 下划线效果 */
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--blue-500);
+    border-radius: var(--radius-full);
+    transition: width var(--duration-fast) ease, left var(--duration-fast) ease;
+  }
+
   .nav-link:hover {
-    background: rgba(255, 255, 255, 0.6);
-    color: #4A90D9;
+    color: var(--blue-500);
+  }
+
+  .nav-link:hover::after {
+    width: 60%;
+    left: 20%;
+  }
+
+  /* 当前页面高亮 */
+  .nav-link.active {
+    background: rgba(74, 144, 217, 0.15);
+    color: var(--blue-600);
+    font-weight: 600;
+  }
+
+  .nav-link.active::after {
+    width: 60%;
+    left: 20%;
+  }
+
+  .nav-link.active:hover {
+    background: rgba(74, 144, 217, 0.2);
   }
 
   /* 汉堡菜单按钮 */
@@ -156,16 +251,16 @@ const navItems = [
     background: transparent;
     border: none;
     cursor: pointer;
-    z-index: 1500;
+    z-index: var(--z-hamburger);
   }
 
   .hamburger-line {
     display: block;
     width: 100%;
     height: 3px;
-    background: #6B5637;
+    background: var(--brown-600);
     border-radius: 2px;
-    transition: all 0.3s ease;
+    transition: all var(--duration-normal) ease;
   }
 
   .hamburger-btn.active .hamburger-line:nth-child(1) {
@@ -180,9 +275,8 @@ const navItems = [
     transform: translateY(-9.5px) rotate(-45deg);
   }
 
-  /* 移动端菜单 */
+  /* 移动端菜单 - 使用 transform 动画替代 display 切换 */
   .mobile-menu {
-    display: none;
     position: fixed;
     top: 70px;
     left: 0;
@@ -190,34 +284,45 @@ const navItems = [
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(20px);
     padding: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
     z-index: 1499;
-    transform: translateY(-100%);
+    transform: translateY(-20px);
     opacity: 0;
-    transition: all 0.3s ease;
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform var(--duration-normal) ease, opacity var(--duration-normal) ease, visibility var(--duration-normal) ease;
   }
 
   .mobile-menu.active {
-    display: block;
     transform: translateY(0);
     opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .mobile-nav-link {
     display: block;
     padding: 14px 20px;
-    color: #6B5637;
+    color: var(--brown-600);
     font-size: 16px;
     font-weight: 500;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     margin-bottom: 6px;
-    transition: all 0.3s ease;
+    transition: all var(--duration-fast) ease;
     text-decoration: none;
   }
 
   .mobile-nav-link:hover {
     background: rgba(214, 235, 248, 0.5);
-    color: #4A90D9;
+    color: var(--blue-500);
+    transform: translateX(4px);
+  }
+
+  /* 移动端当前页面高亮 */
+  .mobile-nav-link.active {
+    background: rgba(74, 144, 217, 0.15);
+    color: var(--blue-600);
+    font-weight: 600;
   }
 
   /* 防止滚动 */
