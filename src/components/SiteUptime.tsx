@@ -8,8 +8,8 @@ interface TimeData {
   seconds: number;
 }
 
-// 建站日期：2025-03-12
-const SITE_START_DATE = new Date('2025-03-12T00:00:00');
+// 建站日期：2026-05-01
+const SITE_START_DATE = new Date('2026-05-01T00:00:00');
 
 function calculateUptime(): TimeData {
   const now = new Date();
