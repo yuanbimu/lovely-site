@@ -37,7 +37,7 @@ export default function SongsList() {
     { name: '中文', key: '中文', count: songs.filter(s => s.tag === '中文').length },
     { name: '日文', key: '日文', count: songs.filter(s => s.tag === '日文').length },
     { name: '翻唱', key: '翻唱', count: songs.filter(s => s.tag === '翻唱').length },
-    { name: '原創', key: '原創', count: songs.filter(s => s.tag === '原創').length },
+    { name: '原创', key: '原创', count: songs.filter(s => s.tag === '原创').length },
   ];
 
   const filteredSongs = activeCategory === 'all'

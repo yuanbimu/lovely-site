@@ -25,18 +25,18 @@ const AUTH_API = '/api/auth';
 const TIMELINE_API = '/api/timeline';
 
 export default function AdminDashboard() {
-  // 認證狀態
+  // 认证状态
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  // 登錄表單
+  // 登录表单
   const [loginForm, setLoginForm] = useState<LoginForm>({ username: '', password: '' });
   const [loginError, setLoginError] = useState<string | null>(null);
   
-  // 當前頁面
+  // 当前页面
   const [activeTab, setActiveTab] = useState('dashboard');
   
-  // Dashboard 數據
+  // Dashboard 数据
   const [stats, setStats] = useState<Stats>({
     timelineCount: 0,
     userCount: 0,
@@ -44,7 +44,7 @@ export default function AdminDashboard() {
     lastUpdate: null
   });
   
-  // Timeline 數據
+  // Timeline 数据
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [editingEvent, setEditingEvent] = useState<TimelineEvent | null>(null);
   const [importText, setImportText] = useState('');
@@ -52,11 +52,11 @@ export default function AdminDashboard() {
   const [timelineLimit, setTimelineLimit] = useState(20);
   const [timelineTotal, setTimelineTotal] = useState(0);
 
-  // 歌單數據
+  // 歌单数据
   const [songs, setSongs] = useState<Song[]>([]);
   const [editingSong, setEditingSong] = useState<Song | null>(null);
   
-  // 櫥窗數據
+  // 橱窗数据
   const [showcases, setShowcases] = useState<Showcase[]>([]);
   const [editingShowcase, setEditingShowcase] = useState<Showcase | null>(null);
   const [maxShowcaseSort, setMaxShowcaseSort] = useState(0);
@@ -65,7 +65,7 @@ export default function AdminDashboard() {
   const [imagePickerType, setImagePickerType] = useState<'cover' | 'image'>('image');
   const [uploading, setUploading] = useState(false);
   
-  // 用戶管理
+  // 用户管理
   const [users, setUsers] = useState<User[]>([]);
   const [showUserForm, setShowUserForm] = useState(false);
   const [newUser, setNewUser] = useState<NewUser>({ username: '', email: '', password: '', role: 'editor' });
@@ -73,12 +73,12 @@ export default function AdminDashboard() {
   // 消息提示
   const [message, setMessage] = useState<Message | null>(null);
 
-  // 檢查登錄狀態
+  // 检查登录状态
   useEffect(() => {
     checkAuth();
   }, []);
 
-  // 加載數據
+  // 加载数据
   useEffect(() => {
     if (user) {
       if (activeTab === 'dashboard') loadDashboardData();
@@ -119,12 +119,12 @@ export default function AdminDashboard() {
       if (res.ok) {
         setUser(data.user);
         setLoginForm({ username: '', password: '' });
-        showMessage('success', `歡迎回來，${data.user.username}！`);
+        showMessage('success', `欢迎回来，${data.user.username}！`);
       } else {
-        setLoginError(data.error || '登錄失敗');
+        setLoginError(data.error || '登录失败');
       }
     } catch {
-      setLoginError('網絡錯誤');
+      setLoginError('网络错误');
     }
   }
 
@@ -166,7 +166,7 @@ export default function AdminDashboard() {
       setTimelinePage(data.page || page);
       setTimelineLimit(data.limit || limit);
     } catch {
-      showMessage('error', '加載時間線失敗');
+      showMessage('error', '加载时间线失败');
     }
   }
 
@@ -177,10 +177,10 @@ export default function AdminDashboard() {
       if (data.success) {
         setUsers(data.data || []);
       } else {
-        showMessage('error', data.error || '加載用戶失敗');
+        showMessage('error', data.error || '加载用户失败');
       }
     } catch {
-      showMessage('error', '網絡錯誤');
+      showMessage('error', '网络错误');
     }
   }
 
@@ -199,12 +199,12 @@ export default function AdminDashboard() {
         setNewUser({ username: '', email: '', password: '', role: 'editor' });
         loadUsersData();
         loadDashboardData();
-        showMessage('success', '用戶添加成功');
+        showMessage('success', '用户添加成功');
       } else {
-        showMessage('error', data.error || '添加失敗');
+        showMessage('error', data.error || '添加失败');
       }
     } catch {
-      showMessage('error', '網絡錯誤');
+      showMessage('error', '网络错误');
     }
   }
 
@@ -218,17 +218,17 @@ export default function AdminDashboard() {
       });
       if (res.ok) {
         loadUsersData();
-        showMessage('success', '權限已更新');
+        showMessage('success', '权限已更新');
       } else {
-        showMessage('error', '更新失敗');
+        showMessage('error', '更新失败');
       }
     } catch {
-      showMessage('error', '網絡錯誤');
+      showMessage('error', '网络错误');
     }
   }
 
   async function handleDeleteUser(id: string) {
-    if (!confirm('確定刪除該用戶？')) return;
+    if (!confirm('确定删除该用户？')) return;
     try {
       const res = await fetch(`/api/users/${id}`, {
         method: 'DELETE',
@@ -238,12 +238,12 @@ export default function AdminDashboard() {
       if (res.ok) {
         loadUsersData();
         loadDashboardData();
-        showMessage('success', '刪除成功');
+        showMessage('success', '删除成功');
       } else {
-        showMessage('error', data.error || '刪除失敗');
+        showMessage('error', data.error || '删除失败');
       }
     } catch {
-      showMessage('error', '網絡錯誤');
+      showMessage('error', '网络错误');
     }
   }
 
@@ -253,7 +253,7 @@ export default function AdminDashboard() {
       const data = await res.json();
       setSongs(data.data || []);
     } catch {
-      showMessage('error', '加載歌單失敗');
+      showMessage('error', '加载歌单失败');
     }
   }
 
@@ -271,27 +271,27 @@ export default function AdminDashboard() {
         loadSongsData();
         showMessage('success', '保存成功');
       } else {
-        showMessage('error', '保存失敗');
+        showMessage('error', '保存失败');
       }
     } catch {
-      showMessage('error', '網絡錯誤');
+      showMessage('error', '网络错误');
     }
   }
 
   async function handleDeleteSong(id: string) {
-    if (!confirm('確定刪除該歌曲？')) return;
+    if (!confirm('确定删除该歌曲？')) return;
     try {
       const res = await fetch(`/api/songs/${id}`, { method: 'DELETE', credentials: 'include' });
       if (res.ok) {
         loadSongsData();
-        showMessage('success', '刪除成功');
+        showMessage('success', '删除成功');
       }
     } catch {
-      showMessage('error', '刪除失敗');
+      showMessage('error', '删除失败');
     }
   }
 
-  // 櫥窗管理函數
+  // 橱窗管理函数
   async function loadShowcasesData() {
     try {
       const res = await fetch('/api/showcases', { credentials: 'include' });
@@ -303,7 +303,7 @@ export default function AdminDashboard() {
         Math.max(max, s.sort_order || 0), 0);
       setMaxShowcaseSort(maxSort);
     } catch {
-      showMessage('error', '加載櫥窗失敗');
+      showMessage('error', '加载橱窗失败');
     }
   }
 
@@ -326,27 +326,27 @@ export default function AdminDashboard() {
         setFolderImages(images);
       }
     } catch {
-      showMessage('error', '加載圖片失敗');
+      showMessage('error', '加载图片失败');
     }
   }
 
   async function deleteR2Image(key: string) {
-    if (!confirm('確定刪除該圖片？')) return;
+    if (!confirm('确定删除该图片？')) return;
     try {
       const res = await fetch(`/api/r2-files/${encodeURIComponent(key)}`, {
         method: 'DELETE',
         credentials: 'include'
       });
       if (res.ok) {
-        showMessage('success', '刪除成功');
+        showMessage('success', '删除成功');
         if (editingShowcase?.folder) {
           loadFolderImages(editingShowcase.folder);
         }
       } else {
-        showMessage('error', '刪除失敗');
+        showMessage('error', '删除失败');
       }
     } catch {
-      showMessage('error', '刪除失敗');
+      showMessage('error', '删除失败');
     }
   }
 
@@ -373,23 +373,23 @@ export default function AdminDashboard() {
         loadShowcasesData();
         showMessage('success', '保存成功');
       } else {
-        showMessage('error', '保存失敗');
+        showMessage('error', '保存失败');
       }
     } catch {
-      showMessage('error', '網絡錯誤');
+      showMessage('error', '网络错误');
     }
   }
 
   async function handleDeleteShowcase(id: string) {
-    if (!confirm('確定刪除該櫥窗？')) return;
+    if (!confirm('确定删除该橱窗？')) return;
     try {
       const res = await fetch(`/api/showcases/${id}`, { method: 'DELETE', credentials: 'include' });
       if (res.ok) {
         loadShowcasesData();
-        showMessage('success', '刪除成功');
+        showMessage('success', '删除成功');
       }
     } catch {
-      showMessage('error', '刪除失敗');
+      showMessage('error', '删除失败');
     }
   }
 
@@ -426,15 +426,15 @@ export default function AdminDashboard() {
         showMessage('success', '保存成功！');
       } else {
         const data = await res.json();
-        showMessage('error', data.error || '保存失敗');
+        showMessage('error', data.error || '保存失败');
       }
     } catch {
-      showMessage('error', '網絡錯誤');
+      showMessage('error', '网络错误');
     }
   }
 
   async function deleteEvent(id: string) {
-    if (!confirm('確定删除？')) return;
+    if (!confirm('确定删除？')) return;
     
     try {
       const res = await fetch(`${TIMELINE_API}/${id}`, {
@@ -447,7 +447,7 @@ export default function AdminDashboard() {
         showMessage('success', '删除成功！');
       }
     } catch {
-      showMessage('error', '删除失敗');
+      showMessage('error', '删除失败');
     }
   }
 
@@ -480,27 +480,27 @@ export default function AdminDashboard() {
       if (res.ok) {
         setImportText('');
         loadTimelineData();
-        showMessage('success', `成功導入 ${eventsToImport.length} 個事件！`);
+        showMessage('success', `成功导入 ${eventsToImport.length} 个事件！`);
       }
     } catch {
-      showMessage('error', '導入失敗');
+      showMessage('error', '导入失败');
     }
   }
 
-  // 標籤系統：標籤名 -> { color, icon }
+  // 标签系统：标签名 -> { color, icon }
   const TAG_MAP: Record<string, { color: string; icon: string }> = {
   '首播': { color: 'purple', icon: '🎤' },
   '歌回': { color: 'green', icon: '🎵' },
-  '遊戲': { color: 'teal', icon: '🎮' },
+  '游戏': { color: 'teal', icon: '🎮' },
   '视频投稿': { color: 'cyan', icon: '📹' },
     '3D披露': { color: 'violet', icon: '👤' },
-    '新衣裝': { color: 'orange', icon: '👗' },
-    '紀念回': { color: 'red', icon: '🏆' },
-    '聯動': { color: 'blue', icon: '🤝' },
+    '新衣装': { color: 'orange', icon: '👗' },
+    '纪念回': { color: 'red', icon: '🏆' },
+    '联动': { color: 'blue', icon: '🤝' },
     '重要': { color: 'red', icon: '⭐' },
     '生日': { color: 'yellow', icon: '🎂' },
     '周年': { color: 'amber', icon: '🎉' },
-    '活動': { color: 'slate', icon: '📅' },
+    '活动': { color: 'slate', icon: '📅' },
     '日常': { color: 'gray', icon: '📝' },
   };
 
@@ -533,21 +533,21 @@ export default function AdminDashboard() {
       
       const data = await res.json();
       if (data.success) {
-        showMessage('success', '上傳成功！');
+        showMessage('success', '上传成功！');
         loadFolderImages(editingShowcase.folder);
       } else {
-        showMessage('error', data.error || '上傳失敗');
+        showMessage('error', data.error || '上传失败');
       }
     } catch {
-      showMessage('error', '上傳失敗');
+      showMessage('error', '上传失败');
     } finally {
       setUploading(false);
     }
   }
 
-  // 登錄界面
+  // 登录界面
   if (isLoading) {
-    return <div className="admin-loading">加載中...</div>;
+    return <div className="admin-loading">加载中...</div>;
   }
 
   if (!user) {
@@ -562,12 +562,12 @@ export default function AdminDashboard() {
     );
   }
 
-  // 檢查權限
+  // 检查权限
   if (user.role === 'viewer') {
     return (
       <div className="admin-unauthorized">
-        <h2>訪問被拒</h2>
-        <p>您的賬戶沒有管理權限</p>
+        <h2>访问被拒</h2>
+        <p>您的账户没有管理权限</p>
         <button onClick={handleLogout}>登出</button>
       </div>
     );

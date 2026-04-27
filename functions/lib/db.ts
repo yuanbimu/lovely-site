@@ -119,20 +119,20 @@ export interface TimelineEventData {
   sort_order?: number;
 }
 
-// 標籤系統：標籤名 -> { color, icon }
+// 标签系统：标签名 -> { color, icon }
 export const TIMELINE_TAG_MAP: Record<string, { color: string; icon: string }> = {
   '首播': { color: 'purple', icon: '🎤' },
   '歌回': { color: 'green', icon: '🎵' },
-  '遊戲': { color: 'teal', icon: '🎮' },
+  '游戏': { color: 'teal', icon: '🎮' },
   '视频投稿': { color: 'cyan', icon: '📹' },
   '3D披露': { color: 'violet', icon: '👤' },
-  '新衣裝': { color: 'orange', icon: '👗' },
-  '紀念回': { color: 'red', icon: '🏆' },
-  '聯動': { color: 'blue', icon: '🤝' },
+  '新衣装': { color: 'orange', icon: '👗' },
+  '纪念回': { color: 'red', icon: '🏆' },
+  '联动': { color: 'blue', icon: '🤝' },
   '重要': { color: 'red', icon: '⭐' },
   '生日': { color: 'yellow', icon: '🎂' },
   '周年': { color: 'amber', icon: '🎉' },
-  '活動': { color: 'slate', icon: '📅' },
+  '活动': { color: 'slate', icon: '📅' },
   '日常': { color: 'gray', icon: '📝' },
 };
 
@@ -378,7 +378,7 @@ export async function saveSong(db: D1Database, song: Omit<Song, 'created_at' | '
   `).bind(
     song.id,
     song.title,
-    song.artist || '東愛璃 Lovely',
+    song.artist || '东爱璃 Lovely',
     song.cover_url || null,
     song.url || null,
     song.release_date || null,

@@ -12,19 +12,19 @@ interface TimelineEvent {
   sort_order?: number;
 }
 
-// 標籤系統：標籤名 -> { color, icon }
+// 标签系统：标签名 -> { color, icon }
 const TAG_MAP: Record<string, { color: string; icon: string }> = {
   '首播': { color: 'purple', icon: '🎤' },
   '歌回': { color: 'green', icon: '🎵' },
-  '遊戲': { color: 'teal', icon: '🎮' },
+  '游戏': { color: 'teal', icon: '🎮' },
   '3D披露': { color: 'violet', icon: '👤' },
-  '新衣裝': { color: 'orange', icon: '👗' },
-  '紀念回': { color: 'red', icon: '🏆' },
-  '聯動': { color: 'blue', icon: '🤝' },
+  '新衣装': { color: 'orange', icon: '👗' },
+  '纪念回': { color: 'red', icon: '🏆' },
+  '联动': { color: 'blue', icon: '🤝' },
   '重要': { color: 'red', icon: '⭐' },
   '生日': { color: 'yellow', icon: '🎂' },
   '周年': { color: 'amber', icon: '🎉' },
-  '活動': { color: 'slate', icon: '📅' },
+  '活动': { color: 'slate', icon: '📅' },
   '日常': { color: 'gray', icon: '📝' },
 };
 
@@ -48,33 +48,33 @@ const API_BASE = '/api/timeline';
 const AUTH_BASE = '/api/auth';
 
 export default function TimelineAdmin() {
-  // 認證狀態
+  // 认证状态
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  // 登錄表單
+  // 登录表单
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoginLoading, setIsLoginLoading] = useState(false);
   
-  // 時間線數據
+  // 时间线数据
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
-  // 導入文本框
+  // 导入文本框
   const [importText, setImportText] = useState('');
   
-  // 編輯狀態
+  // 编辑状态
   const [editingEvent, setEditingEvent] = useState<TimelineEvent | null>(null);
 
-  // 檢查登錄狀態
+  // 检查登录状态
   useEffect(() => {
     checkAuthStatus();
   }, []);
 
-  // 自動清除成功消息
+  // 自动清除成功消息
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => setSuccessMessage(null), 3000);
@@ -108,7 +108,7 @@ export default function TimelineAdmin() {
     setIsLoginLoading(true);
 
     if (!loginForm.username.trim() || !loginForm.password.trim()) {
-      setLoginError('請輸入用戶名和密碼');
+      setLoginError('请输入用户名和密码');
       setIsLoginLoading(false);
       return;
     }
@@ -131,12 +131,12 @@ export default function TimelineAdmin() {
         setLoginForm({ username: '', password: '' });
         setError(null);
         loadEvents();
-        setSuccessMessage(`歡迎回來，${data.user.username}！`);
+        setSuccessMessage(`欢迎回来，${data.user.username}！`);
       } else {
-        setLoginError(data.error || '登錄失敗，請檢查用戶名和密碼');
+        setLoginError(data.error || '登录失败，请检查用户名和密码');
       }
     } catch (err) {
-      setLoginError('網絡連接失敗，請稍後重試');
+      setLoginError('网络连接失败，请稍后重试');
     } finally {
       setIsLoginLoading(false);
     }
@@ -165,10 +165,10 @@ export default function TimelineAdmin() {
         const data = await response.json();
         setEvents(data.data || []);
       } else {
-        setError('加載數據失敗');
+        setError('加载数据失败');
       }
     } catch (err) {
-      setError('網絡錯誤，無法加載數據');
+      setError('网络错误，无法加载数据');
     } finally {
       setLoading(false);
     }
@@ -190,17 +190,17 @@ export default function TimelineAdmin() {
         setSuccessMessage('保存成功！');
       } else {
         const data = await response.json();
-        setError(data.error || '保存失敗');
+        setError(data.error || '保存失败');
       }
     } catch (err) {
-      setError('網絡錯誤，保存失敗');
+      setError('网络错误，保存失败');
     } finally {
       setLoading(false);
     }
   }
 
   async function deleteEvent(id: string) {
-    if (!confirm('確定要删除這個事件嗎？此操作不可撤銷。')) {
+    if (!confirm('确定要删除这个事件吗？此操作不可撤销。')) {
       return;
     }
 
@@ -216,10 +216,10 @@ export default function TimelineAdmin() {
         setSuccessMessage('删除成功！');
       } else {
         const data = await response.json();
-        setError(data.error || '删除失敗');
+        setError(data.error || '删除失败');
       }
     } catch (err) {
-      setError('網絡錯誤，删除失敗');
+      setError('网络错误，删除失败');
     } finally {
       setLoading(false);
     }
@@ -227,7 +227,7 @@ export default function TimelineAdmin() {
 
   async function handleImport() {
     if (!importText.trim()) {
-      setError('請輸入要導入的數據');
+      setError('请输入要导入的数据');
       return;
     }
 
@@ -248,7 +248,7 @@ export default function TimelineAdmin() {
       }).filter(e => e.date && e.title);
 
       if (events.length === 0) {
-        setError('沒有有效的數據可導入');
+        setError('没有有效的数据可导入');
         return;
       }
 
@@ -264,23 +264,23 @@ export default function TimelineAdmin() {
         const data = await response.json();
         setImportText('');
         loadEvents();
-        setSuccessMessage(`成功導入 ${data.count} 個事件！`);
+        setSuccessMessage(`成功导入 ${data.count} 个事件！`);
       } else {
         const data = await response.json();
-        setError(data.error || '導入失敗');
+        setError(data.error || '导入失败');
       }
     } catch (err) {
-      setError('數據格式錯誤或網絡錯誤');
+      setError('数据格式错误或网络错误');
     } finally {
       setLoading(false);
     }
   }
 
-  // 登錄界面
+  // 登录界面
   if (isLoading) {
     return (
       <div className="timeline-admin">
-        <div className="loading">加載中...</div>
+        <div className="loading">加载中...</div>
       </div>
     );
   }
@@ -289,8 +289,8 @@ export default function TimelineAdmin() {
     return (
       <div className="timeline-admin">
         <div className="login-container">
-          <h2>管理員登錄</h2>
-          <p className="login-description">請使用您的用戶名和密碼登錄以管理時間線</p>
+          <h2>管理员登录</h2>
+          <p className="login-description">请使用您的用户名和密码登录以管理时间线</p>
           
           {loginError && (
             <div className="error-message">{loginError}</div>
@@ -298,25 +298,25 @@ export default function TimelineAdmin() {
           
           <form onSubmit={handleLogin} className="login-form">
             <div className="form-group">
-              <label htmlFor="username">用戶名</label>
+              <label htmlFor="username">用户名</label>
               <input
                 type="text"
                 id="username"
                 value={loginForm.username}
                 onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
-                placeholder="輸入用戶名"
+                placeholder="输入用户名"
                 disabled={isLoginLoading}
               />
             </div>
             
             <div className="form-group">
-              <label htmlFor="password">密碼</label>
+              <label htmlFor="password">密码</label>
               <input
                 type="password"
                 id="password"
                 value={loginForm.password}
                 onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                placeholder="輸入密碼"
+                placeholder="输入密码"
                 disabled={isLoginLoading}
               />
             </div>
@@ -326,7 +326,7 @@ export default function TimelineAdmin() {
               className="btn btn-primary"
               disabled={isLoginLoading}
             >
-              {isLoginLoading ? '登錄中...' : '登錄'}
+              {isLoginLoading ? '登录中...' : '登录'}
             </button>
           </form>
         </div>
@@ -334,14 +334,14 @@ export default function TimelineAdmin() {
     );
   }
 
-  // 檢查權限
+  // 检查权限
   if (user.role === 'viewer') {
     return (
       <div className="timeline-admin">
         <div className="access-denied">
-          <h2>訪問被拒</h2>
-          <p>您的賬戶（{user.username}）沒有編輯權限。</p>
-          <p>需要管理員或編輯員權限才能管理時間線。</p>
+          <h2>访问被拒</h2>
+          <p>您的账户（{user.username}）没有编辑权限。</p>
+          <p>需要管理员或编辑员权限才能管理时间线。</p>
           <button onClick={handleLogout} className="btn btn-secondary">
             登出
           </button>
@@ -352,10 +352,10 @@ export default function TimelineAdmin() {
 
   return (
     <div className="timeline-admin">
-      {/* 頭部信息 */}
+      {/* 头部信息 */}
       <div className="admin-header">
         <div className="user-info">
-          <span>當前用戶: <strong>{user.username}</strong></span>
+          <span>当前用户: <strong>{user.username}</strong></span>
           <span className="user-role">角色: {user.role}</span>
         </div>
         <button onClick={handleLogout} className="btn btn-secondary btn-sm">
@@ -363,7 +363,7 @@ export default function TimelineAdmin() {
         </button>
       </div>
 
-      {/* 成功/錯誤提示 */}
+      {/* 成功/错误提示 */}
       {successMessage && (
         <div className="success-message">{successMessage}</div>
       )}
@@ -374,13 +374,13 @@ export default function TimelineAdmin() {
         </div>
       )}
 
-      {/* 導入區域 */}
+      {/* 导入区域 */}
       <div className="import-section">
-        <h3>批量導入</h3>
+        <h3>批量导入</h3>
         <textarea
           value={importText}
           onChange={(e) => setImportText(e.target.value)}
-          placeholder="格式：日期|標題|內容|標籤（每行一個事件）&#10;例如：&#10;2024-01-01|新年快樂|祝大家新年快樂！|重要&#10;2024-03-15|首次歌回|唱了多首經典歌曲|首播&#10;標籤可選：首播、歌回、遊戲、3D披露、新衣裝、紀念回、聯動、重要、生日、周年、活動、日常"
+          placeholder="格式：日期|标题|内容|标签（每行一个事件）&#10;例如：&#10;2024-01-01|新年快乐|祝大家新年快乐！|重要&#10;2024-03-15|首次歌回|唱了多首经典歌曲|首播&#10;标签可选：首播、歌回、游戏、3D披露、新衣装、纪念回、联动、重要、生日、周年、活动、日常"
           rows={4}
         />
         <button 
@@ -388,14 +388,14 @@ export default function TimelineAdmin() {
           className="btn btn-primary"
           disabled={loading}
         >
-          {loading ? '導入中...' : '導入事件'}
+          {loading ? '导入中...' : '导入事件'}
         </button>
       </div>
 
-      {/* 編輯表單 */}
+      {/* 编辑表单 */}
       {editingEvent && (
         <div className="edit-form">
-          <h3>{editingEvent.id ? '編輯事件' : '新建事件'}</h3>
+          <h3>{editingEvent.id ? '编辑事件' : '新建事件'}</h3>
           <div className="form-row">
             <div className="form-group">
               <label>日期</label>
@@ -406,26 +406,26 @@ export default function TimelineAdmin() {
               />
             </div>
             <div className="form-group">
-              <label>標題</label>
+              <label>标题</label>
               <input
                 type="text"
                 value={editingEvent.title}
                 onChange={(e) => setEditingEvent({ ...editingEvent, title: e.target.value })}
-                placeholder="事件標題"
+                placeholder="事件标题"
               />
             </div>
           </div>
           <div className="form-group">
-            <label>內容</label>
+            <label>内容</label>
             <textarea
               value={editingEvent.content || ''}
               onChange={(e) => setEditingEvent({ ...editingEvent, content: e.target.value })}
-              placeholder="事件詳細內容（可選）"
+              placeholder="事件详细内容（可选）"
               rows={3}
             />
           </div>
           <div className="form-group">
-            <label>標籤</label>
+            <label>标签</label>
             <select
               value={editingEvent.tag || ''}
               onChange={(e) => {
@@ -439,7 +439,7 @@ export default function TimelineAdmin() {
                 });
               }}
             >
-              <option value="">請選擇標籤</option>
+              <option value="">请选择标签</option>
               {TAG_NAMES.map(tag => (
                 <option key={tag} value={tag}>
                   {TAG_MAP[tag].icon} {tag}
@@ -498,17 +498,17 @@ export default function TimelineAdmin() {
         </div>
 
         {loading && events.length === 0 ? (
-          <div className="loading">加載中...</div>
+          <div className="loading">加载中...</div>
         ) : events.length === 0 ? (
-          <div className="empty-state">暫無事件，點擊上方按鈕創建第一個事件</div>
+          <div className="empty-state">暂无事件，点击上方按钮创建第一个事件</div>
         ) : (
           <table className="events-table">
             <thead>
               <tr>
                 <th>日期</th>
-                <th>標題</th>
-                <th>內容</th>
-                <th>標籤</th>
+                <th>标题</th>
+                <th>内容</th>
+                <th>标签</th>
                 <th>操作</th>
               </tr>
             </thead>
@@ -530,7 +530,7 @@ export default function TimelineAdmin() {
                       onClick={() => setEditingEvent(event)}
                       className="btn btn-secondary btn-sm"
                     >
-                      編輯
+                      编辑
                     </button>
                     <button 
                       onClick={() => deleteEvent(event.id)}

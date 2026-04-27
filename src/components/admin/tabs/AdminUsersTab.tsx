@@ -26,23 +26,23 @@ export default function AdminUsersTab({
   return (
     <div className="tab-content">
       <div className="section-header">
-        <h1>用戶管理</h1>
+        <h1>用户管理</h1>
         <button onClick={onToggleUserForm}>
-          {showUserForm ? '取消' : '+ 新增管理員'}
+          {showUserForm ? '取消' : '+ 新增管理员'}
         </button>
       </div>
       
       {showUserForm && (
         <div className="section edit-section">
-          <h3>新建用戶</h3>
+          <h3>新建用户</h3>
           <form onSubmit={onAddUser} className="form-grid">
-            <input required type="text" placeholder="用戶名" value={newUser.username} onChange={e => onUpdateNewUser({...newUser, username: e.target.value})} />
+            <input required type="text" placeholder="用户名" value={newUser.username} onChange={e => onUpdateNewUser({...newUser, username: e.target.value})} />
             <input required type="email" placeholder="Email" value={newUser.email} onChange={e => onUpdateNewUser({...newUser, email: e.target.value})} />
-            <input required type="password" placeholder="密碼" value={newUser.password} onChange={e => onUpdateNewUser({...newUser, password: e.target.value})} />
+            <input required type="password" placeholder="密码" value={newUser.password} onChange={e => onUpdateNewUser({...newUser, password: e.target.value})} />
             <select value={newUser.role} onChange={e => onUpdateNewUser({...newUser, role: e.target.value})}>
-              <option value="admin">管理員 (admin)</option>
-              <option value="editor">編輯者 (editor)</option>
-              <option value="viewer">檢視者 (viewer)</option>
+              <option value="admin">管理员 (admin)</option>
+              <option value="editor">编辑者 (editor)</option>
+              <option value="viewer">检视者 (viewer)</option>
             </select>
             <div className="form-actions">
               <button type="submit">保存</button>
@@ -55,9 +55,9 @@ export default function AdminUsersTab({
         <table className="data-table">
           <thead>
             <tr>
-              <th>用戶名</th>
+              <th>用户名</th>
               <th>Email</th>
-              <th>權限</th>
+              <th>权限</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -72,13 +72,13 @@ export default function AdminUsersTab({
                     onChange={(e) => onUpdateRole(u.id, e.target.value)}
                     disabled={u.id === currentUser.id}
                   >
-                    <option value="admin">管理員 (admin)</option>
-                    <option value="editor">編輯者 (editor)</option>
-                    <option value="viewer">檢視者 (viewer)</option>
+                    <option value="admin">管理员 (admin)</option>
+                    <option value="editor">编辑者 (editor)</option>
+                    <option value="viewer">检视者 (viewer)</option>
                   </select>
                 </td>
                 <td className="actions">
-                  <button className="btn-danger" onClick={() => onDeleteUser(u.id)} disabled={u.id === currentUser.id}>刪除</button>
+                  <button className="btn-danger" onClick={() => onDeleteUser(u.id)} disabled={u.id === currentUser.id}>删除</button>
                 </td>
               </tr>
             ))}

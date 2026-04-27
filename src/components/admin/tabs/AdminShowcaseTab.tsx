@@ -31,11 +31,11 @@ export default function AdminShowcaseTab({
 }: AdminShowcaseTabProps) {
   return (
     <div className="tab-content">
-      <h1>櫥窗管理</h1>
+      <h1>橱窗管理</h1>
       
       {editingShowcase && (
         <div className="section edit-section">
-          <h3>{editingShowcase.id ? '編輯櫥窗' : '新增櫥窗'}</h3>
+          <h3>{editingShowcase.id ? '编辑橱窗' : '新增橱窗'}</h3>
           
           {/* 第一行：展示序号 */}
           <div style={{ borderBottom: '1px dashed #ddd', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
@@ -103,7 +103,7 @@ export default function AdminShowcaseTab({
                 <div style={{ width: '80px', height: '100px', background: '#eee', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🖼️</div>
               )}
               <button type="button" onClick={onOpenImagePicker} style={{ padding: '8px 16px', background: '#4A90D9', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-                選擇圖片
+                选择图片
               </button>
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function AdminShowcaseTab({
           {editingShowcase.id && editingShowcase.folder && folderImages.length > 0 && (
             <div style={{ marginBottom: '1rem' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>
-                目錄圖片 ({folderImages.length})
+                目录图片 ({folderImages.length})
               </label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                 {folderImages.map((img, idx) => (
@@ -153,7 +153,7 @@ export default function AdminShowcaseTab({
           {/* Upload to folder - show when editing existing showcase */}
           {editingShowcase.id && editingShowcase.folder && (
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>上傳圖片到此目錄</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>上传图片到此目录</label>
               <input
                 type="file"
                 accept="image/*"
@@ -165,7 +165,7 @@ export default function AdminShowcaseTab({
                 disabled={uploading}
                 style={{ width: '100%', padding: '0.5rem' }}
               />
-              {uploading && <span style={{ color: '#4A90D9', fontSize: '14px' }}>上傳中...</span>}
+              {uploading && <span style={{ color: '#4A90D9', fontSize: '14px' }}>上传中...</span>}
             </div>
           )}
           <div className="form-actions">
@@ -177,7 +177,7 @@ export default function AdminShowcaseTab({
       
       <div className="section">
         <div className="section-header">
-          <h3>櫥窗列表 ({showcases.length})</h3>
+          <h3>橱窗列表 ({showcases.length})</h3>
           <button onClick={() => onEditShowcase({ id: '', name: '', sort_order: maxShowcaseSort + 1 })}>
             + 新增
           </button>
@@ -186,8 +186,8 @@ export default function AdminShowcaseTab({
         <table className="data-table">
           <thead>
             <tr>
-              <th>圖片</th>
-              <th>名稱 / 描述</th>
+              <th>图片</th>
+              <th>名称 / 描述</th>
               <th>排序</th>
               <th>操作</th>
             </tr>
@@ -208,7 +208,7 @@ export default function AdminShowcaseTab({
                 </td>
                 <td>{showcase.sort_order || 0}</td>
                 <td className="actions">
-                  <button onClick={() => onEditShowcase(showcase)}>編輯</button>
+                  <button onClick={() => onEditShowcase(showcase)}>编辑</button>
                   <button className="btn-danger" onClick={() => onDeleteShowcase(showcase.id)}>删除</button>
                 </td>
               </tr>

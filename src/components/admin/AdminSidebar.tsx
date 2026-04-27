@@ -8,10 +8,10 @@ interface AdminSidebarProps {
 }
 
 const TABS = [
-  { id: 'dashboard', label: '概覽', icon: '📊' },
-  { id: 'timeline', label: '時間線管理', icon: '📅' },
-  { id: 'songs', label: '歌單管理', icon: '🎵' },
-  { id: 'showcase', label: '櫥窗管理', icon: '🖼️' },
+  { id: 'dashboard', label: '概览', icon: '📊' },
+  { id: 'timeline', label: '时间线管理', icon: '📅' },
+  { id: 'songs', label: '歌单管理', icon: '🎵' },
+  { id: 'showcase', label: '橱窗管理', icon: '🖼️' },
 ];
 
 export default function AdminSidebar({ user, activeTab, onTabChange, onLogout }: AdminSidebarProps) {
@@ -19,7 +19,7 @@ export default function AdminSidebar({ user, activeTab, onTabChange, onLogout }:
     <aside className="admin-sidebar">
       <div className="sidebar-header">
         <div className="logo">🎀 东爱璃 Lovely</div>
-        <div className="logo-sub">管理後台</div>
+        <div className="logo-sub">管理后台</div>
       </div>
       
       <nav className="admin-nav">
@@ -37,7 +37,7 @@ export default function AdminSidebar({ user, activeTab, onTabChange, onLogout }:
             className={activeTab === 'users' ? 'active' : ''}
             onClick={() => onTabChange('users')}
           >
-            <span>👥</span> 用戶管理
+            <span>👥</span> 用户管理
           </button>
         )}
       </nav>

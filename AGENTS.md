@@ -1,4 +1,4 @@
-# AGENTS.md - 東愛璃 Lovely 应援站
+# AGENTS.md - 东爱璃 Lovely 应援站
 
 **Stack**: Astro 5.17 + React 19 + TypeScript + Cloudflare Pages  
 **Domain**: VTuber 粉丝应援站点

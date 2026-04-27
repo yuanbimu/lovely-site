@@ -18,7 +18,7 @@ export default function AdminLogin({
   return (
     <div className="admin-login">
       <div className="login-box">
-        <h2>管理後台登錄</h2>
+        <h2>管理后台登录</h2>
         <p>东爱璃 Lovely 应援站</p>
         
         {loginError && <div className="login-error">{loginError}</div>}
@@ -26,17 +26,17 @@ export default function AdminLogin({
         <form onSubmit={onSubmit}>
           <input
             type="text"
-            placeholder="用戶名"
+            placeholder="用户名"
             value={loginForm.username}
             onChange={e => onUsernameChange(e.target.value)}
           />
           <input
             type="password"
-            placeholder="密碼"
+            placeholder="密码"
             value={loginForm.password}
             onChange={e => onPasswordChange(e.target.value)}
           />
-          <button type="submit">登錄</button>
+          <button type="submit">登录</button>
         </form>
       </div>
     </div>

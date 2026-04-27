@@ -21,11 +21,11 @@ export default function AdminSongsTab({
 }: AdminSongsTabProps) {
   return (
     <div className="tab-content">
-      <h1>歌單管理</h1>
+      <h1>歌单管理</h1>
       
       {editingSong && (
         <div className="section edit-section">
-          <h3>{editingSong.id ? '編輯歌曲' : '新增歌曲'}</h3>
+          <h3>{editingSong.id ? '编辑歌曲' : '新增歌曲'}</h3>
           <div className="form-grid">
             <input
               type="text"
@@ -43,22 +43,22 @@ export default function AdminSongsTab({
               type="date"
               value={editingSong.release_date || ''}
               onChange={e => onUpdateEditingSong({...editingSong, release_date: e.target.value})}
-              placeholder="發佈時間"
+              placeholder="发布时间"
             />
             <select
               value={editingSong.tag || ''}
               onChange={e => onUpdateEditingSong({...editingSong, tag: e.target.value || undefined})}
               style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
             >
-              <option value="">選擇標籤</option>
+              <option value="">选择标签</option>
               <option value="中文">中文</option>
               <option value="日文">日文</option>
               <option value="翻唱">翻唱</option>
-              <option value="原創">原創</option>
+              <option value="原创">原创</option>
             </select>
           </div>
           <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>封面圖片</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>封面图片</label>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               {editingSong.cover_url ? (
                 <img src={editingSong.cover_url} alt="cover" style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
@@ -66,7 +66,7 @@ export default function AdminSongsTab({
                 <div style={{ width: '60px', height: '60px', background: '#eee', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🎵</div>
               )}
               <button type="button" onClick={onOpenImagePicker} style={{ padding: '8px 16px', background: '#4A90D9', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-                選擇圖片
+                选择图片
               </button>
             </div>
           </div>
@@ -74,7 +74,7 @@ export default function AdminSongsTab({
             type="text"
             value={editingSong.url || ''}
             onChange={e => onUpdateEditingSong({...editingSong, url: e.target.value})}
-            placeholder="歌曲連結 (Bilibili/網易雲 等)"
+            placeholder="歌曲链接 (Bilibili/网易云 等)"
             style={{ width: '100%', marginBottom: '1rem', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
           />
           <div className="form-actions">
@@ -87,7 +87,7 @@ export default function AdminSongsTab({
       <div className="section">
         <div className="section-header">
           <h3>歌曲列表 ({songs.length})</h3>
-          <button onClick={() => onEditSong({ id: '', title: '', artist: '東愛璃 Lovely' })}>
+          <button onClick={() => onEditSong({ id: '', title: '', artist: '东爱璃 Lovely' })}>
             + 新增
           </button>
         </div>
@@ -97,8 +97,8 @@ export default function AdminSongsTab({
             <tr>
               <th>封面</th>
               <th>歌名 / 歌手</th>
-              <th>標籤</th>
-              <th>發佈日</th>
+              <th>标签</th>
+              <th>发布日</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -119,8 +119,8 @@ export default function AdminSongsTab({
                 <td>{song.tag || '-'}</td>
                 <td>{song.release_date || '-'}</td>
                 <td className="actions">
-                  {song.url && <a href={song.url} target="_blank" rel="noreferrer" style={{ marginRight: '8px', color: '#8B6F47' }}>連結</a>}
-                  <button onClick={() => onEditSong(song)}>編輯</button>
+                  {song.url && <a href={song.url} target="_blank" rel="noreferrer" style={{ marginRight: '8px', color: '#8B6F47' }}>链接</a>}
+                  <button onClick={() => onEditSong(song)}>编辑</button>
                   <button className="btn-danger" onClick={() => onDeleteSong(song.id)}>删除</button>
                 </td>
               </tr>

@@ -5,15 +5,15 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
-# 允許載入外部圖片
+# 允许载入外部图片
 /img/*
   Access-Control-Allow-Origin: *
 
-# 允許載入 Bilibili 頭像
+# 允许载入 Bilibili 头像
 /i0.hdslb.com/*
   Access-Control-Allow-Origin: *
 
-# 允許載入 R2 CDN 圖片
+# 允许载入 R2 CDN 图片
 /cdn.yuanbimu.top/*
   Access-Control-Allow-Origin: *
 

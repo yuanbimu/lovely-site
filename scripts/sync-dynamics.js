@@ -151,7 +151,7 @@ function parseDynamicItem(item) {
   }
   
   // 作者信息
-  const author = moduleAuthor?.name || '東愛璃 Lovely';
+  const author = moduleAuthor?.name || '东爱璃 Lovely';
   
   // 发布时间（Unix 时间戳）
   const publishTime = item?.modules?.module_author?.pub_time 

@@ -1,4 +1,4 @@
-# 東愛璃Lovely - 非官方应援站
+# 东爱璃Lovely - 非官方应援站
 
 [![Astro](https://img.shields.io/badge/Astro-5.17.1-BC52EE?style=flat-square&logo=astro)](https://astro.build)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev)

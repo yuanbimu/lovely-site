@@ -17,7 +17,7 @@ app.get('/r2-files', async (c) => {
       ? await c.env.IMAGES.list({ prefix })
       : await c.env.IMAGES.list({ prefix, delimiter: '/' });
 
-    // 文件夾（目錄）- 仅在非递归模式下有值
+    // 文件夹（目录）- 仅在非递归模式下有值
     const folders = recursive
       ? []
       : (list.delimitedPrefixes || []).map(p => ({
@@ -36,11 +36,11 @@ app.get('/r2-files', async (c) => {
     return c.json({ success: true, data: { folders, files } });
   } catch (err) {
     console.error('[R2] List error:', err);
-    return c.json({ error: '獲取文件列表失敗' }, 500);
+    return c.json({ error: '获取文件列表失败' }, 500);
   }
 });
 
-// R2 文件獲取 API - 本地開發環境代理
+// R2 文件获取 API - 本地开发环境代理
 app.get('/r2-get/:key', async (c) => {
   try {
     const key = decodeURIComponent(c.req.param('key'));
@@ -58,11 +58,11 @@ app.get('/r2-get/:key', async (c) => {
     });
   } catch (err) {
     console.error('[R2] Get error:', err);
-    return c.json({ error: '獲取文件失敗' }, 500);
+    return c.json({ error: '获取文件失败' }, 500);
   }
 });
 
-// R2 文件刪除 API
+// R2 文件删除 API
 app.delete('/r2-files/:key', requireAuth, requireEditor, async (c) => {
   try {
     const key = c.req.param('key');
@@ -76,18 +76,18 @@ app.delete('/r2-files/:key', requireAuth, requireEditor, async (c) => {
     return c.json({ success: true });
   } catch (err) {
     console.error('[R2] Delete error:', err);
-    return c.json({ error: '刪除失敗' }, 500);
+    return c.json({ error: '删除失败' }, 500);
   }
 });
 
-// R2 上傳 API
+// R2 上传 API
 app.post('/r2-upload', requireAuth, requireEditor, async (c) => {
   try {
     const formData = await c.req.parseBody();
     const file = formData['file'] as File;
 
     if (!file) {
-      return c.json({ error: '請選擇文件' }, 400);
+      return c.json({ error: '请选择文件' }, 400);
     }
 
     const filename = formData['filename'] as string || file.name;
@@ -112,7 +112,7 @@ app.post('/r2-upload', requireAuth, requireEditor, async (c) => {
     });
   } catch (err) {
     console.error('[R2] Upload error:', err);
-    return c.json({ error: '上傳失敗' }, 500);
+    return c.json({ error: '上传失败' }, 500);
   }
 });
 

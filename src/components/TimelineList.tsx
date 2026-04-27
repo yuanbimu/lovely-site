@@ -60,16 +60,16 @@ export default function TimelineList() {
     const map: Record<string, string> = {
       '首播': 'debut',
       '歌回': 'song',
-      '遊戲': 'game',
+      '游戏': 'game',
       '视频投稿': 'video',
       '3D披露': '_3d',
-      '新衣裝': 'costume',
-      '紀念回': 'memorial',
-      '聯動': 'collab',
+      '新衣装': 'costume',
+      '纪念回': 'memorial',
+      '联动': 'collab',
       '重要': 'important',
       '生日': 'birthday',
       '周年': 'anniversary',
-      '活動': 'event',
+      '活动': 'event',
       '日常': 'daily'
     };
     return map[tag] || '';

@@ -78,7 +78,7 @@
 | `cover_url` | `TEXT` | 封面图 URL，可为空 |
 | `url` | `TEXT` | 外链，可为空 |
 | `release_date` | `TEXT` | 发布时间或日期字符串，可为空 |
-| `tag` | `TEXT` | 标签，如「中文」「日文」「翻唱」「原創」等，可为空 |
+| `tag` | `TEXT` | 标签，如「中文」「日文」「翻唱」「原创」等，可为空 |
 | `created_at` | `INTEGER` | 创建时间戳 |
 | `updated_at` | `INTEGER` | 更新时间戳 |
 

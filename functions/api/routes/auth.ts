@@ -18,7 +18,7 @@ app.post('/login', async (c) => {
     const body = await c.req.json();
     const { username, password } = body;
 
-    if (!username || !password) return c.json({ error: '請輸入用戶名和密碼' }, 400);
+    if (!username || !password) return c.json({ error: '请输入用户名和密码' }, 400);
 
     const db = c.env.DB;
     if (!db) {
@@ -28,12 +28,12 @@ app.post('/login', async (c) => {
 
     const user = await getUserByUsername(db, username);
     if (!user) {
-      return c.json({ error: '用戶名或密碼錯誤' }, 401);
+      return c.json({ error: '用户名或密码错误' }, 401);
     }
 
     const isValid = await verifyPassword(password, user.password_hash);
     if (!isValid) {
-      return c.json({ error: '用戶名或密碼錯誤' }, 401);
+      return c.json({ error: '用户名或密码错误' }, 401);
     }
 
     const sessionToken = generateSessionToken();
