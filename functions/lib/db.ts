@@ -360,6 +360,7 @@ export interface Song {
   cover_url?: string;
   url?: string;
   release_date?: string;
+  tag?: string;
   created_at: number;
   updated_at: number;
 }
@@ -372,8 +373,8 @@ export async function getSongs(db: D1Database): Promise<Song[]> {
 export async function saveSong(db: D1Database, song: Omit<Song, 'created_at' | 'updated_at'>) {
   const now = Date.now();
   await db.prepare(`
-    INSERT OR REPLACE INTO songs (id, title, artist, cover_url, url, release_date, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT OR REPLACE INTO songs (id, title, artist, cover_url, url, release_date, tag, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     song.id,
     song.title,
@@ -381,6 +382,7 @@ export async function saveSong(db: D1Database, song: Omit<Song, 'created_at' | '
     song.cover_url || null,
     song.url || null,
     song.release_date || null,
+    song.tag || null,
     now, // For UPSERT, created_at will be replaced, ideally we'd preserve it but keeping it simple for now
     now
   ).run();

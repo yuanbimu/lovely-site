@@ -62,6 +62,11 @@ import ShowcaseList from '../components/ShowcaseList';
     margin: 0 0 10px 0;
   }
 
+  /* 橱窗图片统一显示：从顶部裁剪，保持人像完整 */
+  :global(.model-img img) {
+    object-position: top center !important;
+  }
+
   @media (max-width: 768px) {
     .section-header h2 {
       font-size: 28px;

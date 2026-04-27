@@ -206,11 +206,15 @@ export default function ShowcaseList() {
           aspect-ratio: 4/5;
           overflow: hidden;
           background: linear-gradient(135deg, #FAF6F0 0%, #E8DFD3 100%);
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
         }
         .model-img img {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          object-position: top center;
           transition: transform 0.3s ease;
         }
         .model-card:hover .model-img img {

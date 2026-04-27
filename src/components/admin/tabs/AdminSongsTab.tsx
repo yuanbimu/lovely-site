@@ -45,6 +45,17 @@ export default function AdminSongsTab({
               onChange={e => onUpdateEditingSong({...editingSong, release_date: e.target.value})}
               placeholder="發佈時間"
             />
+            <select
+              value={editingSong.tag || ''}
+              onChange={e => onUpdateEditingSong({...editingSong, tag: e.target.value || undefined})}
+              style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
+            >
+              <option value="">選擇標籤</option>
+              <option value="中文">中文</option>
+              <option value="日文">日文</option>
+              <option value="翻唱">翻唱</option>
+              <option value="原創">原創</option>
+            </select>
           </div>
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>封面圖片</label>
@@ -86,6 +97,7 @@ export default function AdminSongsTab({
             <tr>
               <th>封面</th>
               <th>歌名 / 歌手</th>
+              <th>標籤</th>
               <th>發佈日</th>
               <th>操作</th>
             </tr>
@@ -104,6 +116,7 @@ export default function AdminSongsTab({
                   <strong>{song.title}</strong>
                   <div style={{ fontSize: '0.85em', color: '#666' }}>{song.artist}</div>
                 </td>
+                <td>{song.tag || '-'}</td>
                 <td>{song.release_date || '-'}</td>
                 <td className="actions">
                   {song.url && <a href={song.url} target="_blank" rel="noreferrer" style={{ marginRight: '8px', color: '#8B6F47' }}>連結</a>}
