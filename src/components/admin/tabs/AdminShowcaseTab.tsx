@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { Showcase, FolderImage } from '../types';
 
 interface AdminShowcaseTabProps {
@@ -29,12 +30,21 @@ export default function AdminShowcaseTab({
   onOpenImagePicker,
   onUploadToFolder
 }: AdminShowcaseTabProps) {
+  const editFormRef = useRef<HTMLDivElement>(null);
+
+  // 当进入编辑/新增模式时，自动滚动到表单区域
+  useEffect(() => {
+    if (editingShowcase && editFormRef.current) {
+      editFormRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [editingShowcase]);
+
   return (
     <div className="tab-content">
       <h1>橱窗管理</h1>
-      
+
       {editingShowcase && (
-        <div className="section edit-section">
+        <div ref={editFormRef} className="section edit-section">
           <h3>{editingShowcase.id ? '编辑橱窗' : '新增橱窗'}</h3>
           
           {/* 第一行：展示序号 */}
