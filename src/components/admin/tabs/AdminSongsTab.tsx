@@ -123,7 +123,7 @@ export default function AdminSongsTab({
           </div>
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>封面图片</label>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '0.5rem' }}>
               {editingSong.cover_url ? (
                 <img src={editingSong.cover_url} alt="cover" style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
               ) : (
@@ -133,6 +133,13 @@ export default function AdminSongsTab({
                 选择图片
               </button>
             </div>
+            <input
+              type="text"
+              value={editingSong.cover_url || ''}
+              onChange={e => onUpdateEditingSong({...editingSong, cover_url: e.target.value || undefined})}
+              placeholder="或粘贴封面图片URL"
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.85rem' }}
+            />
           </div>
           <div style={{ display: 'flex', gap: '10px', marginBottom: coverMsg ? '0.5rem' : '1rem' }}>
             <input
@@ -167,16 +174,24 @@ export default function AdminSongsTab({
           {coverMsg && (
             <div
               style={{
-                padding: '0.5rem 0.75rem',
+                padding: '0.75rem',
                 borderRadius: '6px',
                 marginBottom: '1rem',
                 fontSize: '0.85rem',
-                background: coverMsg.type === 'success' ? '#e8f5e9' : '#ffebee',
-                color: coverMsg.type === 'success' ? '#2e7d32' : '#c62828',
-                border: `1px solid ${coverMsg.type === 'success' ? '#a5d6a7' : '#ef9a9a'}`,
+                background: coverMsg.type === 'success' ? '#e8f5e9' : '#fff3e0',
+                color: coverMsg.type === 'success' ? '#2e7d32' : '#e65100',
+                border: `1px solid ${coverMsg.type === 'success' ? '#a5d6a7' : '#ffcc80'}`,
               }}
             >
-              {coverMsg.text}
+              <div style={{ fontWeight: 600, marginBottom: coverMsg.type === 'error' ? '0.5rem' : 0 }}>
+                {coverMsg.type === 'success' ? '✓ ' : '⚠️ '}{coverMsg.text}
+              </div>
+              {coverMsg.type === 'error' && (
+                <div style={{ fontSize: '0.8rem', color: '#bf360c', lineHeight: 1.5 }}>
+                  由于B站服务器风控限制，自动获取可能不稳定。<br/>
+                  手动获取方法：打开B站视频页 → 右键点击视频封面 → 复制图片地址 → 粘贴到上方「封面图片URL」框
+                </div>
+              )}
             </div>
           )}
           <div className="form-actions">
