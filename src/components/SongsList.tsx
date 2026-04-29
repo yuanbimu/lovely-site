@@ -241,7 +241,25 @@ export default function SongsList() {
         {filteredSongs.map((song, index) => (
           <div key={song.id} className="song-card">
             <div className="song-number">{String(index + 1).padStart(2, '0')}</div>
-            <div className="song-cover">🎵</div>
+            {song.cover_url ? (
+              <img
+                src={song.cover_url}
+                alt={song.title}
+                className="song-cover"
+                referrerPolicy="no-referrer"
+                loading="lazy"
+                style={{ objectFit: 'cover', background: 'none' }}
+                onError={e => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  const fallback = document.createElement('div');
+                  fallback.className = 'song-cover';
+                  fallback.textContent = '🎵';
+                  (e.target as HTMLImageElement).parentNode?.insertBefore(fallback, e.target);
+                }}
+              />
+            ) : (
+              <div className="song-cover">🎵</div>
+            )}
             <div className="song-info">
               <h3 className="song-title">{song.title}</h3>
               <p className="song-artist">{song.artist}</p>
