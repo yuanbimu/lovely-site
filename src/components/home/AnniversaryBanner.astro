@@ -1,0 +1,67 @@
+---
+---
+
+<div id="anniversary-banner" style="display: none;">
+  <div class="anniversary-inner">
+    <span class="anniversary-icon">🎉</span>
+    <span class="anniversary-text">东爱璃 Lovely 现在正在举行六周年庆典</span>
+    <span class="anniversary-icon">🎉</span>
+  </div>
+</div>
+
+<style>
+  #anniversary-banner {
+    width: 100%;
+    background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 50%, #FFF0F5 100%);
+    padding: 12px 16px;
+    text-align: center;
+    position: relative;
+    z-index: 50;
+    animation: slideDown 0.5s ease;
+  }
+  .anniversary-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .anniversary-text {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #c62828;
+    letter-spacing: 0.5px;
+  }
+  .anniversary-icon {
+    font-size: 1.2rem;
+    animation: bounce 1.5s infinite;
+  }
+  @keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  @media (max-width: 480px) {
+    .anniversary-text {
+      font-size: 0.85rem;
+    }
+    .anniversary-icon {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    const now = new Date();
+    const start = new Date('2026-04-29T00:00:00+08:00');
+    const end = new Date('2026-05-07T23:59:59+08:00');
+    const banner = document.getElementById('anniversary-banner');
+    if (banner && now >= start && now <= end) {
+      banner.style.display = 'block';
+    }
+  })();
+</script>

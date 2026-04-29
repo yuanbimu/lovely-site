@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navigation from '../components/Navigation.astro';
+import AnniversaryBanner from '../components/home/AnniversaryBanner.astro';
 import HeroBanner from '../components/home/HeroBanner.astro';
 import AboutSection from '../components/home/AboutSection.astro';
 import Footer from '../components/Footer.astro';
@@ -9,11 +10,12 @@ import siteData from '../data/site-data.json';
 const { site, profile } = siteData;
 ---
 
-<Layout 
+<Layout
   title={site.title}
   description={site.description}
   image={profile.avatar}>
   <Navigation />
+  <AnniversaryBanner />
   <HeroBanner />
   <AboutSection />
   <Footer />
