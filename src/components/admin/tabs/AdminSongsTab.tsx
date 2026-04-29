@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Song } from '../types';
 
 interface AdminSongsTabProps {
@@ -10,6 +11,11 @@ interface AdminSongsTabProps {
   onOpenImagePicker: () => void;
 }
 
+function extractBvid(url: string): string | null {
+  const match = url.match(/BV\w+/);
+  return match ? match[0] : null;
+}
+
 export default function AdminSongsTab({
   songs,
   editingSong,
@@ -19,6 +25,34 @@ export default function AdminSongsTab({
   onDeleteSong,
   onOpenImagePicker
 }: AdminSongsTabProps) {
+  const [fetchingCover, setFetchingCover] = useState(false);
+
+  async function fetchBilibiliCover() {
+    if (!editingSong?.url) {
+      alert('请先填写歌曲链接');
+      return;
+    }
+    const bvid = extractBvid(editingSong.url);
+    if (!bvid) {
+      alert('未检测到有效的 B站 BV 号');
+      return;
+    }
+    setFetchingCover(true);
+    try {
+      const res = await fetch(`https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`);
+      const data = (await res.json()) as { data?: { pic?: string } };
+      if (data.data?.pic) {
+        onUpdateEditingSong({ ...editingSong, cover_url: data.data.pic });
+      } else {
+        alert('未能获取到封面，请检查链接是否正确');
+      }
+    } catch {
+      alert('获取封面失败，请检查网络或链接');
+    } finally {
+      setFetchingCover(false);
+    }
+  }
+
   return (
     <div className="tab-content">
       <h1>歌单管理</h1>
@@ -92,13 +126,31 @@ export default function AdminSongsTab({
               </button>
             </div>
           </div>
-          <input
-            type="text"
-            value={editingSong.url || ''}
-            onChange={e => onUpdateEditingSong({...editingSong, url: e.target.value})}
-            placeholder="歌曲链接 (Bilibili/网易云 等)"
-            style={{ width: '100%', marginBottom: '1rem', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
-          />
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem' }}>
+            <input
+              type="text"
+              value={editingSong.url || ''}
+              onChange={e => onUpdateEditingSong({...editingSong, url: e.target.value})}
+              placeholder="歌曲链接 (Bilibili/网易云 等)"
+              style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
+            />
+            <button
+              type="button"
+              onClick={fetchBilibiliCover}
+              disabled={fetchingCover}
+              style={{
+                padding: '0.75rem 1rem',
+                background: fetchingCover ? '#ccc' : '#FB7299',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: fetchingCover ? 'not-allowed' : 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {fetchingCover ? '获取中...' : '📷 获取B站封面'}
+            </button>
+          </div>
           <div className="form-actions">
             <button onClick={onSaveSong}>保存</button>
             <button className="btn-secondary" onClick={() => onEditSong(null)}>取消</button>
