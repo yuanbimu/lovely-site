@@ -14,6 +14,8 @@ export default function SongsList() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   useEffect(() => {
     async function fetchSongs() {
@@ -43,6 +45,9 @@ export default function SongsList() {
   const filteredSongs = activeCategory === 'all'
     ? songs
     : songs.filter(s => s.tag?.includes(activeCategory));
+
+  const totalPages = Math.max(1, Math.ceil(filteredSongs.length / pageSize));
+  const paginatedSongs = filteredSongs.slice((page - 1) * pageSize, page * pageSize);
 
   if (loading) {
     return (
@@ -210,7 +215,10 @@ export default function SongsList() {
           <button
             key={cat.key}
             className={`category-tab ${activeCategory === cat.key ? 'active' : ''}`}
-            onClick={() => setActiveCategory(cat.key)}
+            onClick={() => {
+              setActiveCategory(cat.key);
+              setPage(1);
+            }}
             style={{
               padding: '10px 20px',
               background: activeCategory === cat.key ? '#6B5637' : 'white',
@@ -237,10 +245,54 @@ export default function SongsList() {
         ))}
       </div>
 
+      <div className="pagination-bar" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '12px',
+        marginBottom: '20px',
+        flexWrap: 'wrap',
+      }}>
+        <button
+          onClick={() => setPage(p => Math.max(1, p - 1))}
+          disabled={page === 1}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '8px',
+            border: '1px solid rgba(107, 86, 55, 0.2)',
+            background: page === 1 ? '#f5f5f5' : 'white',
+            color: page === 1 ? '#999' : '#6B5637',
+            cursor: page === 1 ? 'not-allowed' : 'pointer',
+            fontSize: '0.85rem',
+          }}
+        >
+          ← 上一页
+        </button>
+        <span style={{ fontSize: '0.9rem', color: '#666' }}>
+          第 <strong style={{ color: '#6B5637' }}>{page}</strong> / {totalPages} 页
+          <span style={{ marginLeft: '8px', color: '#999' }}>(共 {filteredSongs.length} 首)</span>
+        </span>
+        <button
+          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+          disabled={page === totalPages}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '8px',
+            border: '1px solid rgba(107, 86, 55, 0.2)',
+            background: page === totalPages ? '#f5f5f5' : 'white',
+            color: page === totalPages ? '#999' : '#6B5637',
+            cursor: page === totalPages ? 'not-allowed' : 'pointer',
+            fontSize: '0.85rem',
+          }}
+        >
+          下一页 →
+        </button>
+      </div>
+
       <div className="songs-grid">
-        {filteredSongs.map((song, index) => (
+        {paginatedSongs.map((song, index) => (
           <div key={song.id} className="song-card">
-            <div className="song-number">{String(index + 1).padStart(2, '0')}</div>
+            <div className="song-number">{String((page - 1) * pageSize + index + 1).padStart(2, '0')}</div>
             {song.cover_url ? (
               <img
                 src={song.cover_url}
@@ -287,6 +339,51 @@ export default function SongsList() {
           </div>
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="pagination-bar" style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '12px',
+          marginTop: '24px',
+          flexWrap: 'wrap',
+        }}>
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '8px',
+              border: '1px solid rgba(107, 86, 55, 0.2)',
+              background: page === 1 ? '#f5f5f5' : 'white',
+              color: page === 1 ? '#999' : '#6B5637',
+              cursor: page === 1 ? 'not-allowed' : 'pointer',
+              fontSize: '0.85rem',
+            }}
+          >
+            ← 上一页
+          </button>
+          <span style={{ fontSize: '0.9rem', color: '#666' }}>
+            第 <strong style={{ color: '#6B5637' }}>{page}</strong> / {totalPages} 页
+          </span>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '8px',
+              border: '1px solid rgba(107, 86, 55, 0.2)',
+              background: page === totalPages ? '#f5f5f5' : 'white',
+              color: page === totalPages ? '#999' : '#6B5637',
+              cursor: page === totalPages ? 'not-allowed' : 'pointer',
+              fontSize: '0.85rem',
+            }}
+          >
+            下一页 →
+          </button>
+        </div>
+      )}
     </>
   );
 }

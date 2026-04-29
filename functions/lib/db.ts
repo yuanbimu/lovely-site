@@ -374,13 +374,49 @@ function deserializeTags(tagValue: unknown): string[] | undefined {
   return undefined;
 }
 
-export async function getSongs(db: D1Database): Promise<Song[]> {
-  const result = await db.prepare('SELECT * FROM songs ORDER BY release_date DESC').all<Song>();
+export async function getSongs(db: D1Database, options?: { limit?: number; offset?: number; tag?: string }): Promise<Song[]> {
+  const conditions: string[] = [];
+  const bindings: (string | number)[] = [];
+
+  if (options?.tag) {
+    conditions.push('tag LIKE ?');
+    bindings.push(`%${options.tag}%`);
+  }
+
+  let query = 'SELECT * FROM songs';
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
+  }
+  query += ' ORDER BY release_date DESC';
+
+  if (options?.limit !== undefined) {
+    query += ' LIMIT ?';
+    bindings.push(options.limit);
+  }
+  if (options?.offset !== undefined) {
+    query += ' OFFSET ?';
+    bindings.push(options.offset);
+  }
+
+  const result = await db.prepare(query).bind(...bindings).all<Song>();
   const rows = (result.results || []) as Array<Record<string, unknown>>;
   return rows.map(row => ({
     ...(row as Song),
     tag: deserializeTags(row.tag),
   })) as Song[];
+}
+
+export async function getSongsCount(db: D1Database, tag?: string): Promise<number> {
+  let query = 'SELECT COUNT(*) as count FROM songs';
+  const bindings: (string)[] = [];
+
+  if (tag) {
+    query += ' WHERE tag LIKE ?';
+    bindings.push(`%${tag}%`);
+  }
+
+  const result = await db.prepare(query).bind(...bindings).first<{ count: number }>();
+  return result?.count ?? 0;
 }
 
 export async function saveSong(db: D1Database, song: Omit<Song, 'created_at' | 'updated_at'>) {

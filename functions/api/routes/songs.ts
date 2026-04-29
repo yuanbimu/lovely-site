@@ -1,15 +1,23 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { Hono } from 'hono';
-import { getSongs, saveSong, deleteSong } from '../../lib/db';
+import { getSongs, getSongsCount, saveSong, deleteSong } from '../../lib/db';
 import { requireAuth, requireEditor } from '../middleware/auth';
 
 const app = new Hono();
 
-// 获取所有歌曲
+// 获取所有歌曲（支持分页和标签筛选）
 app.get('/', async (c) => {
-  const songs = await getSongs(c.env.DB);
-  return c.json({ success: true, data: songs });
+  const limit = parseInt(c.req.query('limit') || '10');
+  const offset = parseInt(c.req.query('offset') || '0');
+  const tag = c.req.query('tag') || undefined;
+
+  const [songs, total] = await Promise.all([
+    getSongs(c.env.DB, { limit, offset, tag }),
+    getSongsCount(c.env.DB, tag)
+  ]);
+
+  return c.json({ success: true, data: songs, total });
 });
 
 // 创建或更新歌曲
