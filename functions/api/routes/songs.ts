@@ -8,12 +8,21 @@ const app = new Hono();
 
 // 获取所有歌曲（支持分页和标签筛选）
 app.get('/', async (c) => {
-  const limit = parseInt(c.req.query('limit') || '10');
-  const offset = parseInt(c.req.query('offset') || '0');
+  const limitQuery = c.req.query('limit');
+  const offsetQuery = c.req.query('offset');
   const tag = c.req.query('tag') || undefined;
 
+  // 不传 limit 时返回全部（兼容旧行为），传了才做分页
+  const options: { limit?: number; offset?: number; tag?: string } = { tag };
+  if (limitQuery !== undefined) {
+    options.limit = parseInt(limitQuery);
+  }
+  if (offsetQuery !== undefined) {
+    options.offset = parseInt(offsetQuery);
+  }
+
   const [songs, total] = await Promise.all([
-    getSongs(c.env.DB, { limit, offset, tag }),
+    getSongs(c.env.DB, options),
     getSongsCount(c.env.DB, tag)
   ]);
 
