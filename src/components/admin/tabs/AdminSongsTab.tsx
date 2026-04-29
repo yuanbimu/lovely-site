@@ -42,19 +42,17 @@ export default function AdminSongsTab({
     setCoverMsg(null);
     try {
       const res = await fetch(`/api/bilibili-cover?bvid=${bvid}`);
-      const json = (await res.json()) as { code: number; message?: string; data?: { pic?: string; title?: string } };
-      if (json.code !== 0) {
-        setCoverMsg({ type: 'error', text: `B站API错误: ${json.message || '未知错误'}` });
+      const json = (await res.json()) as { success?: boolean; error?: string; data?: { cover_url?: string; title?: string } };
+      if (!json.success || json.error) {
+        setCoverMsg({ type: 'error', text: json.error || '获取封面失败' });
         return;
       }
-      const pic = json.data?.pic;
-      if (!pic) {
+      const coverUrl = json.data?.cover_url;
+      if (!coverUrl) {
         setCoverMsg({ type: 'error', text: '未能获取到封面' });
         return;
       }
-      // B站返回的封面URL是http://，在HTTPS站点上会被浏览器阻止，需要升级为https://
-      const securePic = pic.replace(/^http:/, 'https:');
-      onUpdateEditingSong({ ...editingSong, cover_url: securePic });
+      onUpdateEditingSong({ ...editingSong, cover_url: coverUrl });
       setCoverMsg({ type: 'success', text: '封面获取成功！' });
     } catch (err) {
       setCoverMsg({ type: 'error', text: '获取封面失败，请检查网络或链接' });
