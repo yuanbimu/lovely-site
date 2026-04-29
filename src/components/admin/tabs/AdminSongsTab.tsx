@@ -45,17 +45,39 @@ export default function AdminSongsTab({
               onChange={e => onUpdateEditingSong({...editingSong, release_date: e.target.value})}
               placeholder="发布时间"
             />
-            <select
-              value={editingSong.tag || ''}
-              onChange={e => onUpdateEditingSong({...editingSong, tag: e.target.value || undefined})}
-              style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
-            >
-              <option value="">选择标签</option>
-              <option value="中文">中文</option>
-              <option value="日文">日文</option>
-              <option value="翻唱">翻唱</option>
-              <option value="原创">原创</option>
-            </select>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', padding: '0.5rem 0' }}>
+              {['中文', '日文', '翻唱', '原创'].map(t => {
+                const checked = editingSong.tag?.includes(t) ?? false;
+                return (
+                  <label key={t} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    border: `1px solid ${checked ? '#4A90D9' : '#ddd'}`,
+                    background: checked ? 'rgba(74, 144, 217, 0.1)' : 'white',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    color: checked ? '#4A90D9' : '#666',
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => {
+                        const current = editingSong.tag || [];
+                        const next = checked
+                          ? current.filter(x => x !== t)
+                          : [...current, t];
+                        onUpdateEditingSong({ ...editingSong, tag: next.length > 0 ? next : undefined });
+                      }}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    {t}
+                  </label>
+                );
+              })}
+            </div>
           </div>
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>封面图片</label>
@@ -116,7 +138,7 @@ export default function AdminSongsTab({
                   <strong>{song.title}</strong>
                   <div style={{ fontSize: '0.85em', color: '#666' }}>{song.artist}</div>
                 </td>
-                <td>{song.tag || '-'}</td>
+                <td>{song.tag?.join('、') || '-'}</td>
                 <td>{song.release_date || '-'}</td>
                 <td className="actions">
                   {song.url && <a href={song.url} target="_blank" rel="noreferrer" style={{ marginRight: '8px', color: '#8B6F47' }}>链接</a>}

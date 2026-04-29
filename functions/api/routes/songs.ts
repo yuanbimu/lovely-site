@@ -23,7 +23,7 @@ app.post('/', requireAuth, requireEditor, async (c) => {
       cover_url: body.cover_url,
       url: body.url,
       release_date: body.release_date,
-      tag: body.tag
+      tag: Array.isArray(body.tag) ? body.tag : (body.tag ? [body.tag] : undefined)
     };
     await saveSong(c.env.DB, songData);
     return c.json({ success: true, data: songData });

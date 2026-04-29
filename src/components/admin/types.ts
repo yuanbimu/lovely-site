@@ -25,7 +25,7 @@ export interface Song {
   cover_url?: string;
   url?: string;
   release_date?: string;
-  tag?: string;
+  tag?: string[];
   created_at?: number;
 }
 

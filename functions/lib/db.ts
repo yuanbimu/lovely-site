@@ -360,18 +360,32 @@ export interface Song {
   cover_url?: string;
   url?: string;
   release_date?: string;
-  tag?: string;
+  tag?: string[];
   created_at: number;
   updated_at: number;
 }
 
+function deserializeTags(tagValue: unknown): string[] | undefined {
+  if (!tagValue) return undefined;
+  if (Array.isArray(tagValue)) return tagValue;
+  if (typeof tagValue === 'string') {
+    return tagValue.split(',').map(t => t.trim()).filter(Boolean);
+  }
+  return undefined;
+}
+
 export async function getSongs(db: D1Database): Promise<Song[]> {
   const result = await db.prepare('SELECT * FROM songs ORDER BY release_date DESC').all<Song>();
-  return result.results || [];
+  const rows = (result.results || []) as Array<Record<string, unknown>>;
+  return rows.map(row => ({
+    ...(row as Song),
+    tag: deserializeTags(row.tag),
+  })) as Song[];
 }
 
 export async function saveSong(db: D1Database, song: Omit<Song, 'created_at' | 'updated_at'>) {
   const now = Date.now();
+  const tagString = song.tag && song.tag.length > 0 ? song.tag.join(',') : null;
   await db.prepare(`
     INSERT OR REPLACE INTO songs (id, title, artist, cover_url, url, release_date, tag, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -382,7 +396,7 @@ export async function saveSong(db: D1Database, song: Omit<Song, 'created_at' | '
     song.cover_url || null,
     song.url || null,
     song.release_date || null,
-    song.tag || null,
+    tagString,
     now, // For UPSERT, created_at will be replaced, ideally we'd preserve it but keeping it simple for now
     now
   ).run();

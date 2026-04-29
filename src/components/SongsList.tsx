@@ -7,7 +7,7 @@ interface Song {
   cover_url?: string;
   url?: string;
   release_date?: string;
-  tag?: string;
+  tag?: string[];
 }
 
 export default function SongsList() {
@@ -34,15 +34,15 @@ export default function SongsList() {
 
   const categories = [
     { name: '全部', key: 'all', count: songs.length },
-    { name: '中文', key: '中文', count: songs.filter(s => s.tag === '中文').length },
-    { name: '日文', key: '日文', count: songs.filter(s => s.tag === '日文').length },
-    { name: '翻唱', key: '翻唱', count: songs.filter(s => s.tag === '翻唱').length },
-    { name: '原创', key: '原创', count: songs.filter(s => s.tag === '原创').length },
+    { name: '中文', key: '中文', count: songs.filter(s => s.tag?.includes('中文')).length },
+    { name: '日文', key: '日文', count: songs.filter(s => s.tag?.includes('日文')).length },
+    { name: '翻唱', key: '翻唱', count: songs.filter(s => s.tag?.includes('翻唱')).length },
+    { name: '原创', key: '原创', count: songs.filter(s => s.tag?.includes('原创')).length },
   ];
 
   const filteredSongs = activeCategory === 'all'
     ? songs
-    : songs.filter(s => s.tag === activeCategory);
+    : songs.filter(s => s.tag?.includes(activeCategory));
 
   if (loading) {
     return (
@@ -246,19 +246,20 @@ export default function SongsList() {
               <h3 className="song-title">{song.title}</h3>
               <p className="song-artist">{song.artist}</p>
               {song.release_date && <p className="song-date">{song.release_date}</p>}
-              {song.tag && (
-                <span className="song-tag" style={{
+              {song.tag && song.tag.map(t => (
+                <span key={t} className="song-tag" style={{
                   display: 'inline-block',
                   marginTop: '6px',
+                  marginRight: '6px',
                   padding: '2px 10px',
                   fontSize: '0.75rem',
                   color: '#6B5637',
                   background: 'rgba(107, 86, 55, 0.08)',
                   borderRadius: '12px',
                 }}>
-                  {song.tag}
+                  {t}
                 </span>
-              )}
+              ))}
             </div>
             {song.url && (
               <a href={song.url} target="_blank" rel="noopener noreferrer" className="play-btn">
