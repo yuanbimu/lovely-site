@@ -41,7 +41,7 @@ export default function AdminSongsTab({
     setFetchingCover(true);
     setCoverMsg(null);
     try {
-      const res = await fetch(`https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`);
+      const res = await fetch(`/api/bilibili-cover?bvid=${bvid}`);
       const json = (await res.json()) as { code: number; message?: string; data?: { pic?: string; title?: string } };
       if (json.code !== 0) {
         setCoverMsg({ type: 'error', text: `B站API错误: ${json.message || '未知错误'}` });

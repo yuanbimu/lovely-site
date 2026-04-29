@@ -11,6 +11,7 @@ import showcasesRoutes from './routes/showcases';
 import r2Routes from './routes/r2';
 import dynamicsRoutes from './routes/dynamics';
 import liveRoutes from './routes/live';
+import bilibiliRoutes from './routes/bilibili';
 
 const app = new Hono<{ Bindings: Env, Variables: { user: any } }>();
 
@@ -62,5 +63,8 @@ app.route('/api/dynamics', dynamicsRoutes);
 
 // 直播路由 /api/live/*
 app.route('/api/live', liveRoutes);
+
+// B站封面代理路由 /api/bilibili-cover
+app.route('/api', bilibiliRoutes);
 
 export const onRequest = (context: { request: Request; env: Env; executionCtx: ExecutionContext }) => app.fetch(context.request, context.env, context.executionCtx);
