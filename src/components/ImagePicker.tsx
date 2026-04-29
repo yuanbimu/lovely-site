@@ -92,26 +92,13 @@ export default function ImagePicker({ isOpen, onClose, onSelect, type, showcaseF
           return;
         }
 
-        // 封面图片：加载所有 showcase/ 目录
-        const res = await fetch('/api/r2-files?prefix=showcase/', { credentials: 'include' });
-        const data = (await res.json()) as ApiResponse;
-        if (!data.success) {
-          setError('获取文件列表失败');
+        // 封面图片：加载 songs/ 目录
+        if (type === 'cover') {
+          const r2Path = 'songs';
+          setCurrentFolder(r2Path);
+          await loadFiles(r2Path);
+          setFolders([{ name: r2Path, key: r2Path + '/' }]);
           return;
-        }
-
-        const loadedFolders: R2Folder[] = (data.data?.folders || []).map((f) => ({
-          name: f.name.startsWith('showcase/') ? f.name : toR2Path(f.name),
-          key: f.key
-        }));
-
-        setFolders(loadedFolders);
-
-        if (loadedFolders.length > 0) {
-          setCurrentFolder(loadedFolders[0].name);
-          await loadFiles(loadedFolders[0].name);
-        } else {
-          setFiles([]);
         }
       } catch {
         setError('获取文件列表失败');
