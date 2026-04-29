@@ -26,28 +26,38 @@ export default function AdminSongsTab({
   onOpenImagePicker
 }: AdminSongsTabProps) {
   const [fetchingCover, setFetchingCover] = useState(false);
+  const [coverMsg, setCoverMsg] = useState<{type: 'success' | 'error', text: string} | null>(null);
 
   async function fetchBilibiliCover() {
     if (!editingSong?.url) {
-      alert('请先填写歌曲链接');
+      setCoverMsg({ type: 'error', text: '请先填写歌曲链接' });
       return;
     }
     const bvid = extractBvid(editingSong.url);
     if (!bvid) {
-      alert('未检测到有效的 B站 BV 号');
+      setCoverMsg({ type: 'error', text: '未检测到有效的 B站 BV 号' });
       return;
     }
     setFetchingCover(true);
+    setCoverMsg(null);
     try {
       const res = await fetch(`https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`);
-      const data = (await res.json()) as { data?: { pic?: string } };
-      if (data.data?.pic) {
-        onUpdateEditingSong({ ...editingSong, cover_url: data.data.pic });
-      } else {
-        alert('未能获取到封面，请检查链接是否正确');
+      const json = (await res.json()) as { code: number; message?: string; data?: { pic?: string; title?: string } };
+      if (json.code !== 0) {
+        setCoverMsg({ type: 'error', text: `B站API错误: ${json.message || '未知错误'}` });
+        return;
       }
-    } catch {
-      alert('获取封面失败，请检查网络或链接');
+      const pic = json.data?.pic;
+      if (!pic) {
+        setCoverMsg({ type: 'error', text: '未能获取到封面' });
+        return;
+      }
+      // B站返回的封面URL是http://，在HTTPS站点上会被浏览器阻止，需要升级为https://
+      const securePic = pic.replace(/^http:/, 'https:');
+      onUpdateEditingSong({ ...editingSong, cover_url: securePic });
+      setCoverMsg({ type: 'success', text: '封面获取成功！' });
+    } catch (err) {
+      setCoverMsg({ type: 'error', text: '获取封面失败，请检查网络或链接' });
     } finally {
       setFetchingCover(false);
     }
@@ -126,11 +136,14 @@ export default function AdminSongsTab({
               </button>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', gap: '10px', marginBottom: coverMsg ? '0.5rem' : '1rem' }}>
             <input
               type="text"
               value={editingSong.url || ''}
-              onChange={e => onUpdateEditingSong({...editingSong, url: e.target.value})}
+              onChange={e => {
+                onUpdateEditingSong({...editingSong, url: e.target.value});
+                if (coverMsg) setCoverMsg(null);
+              }}
               placeholder="歌曲链接 (Bilibili/网易云 等)"
               style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd' }}
             />
@@ -138,6 +151,7 @@ export default function AdminSongsTab({
               type="button"
               onClick={fetchBilibiliCover}
               disabled={fetchingCover}
+              className="btn-bilibili"
               style={{
                 padding: '0.75rem 1rem',
                 background: fetchingCover ? '#ccc' : '#FB7299',
@@ -146,11 +160,27 @@ export default function AdminSongsTab({
                 borderRadius: '8px',
                 cursor: fetchingCover ? 'not-allowed' : 'pointer',
                 whiteSpace: 'nowrap',
+                fontSize: '0.9rem',
               }}
             >
               {fetchingCover ? '获取中...' : '📷 获取B站封面'}
             </button>
           </div>
+          {coverMsg && (
+            <div
+              style={{
+                padding: '0.5rem 0.75rem',
+                borderRadius: '6px',
+                marginBottom: '1rem',
+                fontSize: '0.85rem',
+                background: coverMsg.type === 'success' ? '#e8f5e9' : '#ffebee',
+                color: coverMsg.type === 'success' ? '#2e7d32' : '#c62828',
+                border: `1px solid ${coverMsg.type === 'success' ? '#a5d6a7' : '#ef9a9a'}`,
+              }}
+            >
+              {coverMsg.text}
+            </div>
+          )}
           <div className="form-actions">
             <button onClick={onSaveSong}>保存</button>
             <button className="btn-secondary" onClick={() => onEditSong(null)}>取消</button>
