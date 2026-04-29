@@ -16,6 +16,35 @@ function extractBvid(url: string): string | null {
   return match ? match[0] : null;
 }
 
+function normalizeDate(input: string): string {
+  if (!input) return '';
+  // 已经是标准格式
+  if (/^\d{4}-\d{2}-\d{2}$/.test(input)) return input;
+
+  // 匹配 2020/1/1 或 2020.1.1
+  const slashMatch = input.match(/^(\d{4})[/.](\d{1,2})[/.](\d{1,2})$/);
+  if (slashMatch) {
+    const [, y, m, d] = slashMatch;
+    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  }
+
+  // 匹配 2020年1月1日
+  const cnMatch = input.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日?$/);
+  if (cnMatch) {
+    const [, y, m, d] = cnMatch;
+    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  }
+
+  // 匹配 20200101
+  const compactMatch = input.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if (compactMatch) {
+    const [, y, m, d] = compactMatch;
+    return `${y}-${m}-${d}`;
+  }
+
+  return input;
+}
+
 export default function AdminSongsTab({
   songs,
   editingSong,
@@ -84,7 +113,16 @@ export default function AdminSongsTab({
             <input
               type="date"
               value={editingSong.release_date || ''}
-              onChange={e => onUpdateEditingSong({...editingSong, release_date: e.target.value})}
+              onChange={e => {
+                const normalized = normalizeDate(e.target.value);
+                onUpdateEditingSong({...editingSong, release_date: normalized});
+              }}
+              onBlur={e => {
+                const normalized = normalizeDate(e.target.value);
+                if (normalized !== e.target.value) {
+                  onUpdateEditingSong({...editingSong, release_date: normalized});
+                }
+              }}
               placeholder="发布时间"
             />
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', padding: '0.5rem 0' }}>
