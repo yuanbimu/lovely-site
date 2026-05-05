@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Song } from '../types';
+import { normalizeDate } from '../../../lib/utils';
 
 interface AdminSongsTabProps {
   songs: Song[];
@@ -14,35 +15,6 @@ interface AdminSongsTabProps {
 function extractBvid(url: string): string | null {
   const match = url.match(/BV\w+/);
   return match ? match[0] : null;
-}
-
-function normalizeDate(input: string): string {
-  if (!input) return '';
-  // 已经是标准格式
-  if (/^\d{4}-\d{2}-\d{2}$/.test(input)) return input;
-
-  // 匹配 2020/1/1 或 2020.1.1
-  const slashMatch = input.match(/^(\d{4})[/.](\d{1,2})[/.](\d{1,2})$/);
-  if (slashMatch) {
-    const [, y, m, d] = slashMatch;
-    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-  }
-
-  // 匹配 2020年1月1日
-  const cnMatch = input.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日?$/);
-  if (cnMatch) {
-    const [, y, m, d] = cnMatch;
-    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-  }
-
-  // 匹配 20200101
-  const compactMatch = input.match(/^(\d{4})(\d{2})(\d{2})$/);
-  if (compactMatch) {
-    const [, y, m, d] = compactMatch;
-    return `${y}-${m}-${d}`;
-  }
-
-  return input;
 }
 
 export default function AdminSongsTab({

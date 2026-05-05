@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './TimelineAdmin.css';
+import { normalizeDate } from '../lib/utils';
 
 interface TimelineEvent {
   id: string;
@@ -402,7 +403,16 @@ export default function TimelineAdmin() {
               <input
                 type="date"
                 value={editingEvent.date}
-                onChange={(e) => setEditingEvent({ ...editingEvent, date: e.target.value })}
+                onChange={(e) => {
+                  const normalized = normalizeDate(e.target.value);
+                  setEditingEvent({ ...editingEvent, date: normalized });
+                }}
+                onBlur={(e) => {
+                  const normalized = normalizeDate(e.target.value);
+                  if (normalized !== e.target.value) {
+                    setEditingEvent({ ...editingEvent, date: normalized });
+                  }
+                }}
               />
             </div>
             <div className="form-group">

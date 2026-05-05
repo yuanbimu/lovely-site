@@ -1,4 +1,5 @@
 import type { TimelineEvent } from '../types';
+import { normalizeDate } from '../../../lib/utils';
 
 // 标签系统：标签名 -> { color, icon }
 const TAG_MAP: Record<string, { color: string; icon: string }> = {
@@ -72,7 +73,16 @@ export default function AdminTimelineTab({
             <input
               type="date"
               value={editingEvent.date}
-              onChange={e => onUpdateEditingEvent({...editingEvent, date: e.target.value})}
+              onChange={e => {
+                const normalized = normalizeDate(e.target.value);
+                onUpdateEditingEvent({...editingEvent, date: normalized});
+              }}
+              onBlur={e => {
+                const normalized = normalizeDate(e.target.value);
+                if (normalized !== e.target.value) {
+                  onUpdateEditingEvent({...editingEvent, date: normalized});
+                }
+              }}
             />
             <input
               type="text"

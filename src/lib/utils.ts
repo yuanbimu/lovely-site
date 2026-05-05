@@ -32,3 +32,32 @@ export function formatDate(date: string | Date): string {
 export function cn(...classes: (string | boolean | undefined | null)[]): string {
   return classes.filter(Boolean).join(' ');
 }
+
+/**
+ * 日期格式归一化：将各种常见格式统一转为 YYYY-MM-DD
+ * 支持: 2020-01-01, 2020/1/1, 2020.1.1, 2020年1月1日, 20200101
+ */
+export function normalizeDate(input: string): string {
+  if (!input) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(input)) return input;
+
+  const slashMatch = input.match(/^(\d{4})[/.](\d{1,2})[/.](\d{1,2})$/);
+  if (slashMatch) {
+    const [, y, m, d] = slashMatch;
+    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  }
+
+  const cnMatch = input.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日?$/);
+  if (cnMatch) {
+    const [, y, m, d] = cnMatch;
+    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  }
+
+  const compactMatch = input.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if (compactMatch) {
+    const [, y, m, d] = compactMatch;
+    return `${y}-${m}-${d}`;
+  }
+
+  return input;
+}
