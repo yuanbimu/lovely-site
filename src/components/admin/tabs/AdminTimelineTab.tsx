@@ -16,6 +16,7 @@ const TAG_MAP: Record<string, { color: string; icon: string }> = {
   '周年': { color: 'amber', icon: '🎉' },
   '活动': { color: 'slate', icon: '📅' },
   '日常': { color: 'gray', icon: '📝' },
+  '屋里说话': { color: 'pink', icon: '💬' },
 };
 
 const TAG_NAMES = Object.keys(TAG_MAP);

@@ -502,6 +502,7 @@ export default function AdminDashboard() {
     '周年': { color: 'amber', icon: '🎉' },
     '活动': { color: 'slate', icon: '📅' },
     '日常': { color: 'gray', icon: '📝' },
+    '屋里说话': { color: 'pink', icon: '💬' },
   };
 
   function resolveTag(tagName?: string): { color: string; icon: string } {
