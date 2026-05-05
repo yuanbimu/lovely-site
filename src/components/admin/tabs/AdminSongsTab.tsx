@@ -83,7 +83,7 @@ export default function AdminSongsTab({
               placeholder="歌手"
             />
             <input
-              type="date"
+              type="text"
               value={editingSong.release_date || ''}
               onChange={e => {
                 const normalized = normalizeDate(e.target.value);
@@ -91,11 +91,9 @@ export default function AdminSongsTab({
               }}
               onBlur={e => {
                 const normalized = normalizeDate(e.target.value);
-                if (normalized !== e.target.value) {
-                  onUpdateEditingSong({...editingSong, release_date: normalized});
-                }
+                onUpdateEditingSong({...editingSong, release_date: normalized});
               }}
-              placeholder="发布时间"
+              placeholder="发布时间 (YYYY-MM-DD)"
             />
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', padding: '0.5rem 0' }}>
               {['中文', '日文', '翻唱', '原创'].map(t => {

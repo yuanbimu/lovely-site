@@ -71,7 +71,7 @@ export default function AdminTimelineTab({
           <h3>{editingEvent.id ? '编辑事件' : '新建事件'}</h3>
           <div className="form-grid">
             <input
-              type="date"
+              type="text"
               value={editingEvent.date}
               onChange={e => {
                 const normalized = normalizeDate(e.target.value);
@@ -79,10 +79,9 @@ export default function AdminTimelineTab({
               }}
               onBlur={e => {
                 const normalized = normalizeDate(e.target.value);
-                if (normalized !== e.target.value) {
-                  onUpdateEditingEvent({...editingEvent, date: normalized});
-                }
+                onUpdateEditingEvent({...editingEvent, date: normalized});
               }}
+              placeholder="日期 (YYYY-MM-DD)"
             />
             <input
               type="text"

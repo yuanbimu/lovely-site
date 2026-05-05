@@ -401,7 +401,7 @@ export default function TimelineAdmin() {
             <div className="form-group">
               <label>日期</label>
               <input
-                type="date"
+                type="text"
                 value={editingEvent.date}
                 onChange={(e) => {
                   const normalized = normalizeDate(e.target.value);
@@ -409,10 +409,9 @@ export default function TimelineAdmin() {
                 }}
                 onBlur={(e) => {
                   const normalized = normalizeDate(e.target.value);
-                  if (normalized !== e.target.value) {
-                    setEditingEvent({ ...editingEvent, date: normalized });
-                  }
+                  setEditingEvent({ ...editingEvent, date: normalized });
                 }}
+                placeholder="日期 (YYYY-MM-DD)"
               />
             </div>
             <div className="form-group">
