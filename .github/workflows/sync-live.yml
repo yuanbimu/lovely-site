@@ -2,15 +2,8 @@ name: Sync Live Status to D1
 
 on:
   schedule:
-    # 每 17 分钟执行一次
-    - cron: '*/17 * * * *'
-    # 以下固定时间点 (UTC)，对应北京时间 +8 小时
-    - cron: '0 12 * * *'  # 12:00 UTC = 20:00 CST
-    - cron: '0 13 * * *'  # 13:00 UTC = 21:00 CST
-    - cron: '0 18 * * *'  # 18:00 UTC = 02:00 CST
-    - cron: '0 4 * * *'   # 04:00 UTC = 12:00 CST
-    - cron: '0 10 * * *'  # 10:00 UTC = 18:00 CST
-    - cron: '0 23 * * *'  # 23:00 UTC = 07:00 CST
+    # 每 5 分钟执行一次
+    - cron: '*/5 * * * *'
   workflow_dispatch: # 允许手动触发
 
 jobs:
