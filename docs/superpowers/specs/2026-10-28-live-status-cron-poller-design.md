@@ -152,8 +152,9 @@ workers/live-poller/
 
 | 文件 | 变更 |
 |---|---|
-| `workers/live-poller/wrangler.toml` | 新增：Worker 配置与 cron |
+| `workers/live-poller/wrangler.example.toml` | 新增：Worker 配置模板（真实 `wrangler.toml` 被 .gitignore 忽略，复制后填 `database_id`） |
 | `workers/live-poller/src/index.ts` | 新增：`scheduled` 抓取逻辑 |
+| `functions/lib/live-fetch.ts` | 新增：B 站取数，Worker 与路由兜底共用 |
 | `functions/api/routes/live.ts` | 改为快照读 + 兜底回源 |
 | `package.json` | 新增 `deploy:poller`（`wrangler deploy -c workers/live-poller/wrangler.toml`） |
 | `AGENTS.md` | 数据流与时效约定改写 |

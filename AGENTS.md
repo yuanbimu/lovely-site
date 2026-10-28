@@ -47,7 +47,7 @@ npm run login
 npm run init:db
 npm run sync:live
 npm run dev:poller      # 本地跑直播轮询 Worker（--test-scheduled）
-npm run deploy:poller   # 部署直播轮询 Worker
+npm run deploy:poller   # 部署直播轮询 Worker（需先复制 wrangler.example.toml）
 npm run build
 npm run preview
 ```
