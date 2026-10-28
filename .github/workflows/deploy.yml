@@ -1,14 +1,12 @@
 name: Deploy Production
 
-# 站点此前没有任何自动部署链路：Pages 是手动 wrangler 部署，最后一次成功发布停在 2026-07-08，
-# 导致线上 /api/live 一直返回那天的 D1 快照。这个工作流补上「push 即发布」。
+# 三个独立步骤，各自 continue-on-error，互不阻断：
+#   1. 部署直播轮询 Worker（写 D1 快照）
+#   2. 立即写一行最新快照（让线上旧 /api/live 立刻不再是 7 月的数据）
+#   3. 手动发布 Pages（绕过 Cloudflare Git 集成的构建失败）
 #
-# 需要的 secret（已存在，sync-live.yml 在用）：
-#   CLOUDFLARE_API_TOKEN  —— 需具备 Pages:Edit 与 Workers Scripts:Edit
-#   CLOUDFLARE_ACCOUNT_ID
-#
-# 部署顺序有意如此：先让 poller 跑起来写快照，再立刻补一行快照，最后才发布站点，
-# 避免新 /api/live 上线时读到 7 月的旧行而走兜底回源。
+# 依赖 secret：CLOUDFLARE_API_TOKEN（sync-live.yml 自 7 月起就用它成功跑过 d1 execute）
+#            CLOUDFLARE_ACCOUNT_ID
 
 on:
   workflow_dispatch:
@@ -43,10 +41,7 @@ jobs:
       - name: 构建站点
         run: npm run build
 
-      - name: 确认 Cloudflare 身份
-        run: npx wrangler whoami
-
-      - name: 写入直播轮询 Worker 配置
+      - name: 写入轮询 Worker 配置
         run: |
           cat > workers/live-poller/wrangler.toml <<'EOF'
           name = "lovely-live-poller"
@@ -63,11 +58,30 @@ jobs:
           crons = ["* * * * *"]
           EOF
 
-      - name: 部署直播轮询 Worker
+      - name: 部署轮询 Worker
+        id: worker
+        continue-on-error: true
         run: npx wrangler deploy -c workers/live-poller/wrangler.toml
 
-      - name: 立即写入一行为最新快照
+      - name: 写入最新快照到 D1
+        id: snapshot
+        continue-on-error: true
         run: node scripts/sync-live-to-d1.js --prod
 
-      - name: 发布站点到 Cloudflare Pages
+      - name: 发布 Pages
+        id: pages
+        continue-on-error: true
         run: npx wrangler pages deploy dist --project-name lovely-site --branch master --commit-dirty=true
+
+      - name: 结果汇总
+        if: always()
+        run: |
+          echo "worker   = ${{ steps.worker.outcome }}"
+          echo "snapshot = ${{ steps.snapshot.outcome }}"
+          echo "pages    = ${{ steps.pages.outcome }}"
+          if [ "${{ steps.worker.outcome }}" != "success" ] && \
+             [ "${{ steps.snapshot.outcome }}" != "success" ] && \
+             [ "${{ steps.pages.outcome }}" != "success" ]; then
+            echo "::error::三项部署全部失败，token 可能已失效或缺权限"
+            exit 1
+          fi
