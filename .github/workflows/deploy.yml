@@ -1,0 +1,73 @@
+name: Deploy Production
+
+# 站点此前没有任何自动部署链路：Pages 是手动 wrangler 部署，最后一次成功发布停在 2026-07-08，
+# 导致线上 /api/live 一直返回那天的 D1 快照。这个工作流补上「push 即发布」。
+#
+# 需要的 secret（已存在，sync-live.yml 在用）：
+#   CLOUDFLARE_API_TOKEN  —— 需具备 Pages:Edit 与 Workers Scripts:Edit
+#   CLOUDFLARE_ACCOUNT_ID
+#
+# 部署顺序有意如此：先让 poller 跑起来写快照，再立刻补一行快照，最后才发布站点，
+# 避免新 /api/live 上线时读到 7 月的旧行而走兜底回源。
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      BILIBILI_UID: '3821157'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建站点
+        run: npm run build
+
+      - name: 确认 Cloudflare 身份
+        run: npx wrangler whoami
+
+      - name: 写入直播轮询 Worker 配置
+        run: |
+          cat > workers/live-poller/wrangler.toml <<'EOF'
+          name = "lovely-live-poller"
+          main = "src/index.ts"
+          compatibility_date = "2024-01-01"
+          workers_dev = false
+
+          [[d1_databases]]
+          binding = "DB"
+          database_name = "lovely-site-db"
+          database_id = "ed2f83e9-07b8-4d2f-b0e7-788c4cfee4a0"
+
+          [triggers]
+          crons = ["* * * * *"]
+          EOF
+
+      - name: 部署直播轮询 Worker
+        run: npx wrangler deploy -c workers/live-poller/wrangler.toml
+
+      - name: 立即写入一行为最新快照
+        run: node scripts/sync-live-to-d1.js --prod
+
+      - name: 发布站点到 Cloudflare Pages
+        run: npx wrangler pages deploy dist --project-name lovely-site --branch master --commit-dirty=true
