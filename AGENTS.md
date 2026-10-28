@@ -30,6 +30,7 @@ lovely-site/
 │   ├── config/         # 站点配置
 │   └── data/           # 构建期静态 JSON 数据
 ├── functions/          # Cloudflare Pages Functions（见 functions/AGENTS.md）
+├── workers/            # 独立部署的 Cloudflare Workers（定时任务）
 ├── scripts/            # 初始化、同步、数据库辅助脚本
 ├── docs/               # 活跃文档与归档文档
 └── .github/workflows/  # CI/CD 与同步任务
@@ -45,6 +46,8 @@ npm run setup
 npm run login
 npm run init:db
 npm run sync:live
+npm run dev:poller      # 本地跑直播轮询 Worker（--test-scheduled）
+npm run deploy:poller   # 部署直播轮询 Worker
 npm run build
 npm run preview
 ```
@@ -95,9 +98,18 @@ npm run preview
 
 ```text
 Bilibili / 外部数据
-  ├── scripts/sync-dynamics.js -> src/data/dynamics.json（构建期静态内容）
-  └── scripts/sync-live-to-d1.js -> D1（运行时直播状态）
+  ├── scripts/sync-dynamics.js -> src/data/dynamics.json（构建期静态内容，当前功能已下线）
+  ├── workers/live-poller -> 每分钟抓取直播状态与粉丝数，写入 D1（主链路）
+  ├── functions/api/routes/live.ts -> 读取 D1 快照，快照过期太久时兜底回源一次
+  └── scripts/sync-live-to-d1.js -> D1（手动兜底快照）
 ```
+
+直播状态时效约定：
+
+- 直播状态（是否在播 / 标题 / 直播间链接）与粉丝数由 `workers/live-poller` 每分钟抓取一次写入 D1，**站点请求不回源**
+- `/api/live` 只读最新快照：90s 内视为新鲜，90s～10min 标记 `stale`，超过 10min 才同步兜底回源一次
+- `lastChecked` 是**快照时间**而非请求时间；poller 停摆时必须如实看到时间倒退
+- B 站不可用时回退到最后一次快照并标记 `stale`，不得谎报「未开播」
 
 ## 验证要求
 
@@ -109,7 +121,7 @@ Bilibili / 外部数据
 
 - `auto-pr.yml`：自动建 PR / build / 自动合并相关流程
 - `sync-dynamics.yml`：存在但定时同步已禁用
-- `sync-live.yml`：定时同步直播状态
+- `sync-live.yml`：仅保留 `workflow_dispatch` 手动兜底（定时任务已移除，实时性由 `workers/live-poller` 负责）
 - `update.yml`：依赖更新相关流程
 
 ## 子目录 AGENTS

@@ -1,0 +1,25 @@
+#:schema ../../node_modules/wrangler/config-schema.json
+
+# 直播轮询 Worker 的配置模板。
+# 仓库根目录的 wrangler.toml 与它一样被 .gitignore 忽略（含绑定信息），
+# 首次使用请复制本文件再填 database_id：
+#
+#   cp workers/live-poller/wrangler.example.toml workers/live-poller/wrangler.toml
+#
+# database_id 与 Pages 项目 `lovely-site` 的 D1 保持一致（cloudflare 控制台或
+# 根目录 wrangler.toml 里可查），绑定名必须是 DB。
+
+name = "lovely-live-poller"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# 不生成 *.workers.dev 公开地址：它只响应 Cron Trigger
+workers_dev = false
+
+[[d1_databases]]
+binding = "DB"
+database_name = "lovely-site-db"
+database_id = "<粘贴与 Pages 相同的 D1 database_id>"
+
+[triggers]
+crons = ["* * * * *"]

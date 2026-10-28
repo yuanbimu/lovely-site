@@ -107,18 +107,23 @@
 
 ## 6. `live_status`
 
-用途：缓存直播状态，前台 `LiveStatus` 组件读取 `/api/live` 时可作为回退。
+用途：保存直播状态快照，由 `workers/live-poller` 每分钟写入一行。
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| `id` | `INTEGER` / 固定值 | 当前实现固定写入 `1` |
+| `id` | `INTEGER` | 主键，自增；写入时不显式赋值 |
 | `is_live` | `INTEGER` | 直播状态，`1` 为直播中，`0` 为未开播 |
 | `title` | `TEXT` | 直播标题，可为空 |
 | `room_id` | `TEXT` | 直播间 ID，可为空 |
 | `url` | `TEXT` | 直播间 URL，可为空 |
-| `checked_at` | `INTEGER` | 最近检查时间戳 |
+| `fans` | `INTEGER` | 粉丝数；抓取失败时沿用上一行的值 |
+| `checked_at` | `INTEGER` | 本行写入时间，即「最后一次成功抓取时间」 |
 
-代码依据：`functions/lib/db.ts:65`, `functions/lib/db.ts:72`, `functions/lib/db.ts:83`
+写入策略：`workers/live-poller` 每分钟抓取一次，**直播状态与粉丝数同一批写入**。房间接口失败时整轮跳过、不写行（`checked_at` 停滞，下游据此判定 stale）；粉丝接口失败只沿用旧值，不阻塞状态写入。`pruneLiveStatus()` 保留最近 120 行（约 2 小时）。
+
+读取策略：`functions/api/routes/live.ts` 只读最新一行，按 `checked_at` 判断新鲜度 —— 90s 内为新鲜，90s～10min 标记 `stale`，超过 10min 才同步兜底回源一次。
+
+代码依据：`functions/lib/db.ts` 中的 `saveLiveStatus` / `getLiveStatus` / `pruneLiveStatus`；抓取逻辑位于 `workers/live-poller/src/index.ts` 与 `functions/lib/live-fetch.ts`。
 
 ---
 

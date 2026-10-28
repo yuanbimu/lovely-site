@@ -1,10 +1,14 @@
-name: Sync Live Status to D1
+name: Sync Live Status to D1 (Manual)
+
+# 主链路已迁移到 Cloudflare Cron Worker（workers/live-poller）：
+#   - 直播状态 + 粉丝数：每分钟抓取一次，写入 D1 live_status
+#   - GET /api/live：只读快照，快照超过 10 分钟未更新才兜底回源
+# 因此这里不再需要定时任务。GitHub 的 schedule 在仓库 60 天无提交后会被自动禁用，
+# 而且 */5 的 cron 实际也会被节流到小时级，不适合承担实时性要求。
+# 本工作流仅作为手动兜底：需要强制刷新一次线上 D1 快照时手动触发。
 
 on:
-  schedule:
-    # 每 5 分钟执行一次
-    - cron: '*/5 * * * *'
-  workflow_dispatch: # 允许手动触发
+  workflow_dispatch:
 
 jobs:
   sync-live:
