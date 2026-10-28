@@ -68,10 +68,22 @@ jobs:
         continue-on-error: true
         run: node scripts/sync-live-to-d1.js --prod
 
+      - name: 诊断 Pages 环境
+        continue-on-error: true
+        run: |
+          {
+            echo "=== project list ==="
+            npx wrangler pages project list 2>&1 || true
+            echo "=== deployment list ==="
+            npx wrangler pages deployment list --project-name lovely-site 2>&1 | head -15 || true
+          } > diag.txt
+          sed -i ':a;N;$!ba;s/\n/%0A/g' diag.txt
+          echo "::warning::$(cat diag.txt)"
+
       - name: 发布 Pages
         id: pages
         continue-on-error: true
-        run: npx wrangler pages deploy dist --project-name lovely-site --branch master --commit-dirty=true
+        run: npx wrangler pages deploy dist --project-name lovely-site --commit-dirty=true
 
       - name: 结果汇总
         if: always()
